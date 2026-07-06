@@ -8,7 +8,9 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const t = getContent(locale).audiences;
+const content = getContent(locale);
+const t = content.audiences;
+const ctaButton = content.conversion.audiences.button;
 ---
 
 <section class="section section--alt" id="who-is-it-for" aria-labelledby="audiences-title">
@@ -29,6 +31,7 @@ const t = getContent(locale).audiences;
 
     <blockquote class="aud__quote reveal">
       <p>{t.quote}</p>
+      <a class="btn btn--primary aud__cta" href="#waitlist" data-cta-source="audiences">{ctaButton}</a>
     </blockquote>
   </div>
 </section>
@@ -92,6 +95,10 @@ const t = getContent(locale).audiences;
     font-weight: 500;
     line-height: 1.5;
     color: var(--text);
+  }
+
+  .aud__cta {
+    margin-top: 1.6rem;
   }
 
   @media (max-width: 48rem) {

@@ -223,6 +223,14 @@ a:hover {
   color: var(--accent-soft);
 }
 
+/* Long localized CTA labels must wrap instead of overflowing on small screens */
+@media (max-width: 40rem) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
 /* Cards */
 .card {
   background: var(--bg-raised);

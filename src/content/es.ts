@@ -1,5 +1,6 @@
 import type { SiteContent } from './types';
 import { brand } from '../config/brand';
+import { leadCapture } from '../config/leadCapture';
 
 const name = brand.projectName;
 
@@ -255,30 +256,47 @@ export const es: SiteContent = {
       'Logos mostrados como placeholders a la espera de aprobación institucional. Aquí se añadirán los logos definitivos de partners y programas.',
   },
 
+  conversion: {
+    technology: {
+      title: '¿No sabes si encaja en tu flujo de trabajo?',
+      text: 'Cada laboratorio y cada material son distintos. Cuéntanos qué quieres depositar, sobre qué sustrato y a qué escala — el equipo te ayudará a evaluar si la deposición compacta encaja en tu caso.',
+      button: 'Comenta tu aplicación',
+    },
+    applications: { button: 'Cuéntanos tu reto con superficies' },
+    audiences: { button: `Descubre si ${name} encaja en tu laboratorio` },
+    footer: { button: 'Contacta con el equipo' },
+  },
+
   waitlist: {
     kicker: 'Acceso anticipado',
-    title: `¿Quieres explorar lo que ${name} puede hacer por tus superficies?`,
-    intro:
-      'Estamos recogiendo el interés de equipos de investigación, departamentos de I+D y partners que quieren probar, validar o discutir aplicaciones de deposición compacta sobre superficies. Únete a la lista y te contactaremos a medida que el proyecto avance.',
+    title: 'Trae tu reto de superficies al equipo.',
+    intro: `${name} está recogiendo el interés de investigadores, equipos de I+D y partners que exploran la deposición compacta sobre superficies. Cuéntanos en qué estás trabajando y te ayudaremos a evaluar si la tecnología encaja con tu aplicación.`,
+    reasons: [
+      'Acceso anticipado a medida que se abran oportunidades de prueba',
+      'Conversación técnica directa con el equipo investigador',
+      'Posibilidad de comentar pilotos, validaciones y aplicaciones concretas',
+      'Estar entre los primeros laboratorios y partners implicados',
+    ],
     form: {
-      name: { label: 'Nombre', placeholder: 'Tu nombre completo', error: 'Introduce tu nombre.' },
+      fullName: { label: 'Nombre completo', placeholder: 'Tu nombre completo', error: 'Introduce tu nombre.' },
+      email: { label: 'Email de trabajo', placeholder: 'tu@institucion.org', error: 'Introduce una dirección de email válida.' },
       organization: { label: 'Organización', placeholder: 'Universidad, empresa o institución', error: 'Introduce tu organización.' },
-      email: { label: 'Email', placeholder: 'tu@institucion.org', error: 'Introduce una dirección de email válida.' },
-      role: { label: 'Cargo', placeholder: 'p. ej. Investigador/a principal, Ingeniero/a de I+D' },
+      role: { label: 'Cargo / posición', placeholder: 'p. ej. Investigador/a principal, Ingeniero/a de I+D' },
       country: { label: 'País', placeholder: 'p. ej. España' },
-      profile: {
-        label: '¿Qué te describe mejor?',
+      organizationType: {
+        label: 'Tipo de organización',
         error: 'Elige una opción.',
         options: [
-          { value: 'research-lab', label: 'Laboratorio de investigación' },
-          { value: 'rd-company', label: 'Empresa con I+D' },
-          { value: 'distributor', label: 'Distribuidor de equipamiento' },
+          { value: 'university-research', label: 'Universidad / centro de investigación' },
+          { value: 'corporate-rd', label: 'I+D corporativo' },
+          { value: 'startup-spinoff', label: 'Startup / spin-off' },
+          { value: 'distributor', label: 'Distribuidor de equipamiento de laboratorio' },
           { value: 'investor-tt', label: 'Inversor / transferencia tecnológica' },
           { value: 'other', label: 'Otro' },
         ],
       },
-      application: {
-        label: '¿Qué aplicación te interesa?',
+      areaOfInterest: {
+        label: 'Área de interés',
         options: [
           { value: 'oleds', label: 'OLEDs' },
           { value: 'sensors', label: 'Sensores' },
@@ -289,20 +307,50 @@ export const es: SiteContent = {
           { value: 'other', label: 'Otra' },
         ],
       },
-      message: {
-        label: 'Cuéntanos tu reto con superficies',
-        placeholder: '¿Qué te gustaría depositar, probar o explorar? (opcional)',
+      currentNeed: {
+        label: '¿Qué describe mejor tu necesidad actual?',
+        error: 'Elige una opción.',
+        options: [
+          { value: 'test-device', label: 'Quiero probar el dispositivo' },
+          { value: 'technical-info', label: 'Quiero información técnica' },
+          { value: 'research-application', label: 'Quiero comentar una aplicación de investigación' },
+          { value: 'distribution-partnership', label: 'Me interesa la distribución / partnership' },
+          { value: 'evaluating-equipment', label: 'Estoy evaluando equipamiento de laboratorio' },
+          { value: 'other', label: 'Otra' },
+        ],
       },
+      timeline: {
+        label: 'Horizonte temporal',
+        options: [
+          { value: 'now-3-months', label: 'Ahora / próximos 3 meses' },
+          { value: '3-6-months', label: '3–6 meses' },
+          { value: '6-12-months', label: '6–12 meses' },
+          { value: 'exploring', label: 'Solo explorando' },
+        ],
+      },
+      message: {
+        label: 'Cuéntanos tu reto de superficie, material o aplicación',
+        placeholder: '¿Qué te gustaría depositar, probar o explorar? ¿Qué sustratos o dispositivos te importan? (opcional)',
+      },
+      // TODO(client/legal): validar el texto de consentimiento definitivo con asesoría legal.
       consent: {
-        label: 'Acepto ser contactado/a sobre este proyecto y acepto la política de privacidad.',
+        labelBefore: `Acepto que la información enviada sea utilizada por el equipo de ${name} para responder a mi solicitud, tal y como se describe en la`,
+        privacyLabel: 'Política de privacidad',
+        labelAfter: '.',
         error: 'Debes aceptar la política de privacidad para continuar.',
       },
       submit: 'Únete a la lista de espera',
       submitting: 'Enviando…',
-      successTitle: 'Gracias — ya estás en la lista.',
-      successText: 'Hemos recibido tu interés. El equipo te contactará a medida que se abran oportunidades de acceso anticipado.',
-      errorText: 'Ha habido un problema al enviar el formulario. Inténtalo de nuevo o escríbenos directamente.',
+      noSpam: 'Sin spam. Tu solicitud será revisada por el equipo del proyecto.',
+      successTitle: 'Gracias. Tu interés ha quedado registrado.',
+      successText: `El equipo de ${name} revisará tu solicitud y te responderá si hay un encaje relevante.`,
+      errorText: 'Ha habido un problema al enviar tu solicitud. Inténtalo de nuevo o escríbenos directamente a',
       requiredHint: 'Los campos obligatorios están marcados con *',
+    },
+    leadMagnet: {
+      title: '¿Prefieres un documento para compartir con tu equipo?',
+      text: 'Estamos preparando un one-pager técnico que estará disponible para descarga próximamente.',
+      button: 'Descargar el one-pager técnico',
     },
   },
 
@@ -319,7 +367,7 @@ export const es: SiteContent = {
     contactText: 'Para consultas sobre la tecnología, colaboraciones o acceso anticipado:',
     legalTitle: 'Legal',
     legal: [
-      { label: 'Política de privacidad', href: '#' },
+      { label: 'Política de privacidad', href: leadCapture.privacyUrl },
       { label: 'Aviso legal', href: '#' },
     ],
     languageTitle: 'Idioma',

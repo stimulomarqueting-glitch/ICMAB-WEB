@@ -56,12 +56,12 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
           ))}
         </li>
         <li class="header__menu-cta">
-          <a class="btn btn--primary" href="#waitlist">{t.header.cta}</a>
+          <a class="btn btn--primary" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
         </li>
       </ul>
     </nav>
 
-    <a class="btn btn--primary header__cta" href="#waitlist">{t.header.cta}</a>
+    <a class="btn btn--primary header__cta" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
 
     <button
       class="header__burger"

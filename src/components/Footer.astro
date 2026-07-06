@@ -7,7 +7,9 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const t = getContent(locale).footer;
+const content = getContent(locale);
+const t = content.footer;
+const ctaButton = content.conversion.footer.button;
 const claim = locale === 'es' ? brand.claimEs : brand.claim;
 const year = new Date().getFullYear();
 ---
@@ -35,6 +37,7 @@ const year = new Date().getFullYear();
         <p class="footer__desc">{t.contactText}</p>
         {/* TODO(client): replace placeholder email in src/config/brand.ts */}
         <a class="footer__mail" href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
+        <a class="btn btn--ghost footer__cta" href="#waitlist" data-cta-source="footer">{ctaButton}</a>
       </div>
 
       <div>
@@ -129,6 +132,13 @@ const year = new Date().getFullYear();
 
   .footer__mail {
     font-size: 0.92rem;
+  }
+
+  .footer__cta {
+    display: inline-flex;
+    margin-top: 1.1rem;
+    font-size: 0.88rem;
+    padding: 0.6rem 1.2rem;
   }
 
   .footer__bottom {

@@ -1,0 +1,72 @@
+---
+/**
+ * Contextual conversion band. Placed between sections to offer a
+ * mid-scroll path to the waitlist form, with intent-specific copy.
+ * `source` feeds the cta_source lead-tracking (see scripts/leadTracking.ts).
+ */
+interface Props {
+  title: string;
+  text: string;
+  button: string;
+  source: string;
+}
+
+const { title, text, button, source } = Astro.props;
+---
+
+<aside class="ctaband" aria-label={title}>
+  <div class="container ctaband__inner reveal">
+    <div class="ctaband__copy">
+      <h2>{title}</h2>
+      <p>{text}</p>
+    </div>
+    <a class="btn btn--primary" href="#waitlist" data-cta-source={source}>{button}</a>
+  </div>
+</aside>
+
+<style>
+  .ctaband {
+    padding-block: 0.5rem 3.5rem;
+  }
+
+  .ctaband__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.8rem 2.2rem;
+    border: 1px solid rgba(47, 217, 195, 0.28);
+    border-radius: var(--radius-l);
+    background:
+      linear-gradient(115deg, rgba(47, 217, 195, 0.1), rgba(90, 169, 255, 0.05) 65%),
+      var(--bg-raised);
+  }
+
+  .ctaband__copy h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .ctaband__copy p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.95rem;
+    max-width: 36rem;
+  }
+
+  .ctaband__inner > .btn {
+    flex: 0 0 auto;
+  }
+
+  @media (max-width: 48rem) {
+    .ctaband__inner {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1.5rem 1.4rem;
+    }
+
+    .ctaband__inner > .btn {
+      width: 100%;
+    }
+  }
+</style>

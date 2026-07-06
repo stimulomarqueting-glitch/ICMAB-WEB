@@ -91,6 +91,13 @@ const jsonLd = {
   <body>
     <slot />
 
+    {/* Lead tracking: capture utm_* params + remember which CTA led to the form */}
+    <script>
+      import { captureUtmParams, setupCtaTracking } from '../scripts/leadTracking';
+      captureUtmParams();
+      setupCtaTracking();
+    </script>
+
     {/* Scroll-reveal: progressive enhancement, respects prefers-reduced-motion */}
     <script>
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

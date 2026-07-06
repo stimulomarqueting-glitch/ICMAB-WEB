@@ -7,7 +7,9 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const t = getContent(locale).applications;
+const content = getContent(locale);
+const t = content.applications;
+const ctaButton = content.conversion.applications.button;
 ---
 
 <section class="section" id="applications" aria-labelledby="applications-title">
@@ -34,6 +36,7 @@ const t = getContent(locale).applications;
 
     <div class="apps__open reveal">
       <p>{t.openEnded}</p>
+      <a class="btn btn--ghost" href="#waitlist" data-cta-source="applications">{ctaButton}</a>
     </div>
   </div>
 </section>
@@ -90,12 +93,18 @@ const t = getContent(locale).applications;
     margin-top: 2.2rem;
     border: 1px dashed var(--line-strong);
     border-radius: var(--radius-m);
-    padding: 1.3rem 1.6rem;
+    padding: 1.5rem 1.6rem;
     max-width: 46rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
   }
 
   .apps__open p {
     margin: 0;
     color: var(--text-2);
+    flex: 1 1 18rem;
   }
 </style>

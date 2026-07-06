@@ -1,5 +1,6 @@
 import type { SiteContent } from './types';
 import { brand } from '../config/brand';
+import { leadCapture } from '../config/leadCapture';
 
 const name = brand.projectName;
 
@@ -254,30 +255,47 @@ export const en: SiteContent = {
       'Logos shown as placeholders pending institutional approval. Final partner and programme logos will be added here.',
   },
 
+  conversion: {
+    technology: {
+      title: 'Not sure if it fits your workflow?',
+      text: 'Every lab and every material is different. Tell us what you want to deposit, on which substrate and at what scale — the team will help you evaluate whether compact deposition fits your case.',
+      button: 'Discuss your application',
+    },
+    applications: { button: 'Tell us about your surface challenge' },
+    audiences: { button: `Explore if ${name} fits your lab` },
+    footer: { button: 'Contact the team' },
+  },
+
   waitlist: {
     kicker: 'Early access',
-    title: `Interested in exploring what ${name} could do for your surfaces?`,
-    intro:
-      'We are collecting interest from research teams, R&D departments and partners who want to test, validate or discuss applications for compact surface deposition. Join the waitlist and we will get back to you as the project moves forward.',
+    title: 'Bring your surface challenge to the team.',
+    intro: `${name} is currently gathering interest from researchers, R&D teams and partners exploring compact surface deposition. Tell us what you are working on and we will help evaluate whether the technology could fit your application.`,
+    reasons: [
+      'Early access as testing opportunities open up',
+      'Direct technical conversation with the research team',
+      'Discuss pilots, validation and concrete applications',
+      'Be among the first labs and partners involved',
+    ],
     form: {
-      name: { label: 'Name', placeholder: 'Your full name', error: 'Please enter your name.' },
+      fullName: { label: 'Full name', placeholder: 'Your full name', error: 'Please enter your name.' },
+      email: { label: 'Work email', placeholder: 'you@institution.org', error: 'Please enter a valid email address.' },
       organization: { label: 'Organization', placeholder: 'University, company or institution', error: 'Please enter your organization.' },
-      email: { label: 'Email', placeholder: 'you@institution.org', error: 'Please enter a valid email address.' },
-      role: { label: 'Role', placeholder: 'e.g. Principal Investigator, R&D Engineer' },
+      role: { label: 'Role / position', placeholder: 'e.g. Principal Investigator, R&D Engineer' },
       country: { label: 'Country', placeholder: 'e.g. Spain' },
-      profile: {
-        label: 'What best describes you?',
+      organizationType: {
+        label: 'Organization type',
         error: 'Please choose an option.',
         options: [
-          { value: 'research-lab', label: 'Research lab' },
-          { value: 'rd-company', label: 'R&D company' },
+          { value: 'university-research', label: 'University / research centre' },
+          { value: 'corporate-rd', label: 'Corporate R&D' },
+          { value: 'startup-spinoff', label: 'Startup / spin-off' },
           { value: 'distributor', label: 'Lab equipment distributor' },
           { value: 'investor-tt', label: 'Investor / tech transfer' },
           { value: 'other', label: 'Other' },
         ],
       },
-      application: {
-        label: 'What application are you interested in?',
+      areaOfInterest: {
+        label: 'Area of interest',
         options: [
           { value: 'oleds', label: 'OLEDs' },
           { value: 'sensors', label: 'Sensors' },
@@ -288,20 +306,50 @@ export const en: SiteContent = {
           { value: 'other', label: 'Other' },
         ],
       },
-      message: {
-        label: 'Tell us about your surface challenge',
-        placeholder: 'What would you like to deposit, test or explore? (optional)',
+      currentNeed: {
+        label: 'What best describes your current need?',
+        error: 'Please choose an option.',
+        options: [
+          { value: 'test-device', label: 'I want to test the device' },
+          { value: 'technical-info', label: 'I want technical information' },
+          { value: 'research-application', label: 'I want to discuss a research application' },
+          { value: 'distribution-partnership', label: 'I am interested in distribution / partnership' },
+          { value: 'evaluating-equipment', label: 'I am evaluating lab equipment' },
+          { value: 'other', label: 'Other' },
+        ],
       },
+      timeline: {
+        label: 'Timeline',
+        options: [
+          { value: 'now-3-months', label: 'Now / next 3 months' },
+          { value: '3-6-months', label: '3–6 months' },
+          { value: '6-12-months', label: '6–12 months' },
+          { value: 'exploring', label: 'Just exploring' },
+        ],
+      },
+      message: {
+        label: 'Tell us about your surface, material or application challenge',
+        placeholder: 'What would you like to deposit, test or explore? Which substrates or devices matter to you? (optional)',
+      },
+      // TODO(client/legal): validate final consent wording with legal counsel.
       consent: {
-        label: 'I agree to be contacted about this project and accept the privacy policy.',
+        labelBefore: `I agree that the information I submit will be used by the ${name} team to respond to my request, as described in the`,
+        privacyLabel: 'Privacy Policy',
+        labelAfter: '.',
         error: 'Please accept the privacy policy to continue.',
       },
       submit: 'Join the waitlist',
       submitting: 'Sending…',
-      successTitle: 'Thank you — you are on the list.',
-      successText: 'We have received your interest. The team will contact you as early-access opportunities open up.',
-      errorText: 'Something went wrong while sending the form. Please try again or write to us directly.',
+      noSpam: 'No spam. Your request will be reviewed by the project team.',
+      successTitle: 'Thank you. Your interest has been registered.',
+      successText: `The ${name} team will review your application and get back to you if there is a relevant fit.`,
+      errorText: 'Something went wrong while sending your request. Please try again, or contact us directly at',
       requiredHint: 'Required fields are marked with *',
+    },
+    leadMagnet: {
+      title: 'Prefer something to share with your team?',
+      text: 'A technical one-pager is in preparation and will be available for download soon.',
+      button: 'Download the technical one-pager',
     },
   },
 
@@ -318,7 +366,7 @@ export const en: SiteContent = {
     contactText: 'For enquiries about the technology, partnerships or early access:',
     legalTitle: 'Legal',
     legal: [
-      { label: 'Privacy Policy', href: '#' },
+      { label: 'Privacy Policy', href: leadCapture.privacyUrl },
       { label: 'Legal Notice', href: '#' },
     ],
     languageTitle: 'Language',

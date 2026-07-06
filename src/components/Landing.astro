@@ -4,8 +4,9 @@
  * Section order: hero → problem → technology → benefits → applications
  *              → audiences → credibility → waitlist.
  */
-import type { Locale } from '../content';
+import { getContent, type Locale } from '../content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBanner from './CtaBanner.astro';
 import Header from './Header.astro';
 import Hero from './Hero.astro';
 import Problem from './Problem.astro';
@@ -22,6 +23,7 @@ interface Props {
 }
 
 const { locale } = Astro.props;
+const t = getContent(locale);
 const skipLabel = locale === 'es' ? 'Saltar al contenido' : 'Skip to content';
 ---
 
@@ -32,6 +34,12 @@ const skipLabel = locale === 'es' ? 'Saltar al contenido' : 'Skip to content';
     <Hero locale={locale} />
     <Problem locale={locale} />
     <Technology locale={locale} />
+    <CtaBanner
+      title={t.conversion.technology.title}
+      text={t.conversion.technology.text}
+      button={t.conversion.technology.button}
+      source="technology"
+    />
     <Benefits locale={locale} />
     <Applications locale={locale} />
     <Audiences locale={locale} />

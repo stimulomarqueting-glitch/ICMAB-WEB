@@ -112,27 +112,43 @@ export interface SiteContent {
     logoPlaceholders: string[];
     phaseNote: string;
   };
+  /** Contextual conversion CTAs distributed across the page (all → #waitlist). */
+  conversion: {
+    technology: { title: string; text: string; button: string };
+    applications: { button: string };
+    audiences: { button: string };
+    footer: { button: string };
+  };
   waitlist: {
     kicker: string;
     title: string;
     intro: string;
+    /** Why leaving your data is worth it (early access, pilots, tech talk…). */
+    reasons: string[];
     form: {
-      name: FormField;
-      organization: FormField;
+      fullName: FormField;
       email: FormField;
+      organization: FormField;
       role: FormField;
       country: FormField;
-      profile: FormField & { options: SelectOption[] };
-      application: FormField & { options: SelectOption[] };
+      organizationType: FormField & { options: SelectOption[] };
+      areaOfInterest: FormField & { options: SelectOption[] };
+      currentNeed: FormField & { options: SelectOption[] };
+      timeline: FormField & { options: SelectOption[] };
       message: FormField;
-      consent: { label: string; error: string };
+      /** Consent sentence is split so the privacy-policy link can be injected. */
+      consent: { labelBefore: string; privacyLabel: string; labelAfter: string; error: string };
       submit: string;
       submitting: string;
+      noSpam: string;
       successTitle: string;
       successText: string;
+      /** Ends mid-sentence; the contact email link is appended in markup. */
       errorText: string;
       requiredHint: string;
     };
+    /** Optional download block, rendered only when leadCapture.leadMagnet.enabled. */
+    leadMagnet: { title: string; text: string; button: string };
   };
   footer: {
     description: string;

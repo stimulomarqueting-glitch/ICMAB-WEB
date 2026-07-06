@@ -27,17 +27,9 @@ export const brand = {
    * TODO(client): replace with the real project inbox.
    */
   contactEmail: 'hello@sublimat.example',
-
-  /**
-   * Waitlist form endpoint.
-   * Leave EMPTY ('') while there is no backend: the form will run in demo mode
-   * (validates, shows the success state, logs the payload to the console).
-   *
-   * To go live, point it at Formspree / Netlify Forms / HubSpot / Airtable or a
-   * custom endpoint that accepts a JSON POST, e.g.:
-   *   formEndpoint: 'https://formspree.io/f/XXXXXXXX'
-   */
-  formEndpoint: '',
 } as const;
+
+// NOTE: lead-capture settings (demo/production mode, form endpoint, privacy
+// URL, lead magnet) live in src/config/leadCapture.ts.
 
 export type Brand = typeof brand;
