@@ -1,0 +1,101 @@
+---
+import { getContent, type Locale } from '../content';
+import Icon from './Icon.astro';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).audiences;
+---
+
+<section class="section section--alt" id="who-is-it-for" aria-labelledby="audiences-title">
+  <div class="container">
+    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="audiences-title" />
+
+    <div class="aud__grid">
+      {t.groups.map((g) => (
+        <article class="aud__item reveal">
+          <span class="aud__icon"><Icon name={g.icon ?? 'user'} /></span>
+          <div>
+            <h3>{g.title}</h3>
+            <p>{g.text}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <blockquote class="aud__quote reveal">
+      <p>{t.quote}</p>
+    </blockquote>
+  </div>
+</section>
+
+<style>
+  .aud__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.9rem 2.5rem;
+  }
+
+  .aud__item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .aud__icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: var(--radius-s);
+    background: rgba(90, 169, 255, 0.1);
+    color: var(--accent-2);
+  }
+
+  .aud__icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .aud__item h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .aud__item p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.92rem;
+  }
+
+  .aud__quote {
+    margin: 3rem 0 0;
+    padding: 2rem 2.4rem;
+    border-radius: var(--radius-l);
+    background:
+      linear-gradient(120deg, rgba(47, 217, 195, 0.09), rgba(90, 169, 255, 0.05)),
+      var(--bg-raised);
+    border: 1px solid var(--line);
+  }
+
+  .aud__quote p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  @media (max-width: 48rem) {
+    .aud__grid { grid-template-columns: 1fr; }
+    .aud__quote { padding: 1.5rem 1.5rem; }
+  }
+</style>

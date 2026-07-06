@@ -1,0 +1,101 @@
+---
+import { getContent, type Locale } from '../content';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).applications;
+---
+
+<section class="section" id="applications" aria-labelledby="applications-title">
+  <div class="container">
+    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="applications-title" />
+
+    <ul class="apps__chips reveal" role="list" aria-hidden="true">
+      {t.items.map((app) => (
+        <li class="apps__chip">{app.short}</li>
+      ))}
+    </ul>
+
+    <div class="grid grid--3">
+      {t.items.map((app) => (
+        <article class="card apps__card reveal">
+          <h3>
+            <span class="apps__prefix">{t.surfacesForLabel}</span>
+            {app.name}<span class="apps__dot" aria-hidden="true">.</span>
+          </h3>
+          <p>{app.text}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="apps__open reveal">
+      <p>{t.openEnded}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .apps__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    list-style: none;
+    margin: 0 0 2rem;
+    padding: 0;
+  }
+
+  .apps__chip {
+    padding: 0.32rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    color: var(--text-2);
+    background: rgba(21, 30, 40, 0.55);
+  }
+
+  .apps__card {
+    background:
+      linear-gradient(160deg, rgba(47, 217, 195, 0.05), transparent 45%),
+      var(--bg-raised);
+  }
+
+  .apps__card:hover {
+    border-color: rgba(47, 217, 195, 0.45);
+  }
+
+  .apps__prefix {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 0.3rem;
+  }
+
+  .apps__card h3 {
+    font-size: 1.25rem;
+  }
+
+  .apps__dot {
+    color: var(--accent);
+  }
+
+  .apps__open {
+    margin-top: 2.2rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-m);
+    padding: 1.3rem 1.6rem;
+    max-width: 46rem;
+  }
+
+  .apps__open p {
+    margin: 0;
+    color: var(--text-2);
+  }
+</style>

@@ -1,0 +1,116 @@
+---
+/**
+ * Base layout: HTML shell + full SEO head (meta, OG, Twitter, hreflang,
+ * canonical, JSON-LD). All meta values come from the locale content files
+ * and the central brand config.
+ */
+import '@fontsource-variable/inter';
+import '@fontsource-variable/space-grotesk';
+import '../styles/global.css';
+import { brand } from '../config/brand';
+import { SITE_URL } from '../config/site.mjs';
+import { getContent, localePath, locales, type Locale } from '../content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale);
+
+const canonicalURL = new URL(Astro.url.pathname, SITE_URL).href;
+// TODO(client): replace /og-image.png with a final branded image (1200×630).
+const ogImage = new URL('/og-image.png', SITE_URL).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: brand.projectName,
+      url: SITE_URL,
+      description: t.meta.description,
+      parentOrganization: {
+        '@type': 'ResearchOrganization',
+        name: 'ICMAB-CSIC (Institut de Ciència de Materials de Barcelona)',
+        url: 'https://icmab.es',
+      },
+    },
+    {
+      '@type': 'Product',
+      name: brand.projectName,
+      description: t.meta.description,
+      brand: { '@id': `${SITE_URL}/#organization` },
+      category: 'Laboratory equipment (research prototype, technology transfer phase)',
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.meta.title}</title>
+    <meta name="description" content={t.meta.description} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0b0f13" />
+
+    {/* hreflang alternates (EN default at /, ES at /es/) */}
+    {locales.map((l) => (
+      <link rel="alternate" hreflang={l} href={new URL(`${localePath(l)}/`, SITE_URL).href} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={new URL('/', SITE_URL).href} />
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={brand.projectName} />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.meta.ogAlt} />
+    <meta property="og:locale" content={locale === 'es' ? 'es_ES' : 'en_US'} />
+
+    {/* Twitter */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={t.meta.title} />
+    <meta name="twitter:description" content={t.meta.description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+
+    {/* Scroll-reveal: progressive enhancement, respects prefers-reduced-motion */}
+    <script>
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const targets = document.querySelectorAll('.reveal');
+      if (prefersReduced || !('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+        );
+        targets.forEach((el) => io.observe(el));
+      }
+    </script>
+  </body>
+</html>

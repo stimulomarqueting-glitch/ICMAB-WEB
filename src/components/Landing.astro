@@ -1,0 +1,42 @@
+---
+/**
+ * Full one-page landing, locale-aware.
+ * Section order: hero → problem → technology → benefits → applications
+ *              → audiences → credibility → waitlist.
+ */
+import type { Locale } from '../content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Problem from './Problem.astro';
+import Technology from './Technology.astro';
+import Benefits from './Benefits.astro';
+import Applications from './Applications.astro';
+import Audiences from './Audiences.astro';
+import Credibility from './Credibility.astro';
+import Waitlist from './Waitlist.astro';
+import Footer from './Footer.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const skipLabel = locale === 'es' ? 'Saltar al contenido' : 'Skip to content';
+---
+
+<BaseLayout locale={locale}>
+  <a class="skip-link" href="#main">{skipLabel}</a>
+  <Header locale={locale} />
+  <main id="main">
+    <Hero locale={locale} />
+    <Problem locale={locale} />
+    <Technology locale={locale} />
+    <Benefits locale={locale} />
+    <Applications locale={locale} />
+    <Audiences locale={locale} />
+    <Credibility locale={locale} />
+    <Waitlist locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</BaseLayout>

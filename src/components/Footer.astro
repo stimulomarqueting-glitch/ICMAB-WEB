@@ -1,0 +1,153 @@
+---
+import { brand } from '../config/brand';
+import { getContent, type Locale } from '../content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).footer;
+const claim = locale === 'es' ? brand.claimEs : brand.claim;
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <p class="footer__name">{brand.projectName}</p>
+        <p class="footer__claim">{claim}</p>
+        <p class="footer__desc">{t.description}</p>
+      </div>
+
+      <nav aria-label={t.navTitle}>
+        <h2 class="footer__title">{t.navTitle}</h2>
+        <ul role="list">
+          {t.nav.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="footer__title">{t.contactTitle}</h2>
+        <p class="footer__desc">{t.contactText}</p>
+        {/* TODO(client): replace placeholder email in src/config/brand.ts */}
+        <a class="footer__mail" href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
+      </div>
+
+      <div>
+        <h2 class="footer__title">{t.legalTitle}</h2>
+        <ul role="list">
+          {/* TODO(client): link real privacy policy & legal notice pages */}
+          {t.legal.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+        <h2 class="footer__title footer__title--lang">{t.languageTitle}</h2>
+        <ul role="list" class="footer__langs">
+          <li><a href="/" aria-current={locale === 'en' ? 'true' : undefined}>English</a></li>
+          <li><a href="/es/" aria-current={locale === 'es' ? 'true' : undefined}>Español</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} · {t.copyright}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    background: var(--bg-alt);
+    padding: 3.5rem 0 2rem;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr 1fr 0.8fr;
+    gap: 2.5rem;
+  }
+
+  .footer__name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .footer__claim {
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0.2rem 0 1rem;
+  }
+
+  .footer__desc {
+    color: var(--text-2);
+    font-size: 0.9rem;
+    max-width: 22rem;
+  }
+
+  .footer__title {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 0.9rem;
+  }
+
+  .footer__title--lang { margin-top: 1.6rem; }
+
+  .footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .footer ul a {
+    color: var(--text-2);
+    font-size: 0.92rem;
+  }
+
+  .footer ul a:hover { color: var(--text); }
+
+  .footer ul a[aria-current='true'] {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .footer__mail {
+    font-size: 0.92rem;
+  }
+
+  .footer__bottom {
+    margin-top: 3rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer__bottom p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 56rem) {
+    .footer__grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 36rem) {
+    .footer__grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+</style>

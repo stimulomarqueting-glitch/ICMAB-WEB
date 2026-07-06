@@ -1,0 +1,27 @@
+---
+import { getContent, type Locale } from '../content';
+import Icon from './Icon.astro';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).benefits;
+---
+
+<section class="section section--alt texture-dots" id="benefits" aria-labelledby="benefits-title">
+  <div class="container">
+    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="benefits-title" />
+    <div class="grid grid--3">
+      {t.items.map((item) => (
+        <article class="card reveal">
+          <span class="card__icon"><Icon name={item.icon ?? 'spark'} /></span>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

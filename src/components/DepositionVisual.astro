@@ -1,0 +1,128 @@
+---
+/**
+ * Generative CSS/SVG visual: an abstract, premium representation of the
+ * device concept — a material source above, particles depositing onto a
+ * substrate below, inside a compact chamber.
+ *
+ * PLACEHOLDER: replace this block with real device photography / renders
+ * when assets are available (keep the same aspect-ratio container).
+ */
+interface Props {
+  alt: string;
+  caption?: string;
+}
+
+const { alt, caption } = Astro.props;
+
+// Deterministic pseudo-random particle field (stable build output).
+const particles = Array.from({ length: 26 }, (_, i) => {
+  const seed = (i * 37) % 100;
+  return {
+    x: 90 + ((seed * 2.2) % 220),
+    delay: (i % 13) * 0.55,
+    duration: 4.5 + (seed % 5) * 0.7,
+    r: 1.4 + (seed % 3) * 0.7,
+    o: 0.35 + (seed % 5) * 0.12,
+  };
+});
+---
+
+<figure class="depo">
+  <div class="depo__frame texture-dots" role="img" aria-label={alt}>
+    <svg viewBox="0 0 400 340" fill="none" aria-hidden="true" class="depo__svg">
+      <defs>
+        <linearGradient id="depo-glow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2fd9c3" stop-opacity="0.28" />
+          <stop offset="100%" stop-color="#5aa9ff" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="depo-surface" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#2fd9c3" />
+          <stop offset="100%" stop-color="#5aa9ff" />
+        </linearGradient>
+      </defs>
+
+      <!-- chamber outline -->
+      <rect x="60" y="26" width="280" height="288" rx="18" stroke="rgba(148,179,195,0.28)" stroke-width="1.2" />
+      <rect x="74" y="40" width="252" height="260" rx="12" stroke="rgba(148,179,195,0.14)" stroke-width="1" stroke-dasharray="3 5" />
+
+      <!-- material source -->
+      <rect x="150" y="48" width="100" height="22" rx="6" fill="rgba(47,217,195,0.16)" stroke="#2fd9c3" stroke-width="1.2" />
+      <text x="200" y="63" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="#8fe9dc" font-family="monospace">SOURCE</text>
+
+      <!-- sublimation glow cone -->
+      <path d="M155 72 L110 258 H290 L245 72 Z" fill="url(#depo-glow)" />
+
+      <!-- adjustable distance indicator -->
+      <line x1="318" y1="74" x2="318" y2="256" stroke="rgba(148,179,195,0.35)" stroke-width="1" />
+      <path d="M314 82 L318 74 L322 82 M314 248 L318 256 L322 248" stroke="rgba(148,179,195,0.5)" stroke-width="1" fill="none" />
+      <text x="330" y="168" font-size="8" letter-spacing="1.2" fill="#74879a" font-family="monospace" transform="rotate(90 330 168)">ADJUSTABLE</text>
+
+      <!-- depositing particles -->
+      <g class="depo__particles">
+        {particles.map((p) => (
+          <circle
+            class="depo__particle"
+            cx={p.x}
+            cy="86"
+            r={p.r}
+            fill="#8fe9dc"
+            opacity={p.o}
+            style={`animation-delay:${p.delay}s; animation-duration:${p.duration}s;`}
+          />
+        ))}
+      </g>
+
+      <!-- deposited layer -->
+      <rect x="120" y="252" width="160" height="6" rx="3" fill="url(#depo-surface)" opacity="0.9" />
+      <!-- substrate -->
+      <rect x="104" y="258" width="192" height="16" rx="4" fill="#151e28" stroke="rgba(148,179,195,0.35)" stroke-width="1.2" />
+      <text x="200" y="292" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="#74879a" font-family="monospace">TARGET SURFACE</text>
+    </svg>
+  </div>
+  {caption && <figcaption class="depo__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .depo {
+    margin: 0;
+  }
+
+  .depo__frame {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(47, 217, 195, 0.08), transparent 60%),
+      var(--bg-alt);
+    overflow: hidden;
+    box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.8);
+  }
+
+  .depo__svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .depo__caption {
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: var(--text-3);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .depo__particle {
+      animation-name: depo-fall;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+
+    @keyframes depo-fall {
+      0% { transform: translateY(0); opacity: 0; }
+      12% { opacity: var(--o, 0.6); }
+      82% { opacity: var(--o, 0.6); }
+      96% { transform: translateY(164px); opacity: 0; }
+      100% { transform: translateY(164px); opacity: 0; }
+    }
+  }
+</style>

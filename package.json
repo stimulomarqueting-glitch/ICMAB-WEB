@@ -1,0 +1,19 @@
+{
+  "name": "sublimat-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SUBLIMAT — compact surface deposition for advanced materials research. Landing page (ICMAB-CSIC technology transfer project).",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.4.1",
+    "@fontsource-variable/inter": "^5.2.5",
+    "@fontsource-variable/space-grotesk": "^5.2.5",
+    "astro": "^5.12.0"
+  }
+}

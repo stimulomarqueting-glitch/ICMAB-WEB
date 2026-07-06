@@ -1,0 +1,38 @@
+---
+import { getContent, type Locale } from '../content';
+import Icon from './Icon.astro';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).problem;
+---
+
+<section class="section section--alt" id="problem" aria-labelledby="problem-title">
+  <div class="container">
+    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="problem-title" />
+    <div class="grid grid--4">
+      {t.points.map((point) => (
+        <article class="card reveal">
+          <span class="card__icon"><Icon name={point.icon ?? 'spark'} /></span>
+          <h3>{point.title}</h3>
+          <p>{point.text}</p>
+        </article>
+      ))}
+    </div>
+    <p class="problem__bridge reveal">{t.bridge}</p>
+  </div>
+</section>
+
+<style>
+  .problem__bridge {
+    margin: 2.6rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+    font-weight: 600;
+    color: var(--accent-soft);
+  }
+</style>

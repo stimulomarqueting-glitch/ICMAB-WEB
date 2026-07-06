@@ -1,0 +1,284 @@
+---
+import { brand } from '../config/brand';
+import { getContent, localePath, type Locale } from '../content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale);
+const home = `${localePath(locale)}/`;
+const claim = locale === 'es' ? brand.claimEs : brand.claim;
+
+/** Language switcher targets (anchor-less: switching language returns to top). */
+const langLinks: { code: Locale; label: string; href: string }[] = [
+  { code: 'en', label: 'EN', href: '/' },
+  { code: 'es', label: 'ES', href: '/es/' },
+];
+---
+
+<header class="header">
+  <div class="container header__inner">
+    <a class="header__logo" href={home} aria-label={`${brand.projectName} — home`}>
+      <span class="header__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <rect x="3" y="22" width="26" height="4" rx="1.5" fill="currentColor" opacity="0.9" />
+          <circle cx="10" cy="17" r="1.6" fill="currentColor" />
+          <circle cx="16" cy="13" r="1.6" fill="currentColor" opacity="0.75" />
+          <circle cx="22" cy="17" r="1.6" fill="currentColor" />
+          <circle cx="16" cy="18.5" r="1.6" fill="currentColor" />
+          <rect x="11" y="4" width="10" height="4" rx="1.5" fill="currentColor" opacity="0.55" />
+        </svg>
+      </span>
+      <span class="header__name">
+        {brand.projectName}
+        <small>{claim}</small>
+      </span>
+    </a>
+
+    <nav class="header__nav" aria-label="Main">
+      <ul id="main-menu" class="header__menu">
+        {t.header.nav.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+        <li class="header__lang" role="presentation">
+          <span class="visually-hidden">{t.header.langLabel}</span>
+          {langLinks.map((l) => (
+            <a
+              href={l.href}
+              class:list={['header__lang-link', { 'is-active': l.code === locale }]}
+              aria-current={l.code === locale ? 'true' : undefined}
+              lang={l.code}
+            >
+              {l.label}
+            </a>
+          ))}
+        </li>
+        <li class="header__menu-cta">
+          <a class="btn btn--primary" href="#waitlist">{t.header.cta}</a>
+        </li>
+      </ul>
+    </nav>
+
+    <a class="btn btn--primary header__cta" href="#waitlist">{t.header.cta}</a>
+
+    <button
+      class="header__burger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="main-menu"
+      data-label-open={t.header.menuOpen}
+      data-label-close={t.header.menuClose}
+      aria-label={t.header.menuOpen}
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: var(--header-h);
+    background: rgba(11, 15, 19, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .header__inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .header__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--text);
+    margin-right: auto;
+  }
+
+  .header__logo:hover { text-decoration: none; }
+
+  .header__mark {
+    width: 2.1rem;
+    height: 2.1rem;
+    color: var(--accent);
+    display: inline-flex;
+  }
+
+  .header__name {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+
+  .header__name small {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    text-transform: uppercase;
+  }
+
+  .header__menu {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header__menu > li > a:not(.btn) {
+    color: var(--text-2);
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .header__menu > li > a:not(.btn):hover {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .header__lang {
+    display: flex;
+    gap: 0.15rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2rem;
+  }
+
+  .header__lang-link {
+    padding: 0.12rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+
+  .header__lang-link:hover { text-decoration: none; color: var(--text); }
+
+  .header__lang-link.is-active {
+    background: rgba(47, 217, 195, 0.14);
+    color: var(--accent);
+  }
+
+  .header__menu-cta { display: none; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .header__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0.6rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+  }
+
+  .header__burger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform 0.25s var(--ease), opacity 0.2s var(--ease);
+  }
+
+  .header__burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .header__burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+  .header__burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  @media (max-width: 64rem) {
+    .header__cta { display: none; }
+    .header__burger { display: flex; }
+
+    .header__nav {
+      position: absolute;
+      inset: var(--header-h) 0 auto 0;
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+      display: none;
+    }
+
+    .header__nav.is-open { display: block; }
+
+    .header__menu {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 0.75rem 1.25rem 1.25rem;
+    }
+
+    .header__menu > li > a:not(.btn) {
+      display: block;
+      padding: 0.85rem 0.25rem;
+      font-size: 1.05rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header__lang {
+      align-self: flex-start;
+      margin: 1rem 0.25rem;
+    }
+
+    .header__menu-cta {
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    .header__menu-cta .btn { width: 100%; }
+  }
+</style>
+
+<script>
+  const burger = document.querySelector<HTMLButtonElement>('.header__burger');
+  const nav = document.querySelector<HTMLElement>('.header__nav');
+
+  if (burger && nav) {
+    const setOpen = (open: boolean) => {
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute(
+        'aria-label',
+        open ? burger.dataset.labelClose ?? 'Close menu' : burger.dataset.labelOpen ?? 'Open menu'
+      );
+      nav.classList.toggle('is-open', open);
+    };
+
+    burger.addEventListener('click', () => {
+      setOpen(burger.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Close the mobile menu when a link is chosen or Escape is pressed.
+    nav.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  }
+</script>

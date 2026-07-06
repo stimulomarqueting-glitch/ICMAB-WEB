@@ -1,0 +1,336 @@
+---
+import { brand } from '../config/brand';
+import { getContent, type Locale } from '../content';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).waitlist;
+const f = t.form;
+---
+
+<section class="section section--alt" id="waitlist" aria-labelledby="waitlist-title">
+  <div class="container waitlist__wrap">
+    <div class="waitlist__intro">
+      <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="waitlist-title" />
+      <p class="waitlist__hint reveal">{f.requiredHint}</p>
+    </div>
+
+    <form
+      class="waitlist__form reveal"
+      id="waitlist-form"
+      method="post"
+      action={brand.formEndpoint || undefined}
+      data-endpoint={brand.formEndpoint}
+      novalidate
+    >
+      <div class="waitlist__row">
+        <div class="field">
+          <label for="wl-name">{f.name.label} *</label>
+          <input id="wl-name" name="name" type="text" autocomplete="name" required placeholder={f.name.placeholder} />
+          <p class="field__error" data-error-for="wl-name" hidden>{f.name.error}</p>
+        </div>
+        <div class="field">
+          <label for="wl-org">{f.organization.label} *</label>
+          <input id="wl-org" name="organization" type="text" autocomplete="organization" required placeholder={f.organization.placeholder} />
+          <p class="field__error" data-error-for="wl-org" hidden>{f.organization.error}</p>
+        </div>
+      </div>
+
+      <div class="waitlist__row">
+        <div class="field">
+          <label for="wl-email">{f.email.label} *</label>
+          <input id="wl-email" name="email" type="email" autocomplete="email" required placeholder={f.email.placeholder} />
+          <p class="field__error" data-error-for="wl-email" hidden>{f.email.error}</p>
+        </div>
+        <div class="field">
+          <label for="wl-role">{f.role.label}</label>
+          <input id="wl-role" name="role" type="text" autocomplete="organization-title" placeholder={f.role.placeholder} />
+        </div>
+      </div>
+
+      <div class="waitlist__row">
+        <div class="field">
+          <label for="wl-country">{f.country.label}</label>
+          <input id="wl-country" name="country" type="text" autocomplete="country-name" placeholder={f.country.placeholder} />
+        </div>
+        <div class="field">
+          <label for="wl-profile">{f.profile.label} *</label>
+          <select id="wl-profile" name="profile" required>
+            <option value="" selected disabled>—</option>
+            {f.profile.options.map((o) => (
+              <option value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <p class="field__error" data-error-for="wl-profile" hidden>{f.profile.error}</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="wl-application">{f.application.label}</label>
+        <select id="wl-application" name="application">
+          <option value="" selected>—</option>
+          {f.application.options.map((o) => (
+            <option value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="wl-message">{f.message.label}</label>
+        <textarea id="wl-message" name="message" rows="4" placeholder={f.message.placeholder}></textarea>
+      </div>
+
+      <div class="field field--consent">
+        <label class="consent">
+          <input id="wl-consent" name="consent" type="checkbox" required />
+          <span>{f.consent.label}</span>
+        </label>
+        <p class="field__error" data-error-for="wl-consent" hidden>{f.consent.error}</p>
+      </div>
+
+      <button class="btn btn--primary waitlist__submit" type="submit" data-label={f.submit} data-label-busy={f.submitting}>
+        {f.submit}
+      </button>
+
+      <p class="waitlist__status waitlist__status--error" data-status="error" role="alert" hidden>
+        {f.errorText}
+      </p>
+    </form>
+
+    <div class="waitlist__success" data-status="success" role="status" hidden>
+      <h3>{f.successTitle}</h3>
+      <p>{f.successText}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .waitlist__wrap {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+
+  .waitlist__hint {
+    font-size: 0.82rem;
+    color: var(--text-3);
+  }
+
+  .waitlist__form {
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    display: grid;
+    gap: 1.15rem;
+  }
+
+  .waitlist__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.15rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .field label {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.15s var(--ease);
+  }
+
+  .field textarea { resize: vertical; }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--text-3);
+  }
+
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+    border-color: var(--accent);
+  }
+
+  .field input[aria-invalid='true'],
+  .field select[aria-invalid='true'] {
+    border-color: #ff7a7a;
+  }
+
+  .field__error {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #ff9d9d;
+  }
+
+  .consent {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    color: var(--text-2);
+    font-weight: 400 !important;
+    cursor: pointer;
+  }
+
+  .consent input {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.2rem;
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  .waitlist__submit {
+    justify-self: start;
+    min-width: 12rem;
+  }
+
+  .waitlist__submit[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+  }
+
+  .waitlist__status {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .waitlist__status--error { color: #ff9d9d; }
+
+  .waitlist__success {
+    grid-column: 2;
+    background:
+      linear-gradient(120deg, rgba(47, 217, 195, 0.12), rgba(90, 169, 255, 0.06)),
+      var(--bg-raised);
+    border: 1px solid rgba(47, 217, 195, 0.4);
+    border-radius: var(--radius-l);
+    padding: 2.2rem;
+  }
+
+  .waitlist__success h3 { color: var(--accent-soft); }
+  .waitlist__success p { color: var(--text-2); margin: 0; }
+
+  @media (max-width: 56rem) {
+    .waitlist__wrap { grid-template-columns: 1fr; }
+    .waitlist__success { grid-column: 1; }
+  }
+
+  @media (max-width: 36rem) {
+    .waitlist__row { grid-template-columns: 1fr; }
+    .waitlist__submit { width: 100%; }
+  }
+</style>
+
+<script>
+  /**
+   * Waitlist form controller.
+   *
+   * INTEGRATION: set `brand.formEndpoint` in src/config/brand.ts to a real
+   * endpoint (Formspree, Netlify Forms, HubSpot, Airtable, custom API…).
+   * While it is empty the form runs in DEMO MODE: it validates, logs the
+   * payload to the console and shows the success state without sending.
+   */
+  const form = document.getElementById('waitlist-form') as HTMLFormElement | null;
+
+  if (form) {
+    const endpoint = form.dataset.endpoint ?? '';
+    const submitBtn = form.querySelector<HTMLButtonElement>('.waitlist__submit')!;
+    const errorBox = form.querySelector<HTMLElement>('[data-status="error"]')!;
+    const successBox = document.querySelector<HTMLElement>('[data-status="success"]')!;
+
+    const showFieldError = (input: HTMLElement, show: boolean) => {
+      const msg = form.querySelector<HTMLElement>(`[data-error-for="${input.id}"]`);
+      input.setAttribute('aria-invalid', String(show));
+      if (msg) {
+        msg.hidden = !show;
+        if (show) input.setAttribute('aria-describedby', msg.dataset.errorFor + '-msg');
+      }
+    };
+
+    const validate = (): boolean => {
+      let ok = true;
+      let firstInvalid: HTMLElement | null = null;
+
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]').forEach((el) => {
+        let valid = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.value.trim() !== '';
+        if (valid && el.type === 'email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+        showFieldError(el, !valid);
+        if (!valid) {
+          ok = false;
+          firstInvalid ??= el;
+        }
+      });
+
+      firstInvalid?.focus();
+      return ok;
+    };
+
+    // Clear a field's error as soon as the user fixes it.
+    form.addEventListener('input', (e) => {
+      const el = e.target as HTMLElement;
+      if (el.getAttribute('aria-invalid') === 'true') showFieldError(el, false);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.hidden = true;
+      if (!validate()) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = submitBtn.dataset.labelBusy ?? '…';
+
+      const payload = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        if (endpoint) {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error(`Form endpoint responded ${res.status}`);
+        } else {
+          // DEMO MODE — no backend connected yet.
+          console.info('[waitlist] demo mode, payload not sent:', payload);
+          await new Promise((r) => setTimeout(r, 500));
+        }
+
+        form.hidden = true;
+        successBox.hidden = false;
+        successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (err) {
+        console.error('[waitlist] submission failed:', err);
+        errorBox.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.label ?? '';
+      }
+    });
+  }
+</script>

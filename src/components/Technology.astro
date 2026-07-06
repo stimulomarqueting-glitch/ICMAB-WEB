@@ -1,0 +1,141 @@
+---
+import { getContent, type Locale } from '../content';
+import Icon from './Icon.astro';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale).technology;
+---
+
+<section class="section" id="technology" aria-labelledby="technology-title">
+  <div class="container">
+    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="technology-title" />
+
+    <div class="tech__what reveal">
+      <h3>{t.whatIsIt.title}</h3>
+      <p>{t.whatIsIt.text}</p>
+    </div>
+
+    <h3 class="tech__steps-title reveal">{t.stepsTitle}</h3>
+    <ol class="tech__steps" role="list" aria-label={t.schematicAlt}>
+      {t.steps.map((step, i) => (
+        <li class="tech__step card reveal">
+          <span class="tech__step-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <h4>{step.title}</h4>
+          <p>{step.text}</p>
+          {i < t.steps.length - 1 && (
+            <span class="tech__step-arrow" aria-hidden="true"><Icon name="arrow" /></span>
+          )}
+        </li>
+      ))}
+    </ol>
+    <p class="tech__note reveal">{t.schematicNote}</p>
+
+    <h3 class="tech__features-title reveal">{t.featuresTitle}</h3>
+    <div class="grid grid--4">
+      {t.features.map((f) => (
+        <article class="card reveal">
+          <span class="card__icon"><Icon name={f.icon ?? 'spark'} /></span>
+          <h3 class="tech__feature-h">{f.title}</h3>
+          <p>{f.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tech__what {
+    background: var(--gradient-panel), var(--bg-raised);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-m);
+    padding: 1.8rem 2rem;
+    max-width: 52rem;
+    margin-bottom: 3rem;
+  }
+
+  .tech__what h3 {
+    font-size: 1.1rem;
+    color: var(--accent-soft);
+  }
+
+  .tech__what p {
+    color: var(--text-2);
+    margin: 0;
+  }
+
+  .tech__steps-title,
+  .tech__features-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .tech__features-title { margin-top: 3rem; }
+
+  .tech__steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.15rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: step;
+  }
+
+  .tech__step {
+    position: relative;
+  }
+
+  .tech__step-num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+
+  .tech__step h4 {
+    font-size: 1.02rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .tech__step p {
+    color: var(--text-2);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  .tech__step-arrow {
+    position: absolute;
+    top: 50%;
+    right: -1rem;
+    transform: translateY(-50%);
+    color: var(--accent);
+    opacity: 0.7;
+    width: 1.1rem;
+    z-index: 1;
+  }
+
+  .tech__note {
+    margin: 1rem 0 0;
+    font-size: 0.78rem;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 56rem) {
+    .tech__steps { grid-template-columns: repeat(2, 1fr); }
+    .tech__step-arrow { display: none; }
+  }
+
+  @media (max-width: 36rem) {
+    .tech__steps { grid-template-columns: 1fr; }
+    .tech__what { padding: 1.4rem 1.4rem; }
+  }
+</style>
