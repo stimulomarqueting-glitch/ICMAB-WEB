@@ -1,6 +1,5 @@
 ---
 import { getContent, type Locale } from '../content';
-import Icon from './Icon.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -11,13 +10,13 @@ const { locale } = Astro.props;
 const t = getContent(locale).benefits;
 ---
 
-<section class="section section--alt texture-dots" id="benefits" aria-labelledby="benefits-title">
+<section class="section" id="benefits" aria-labelledby="benefits-title">
   <div class="container">
-    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="benefits-title" />
-    <div class="grid grid--3">
-      {t.items.map((item) => (
-        <article class="card reveal">
-          <span class="card__icon"><Icon name={item.icon ?? 'spark'} /></span>
+    <SectionHeader num="04" kicker={t.kicker} title={t.title} intro={t.intro} id="benefits-title" />
+    <div class="bene__grid">
+      {t.items.map((item, i) => (
+        <article class="bene__item reveal">
+          <span class="bene__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <h3>{item.title}</h3>
           <p>{item.text}</p>
         </article>
@@ -25,3 +24,59 @@ const t = getContent(locale).benefits;
     </div>
   </div>
 </section>
+
+<style>
+  .bene__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .bene__item {
+    border-top: 1px solid var(--line-strong);
+    padding: 1.5rem 0 2.2rem;
+    position: relative;
+  }
+
+  /* a deposition dot resting on each hairline */
+  .bene__item::before {
+    content: '';
+    position: absolute;
+    top: -2.5px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-2);
+  }
+
+  .bene__num {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 1.1rem;
+  }
+
+  .bene__item h3 {
+    font-size: 1.12rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .bene__item p {
+    color: var(--text-2);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  @media (max-width: 56rem) {
+    .bene__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 36rem) {
+    .bene__grid { grid-template-columns: 1fr; }
+    .bene__item { padding-bottom: 1.5rem; }
+  }
+</style>

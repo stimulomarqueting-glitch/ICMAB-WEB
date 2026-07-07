@@ -2,7 +2,6 @@
 import { brand } from '../config/brand';
 import { leadCapture, isMisconfigured } from '../config/leadCapture';
 import { getContent, type Locale } from '../content';
-import Icon from './Icon.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -23,15 +22,17 @@ if (isMisconfigured) {
 }
 ---
 
-<section class="section section--alt" id="waitlist" aria-labelledby="waitlist-title">
+<section class="section" id="waitlist" aria-labelledby="waitlist-title">
   <div class="container waitlist__wrap">
     <div class="waitlist__intro">
-      <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="waitlist-title" />
+      <SectionHeader num="08" kicker={t.kicker} title={t.title} intro={t.intro} id="waitlist-title" />
 
       <ul class="waitlist__reasons reveal" role="list">
         {t.reasons.map((reason) => (
           <li>
-            <span class="waitlist__reason-icon" aria-hidden="true"><Icon name="check" /></span>
+            <span class="waitlist__reason-icon" aria-hidden="true">
+              <svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6.5"></path></svg>
+            </span>
             {reason}
           </li>
         ))}
@@ -52,6 +53,7 @@ if (isMisconfigured) {
       )}
     </div>
 
+    {/* The application dossier: a paper sheet with a graphite spine */}
     <form
       class="waitlist__form reveal"
       id="waitlist-form"
@@ -62,83 +64,89 @@ if (isMisconfigured) {
       data-project={brand.projectName}
       data-language={locale}
     >
-      <div class="waitlist__row">
-        <div class="field">
-          <label for="wl-fullname">{f.fullName.label} *</label>
-          <input id="wl-fullname" name="fullName" type="text" autocomplete="name" required placeholder={f.fullName.placeholder} />
-          <p class="field__error" id="wl-fullname-error" data-error-for="wl-fullname" hidden>{f.fullName.error}</p>
-        </div>
-        <div class="field">
-          <label for="wl-email">{f.email.label} *</label>
-          <input id="wl-email" name="email" type="email" autocomplete="email" required placeholder={f.email.placeholder} />
-          <p class="field__error" id="wl-email-error" data-error-for="wl-email" hidden>{f.email.error}</p>
-        </div>
-      </div>
-
-      <div class="waitlist__row">
-        <div class="field">
-          <label for="wl-org">{f.organization.label} *</label>
-          <input id="wl-org" name="organization" type="text" autocomplete="organization" required placeholder={f.organization.placeholder} />
-          <p class="field__error" id="wl-org-error" data-error-for="wl-org" hidden>{f.organization.error}</p>
-        </div>
-        <div class="field">
-          <label for="wl-role">{f.role.label}</label>
-          <input id="wl-role" name="role" type="text" autocomplete="organization-title" placeholder={f.role.placeholder} />
+      <div class="wl-group">
+        <p class="wl-group__label" aria-hidden="true"><span>01</span>{f.groups.about}</p>
+        <div class="waitlist__row">
+          <div class="field">
+            <label for="wl-fullname">{f.fullName.label} *</label>
+            <input id="wl-fullname" name="fullName" type="text" autocomplete="name" required placeholder={f.fullName.placeholder} />
+            <p class="field__error" id="wl-fullname-error" data-error-for="wl-fullname" hidden>{f.fullName.error}</p>
+          </div>
+          <div class="field">
+            <label for="wl-email">{f.email.label} *</label>
+            <input id="wl-email" name="email" type="email" autocomplete="email" required placeholder={f.email.placeholder} />
+            <p class="field__error" id="wl-email-error" data-error-for="wl-email" hidden>{f.email.error}</p>
+          </div>
         </div>
       </div>
 
-      <div class="waitlist__row">
-        <div class="field">
-          <label for="wl-country">{f.country.label}</label>
-          <input id="wl-country" name="country" type="text" autocomplete="country-name" placeholder={f.country.placeholder} />
+      <div class="wl-group">
+        <p class="wl-group__label" aria-hidden="true"><span>02</span>{f.groups.organisation}</p>
+        <div class="waitlist__row">
+          <div class="field">
+            <label for="wl-org">{f.organization.label} *</label>
+            <input id="wl-org" name="organization" type="text" autocomplete="organization" required placeholder={f.organization.placeholder} />
+            <p class="field__error" id="wl-org-error" data-error-for="wl-org" hidden>{f.organization.error}</p>
+          </div>
+          <div class="field">
+            <label for="wl-role">{f.role.label}</label>
+            <input id="wl-role" name="role" type="text" autocomplete="organization-title" placeholder={f.role.placeholder} />
+          </div>
         </div>
-        <div class="field">
-          <label for="wl-orgtype">{f.organizationType.label} *</label>
-          <select id="wl-orgtype" name="organizationType" required>
-            <option value="" selected disabled>—</option>
-            {f.organizationType.options.map((o) => (
-              <option value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          <p class="field__error" id="wl-orgtype-error" data-error-for="wl-orgtype" hidden>{f.organizationType.error}</p>
+        <div class="waitlist__row">
+          <div class="field">
+            <label for="wl-country">{f.country.label}</label>
+            <input id="wl-country" name="country" type="text" autocomplete="country-name" placeholder={f.country.placeholder} />
+          </div>
+          <div class="field">
+            <label for="wl-orgtype">{f.organizationType.label} *</label>
+            <select id="wl-orgtype" name="organizationType" required>
+              <option value="" selected disabled>—</option>
+              {f.organizationType.options.map((o) => (
+                <option value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <p class="field__error" id="wl-orgtype-error" data-error-for="wl-orgtype" hidden>{f.organizationType.error}</p>
+          </div>
         </div>
       </div>
 
-      <div class="waitlist__row">
+      <div class="wl-group">
+        <p class="wl-group__label" aria-hidden="true"><span>03</span>{f.groups.project}</p>
+        <div class="waitlist__row">
+          <div class="field">
+            <label for="wl-area">{f.areaOfInterest.label}</label>
+            <select id="wl-area" name="areaOfInterest">
+              <option value="" selected>—</option>
+              {f.areaOfInterest.options.map((o) => (
+                <option value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+          <div class="field">
+            <label for="wl-need">{f.currentNeed.label} *</label>
+            <select id="wl-need" name="currentNeed" required>
+              <option value="" selected disabled>—</option>
+              {f.currentNeed.options.map((o) => (
+                <option value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <p class="field__error" id="wl-need-error" data-error-for="wl-need" hidden>{f.currentNeed.error}</p>
+          </div>
+        </div>
         <div class="field">
-          <label for="wl-area">{f.areaOfInterest.label}</label>
-          <select id="wl-area" name="areaOfInterest">
+          <label for="wl-timeline">{f.timeline.label}</label>
+          <select id="wl-timeline" name="timeline">
             <option value="" selected>—</option>
-            {f.areaOfInterest.options.map((o) => (
+            {f.timeline.options.map((o) => (
               <option value={o.value}>{o.label}</option>
             ))}
           </select>
         </div>
         <div class="field">
-          <label for="wl-need">{f.currentNeed.label} *</label>
-          <select id="wl-need" name="currentNeed" required>
-            <option value="" selected disabled>—</option>
-            {f.currentNeed.options.map((o) => (
-              <option value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          <p class="field__error" id="wl-need-error" data-error-for="wl-need" hidden>{f.currentNeed.error}</p>
+          <label for="wl-message">{f.message.label}</label>
+          <textarea id="wl-message" name="message" rows="4" placeholder={f.message.placeholder}></textarea>
         </div>
-      </div>
-
-      <div class="field">
-        <label for="wl-timeline">{f.timeline.label}</label>
-        <select id="wl-timeline" name="timeline">
-          <option value="" selected>—</option>
-          {f.timeline.options.map((o) => (
-            <option value={o.value}>{o.label}</option>
-          ))}
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="wl-message">{f.message.label}</label>
-        <textarea id="wl-message" name="message" rows="4" placeholder={f.message.placeholder}></textarea>
       </div>
 
       <div class="field field--consent">
@@ -167,7 +175,9 @@ if (isMisconfigured) {
     </form>
 
     <div class="waitlist__success" data-status="success" role="status" tabindex="-1" hidden>
-      <span class="waitlist__success-icon" aria-hidden="true"><Icon name="check" /></span>
+      <span class="waitlist__success-icon" aria-hidden="true">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6.5"></path></svg>
+      </span>
       <h3>{f.successTitle}</h3>
       <p>{f.successText}</p>
     </div>
@@ -187,15 +197,17 @@ if (isMisconfigured) {
     margin: 0 0 1.8rem;
     padding: 0;
     display: grid;
-    gap: 0.7rem;
+    gap: 0.8rem;
   }
 
   .waitlist__reasons li {
     display: flex;
-    gap: 0.7rem;
+    gap: 0.75rem;
     align-items: flex-start;
     color: var(--text-2);
-    font-size: 0.96rem;
+    font-size: 0.97rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line);
   }
 
   .waitlist__reason-icon {
@@ -203,41 +215,79 @@ if (isMisconfigured) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.35rem;
-    height: 1.35rem;
-    margin-top: 0.1rem;
-    border-radius: 50%;
-    background: rgba(47, 217, 195, 0.12);
-    color: var(--accent);
+    width: 1.3rem;
+    height: 1.3rem;
+    margin-top: 0.15rem;
+    border-radius: var(--radius-xs);
+    background: var(--accent-dim);
+    color: var(--accent-90);
   }
 
   .waitlist__reason-icon svg {
-    width: 0.8rem;
-    height: 0.8rem;
+    width: 0.75rem;
+    height: 0.75rem;
   }
 
   .waitlist__hint {
-    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
     color: var(--text-3);
   }
 
   .waitlist__magnet {
     margin-top: 2rem;
     border: 1px dashed var(--line-strong);
-    border-radius: var(--radius-m);
+    border-radius: var(--radius-s);
     padding: 1.4rem 1.6rem;
+    background: var(--bg-panel);
   }
 
   .waitlist__magnet h3 { font-size: 1.02rem; }
   .waitlist__magnet p { color: var(--text-2); font-size: 0.92rem; }
 
   .waitlist__form {
-    background: var(--bg-raised);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-l);
-    padding: clamp(1.4rem, 3vw, 2.2rem);
+    background: var(--bg-panel);
+    border: 1px solid var(--line-strong);
+    border-top: 3px solid var(--text);
+    border-radius: var(--radius-s);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    display: grid;
+    gap: 1.7rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .wl-group {
     display: grid;
     gap: 1.15rem;
+  }
+
+  .wl-group + .wl-group {
+    border-top: 1px solid var(--line);
+    padding-top: 1.6rem;
+  }
+
+  .wl-group__label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .wl-group__label span {
+    color: var(--accent);
+  }
+
+  .wl-group__label::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--line);
   }
 
   .waitlist__row {
@@ -248,28 +298,39 @@ if (isMisconfigured) {
 
   .field {
     display: grid;
-    gap: 0.4rem;
+    gap: 0.45rem;
     align-content: start;
   }
 
   .field label {
-    font-size: 0.86rem;
-    font-weight: 600;
-    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--text);
   }
 
   .field input,
   .field select,
   .field textarea {
     width: 100%;
-    padding: 0.7rem 0.9rem;
+    padding: 0.72rem 0.9rem;
     background: var(--bg);
     border: 1px solid var(--line-strong);
-    border-radius: var(--radius-s);
+    border-radius: var(--radius-xs);
     color: var(--text);
     font: inherit;
     font-size: 0.95rem;
-    transition: border-color 0.15s var(--ease);
+    transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+  }
+
+  .field select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23a7b8c4' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    padding-right: 2.4rem;
   }
 
   .field textarea { resize: vertical; }
@@ -279,31 +340,44 @@ if (isMisconfigured) {
     color: var(--text-3);
   }
 
+  .field input:hover,
+  .field select:hover,
+  .field textarea:hover {
+    border-color: var(--text-2);
+  }
+
   .field input:focus-visible,
   .field select:focus-visible,
   .field textarea:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 0;
+    outline: none;
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
   }
 
   .field input[aria-invalid='true'],
   .field select[aria-invalid='true'] {
-    border-color: #ff7a7a;
+    border-color: var(--error);
   }
 
   .field__error {
     margin: 0;
     font-size: 0.8rem;
-    color: #ff9d9d;
+    color: var(--error-strong);
+  }
+
+  .field--consent {
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
   }
 
   .consent {
     display: flex;
     gap: 0.65rem;
     align-items: flex-start;
+    font-family: var(--font-body) !important;
     font-size: 0.85rem;
-    color: var(--text-2);
+    letter-spacing: 0 !important;
+    color: var(--text-2) !important;
     font-weight: 400 !important;
     cursor: pointer;
   }
@@ -317,14 +391,14 @@ if (isMisconfigured) {
   }
 
   .waitlist__actions {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    flex-wrap: wrap;
+    display: grid;
+    gap: 0.8rem;
   }
 
   .waitlist__submit {
-    min-width: 12rem;
+    width: 100%;
+    padding-block: 1rem;
+    font-size: 1rem;
   }
 
   .waitlist__submit[disabled] {
@@ -335,9 +409,11 @@ if (isMisconfigured) {
 
   .waitlist__nospam {
     margin: 0;
-    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
     color: var(--text-3);
-    max-width: 16rem;
+    text-align: center;
   }
 
   .waitlist__status {
@@ -345,17 +421,16 @@ if (isMisconfigured) {
     font-size: 0.9rem;
   }
 
-  .waitlist__status--error { color: #ff9d9d; }
-  .waitlist__status--error a { color: #ffc4c4; }
+  .waitlist__status--error { color: var(--error-strong); }
+  .waitlist__status--error a { color: var(--error-strong); }
 
   .waitlist__success {
     grid-column: 2;
-    background:
-      linear-gradient(120deg, rgba(47, 217, 195, 0.12), rgba(90, 169, 255, 0.06)),
-      var(--bg-raised);
-    border: 1px solid rgba(47, 217, 195, 0.4);
-    border-radius: var(--radius-l);
-    padding: 2.2rem;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius-s);
+    padding: clamp(2rem, 4vw, 2.8rem);
   }
 
   .waitlist__success-icon {
@@ -365,17 +440,17 @@ if (isMisconfigured) {
     width: 2.6rem;
     height: 2.6rem;
     border-radius: 50%;
-    background: rgba(47, 217, 195, 0.16);
-    color: var(--accent);
-    margin-bottom: 1rem;
+    background: var(--accent);
+    color: var(--accent-ink);
+    margin-bottom: 1.1rem;
   }
 
   .waitlist__success-icon svg {
-    width: 1.3rem;
-    height: 1.3rem;
+    width: 1.2rem;
+    height: 1.2rem;
   }
 
-  .waitlist__success h3 { color: var(--accent-soft); }
+  .waitlist__success h3 { color: var(--text); font-size: 1.35rem; }
   .waitlist__success p { color: var(--text-2); margin: 0; }
 
   @media (max-width: 56rem) {
@@ -385,8 +460,6 @@ if (isMisconfigured) {
 
   @media (max-width: 36rem) {
     .waitlist__row { grid-template-columns: 1fr; }
-    .waitlist__submit { width: 100%; }
-    .waitlist__nospam { max-width: none; }
   }
 </style>
 

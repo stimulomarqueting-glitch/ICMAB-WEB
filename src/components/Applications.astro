@@ -14,25 +14,27 @@ const ctaButton = content.conversion.applications.button;
 
 <section class="section" id="applications" aria-labelledby="applications-title">
   <div class="container">
-    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="applications-title" />
+    <SectionHeader num="05" kicker={t.kicker} title={t.title} intro={t.intro} id="applications-title" />
 
-    <ul class="apps__chips reveal" role="list" aria-hidden="true">
+    <ul class="apps__tags reveal" role="list" aria-hidden="true">
       {t.items.map((app) => (
-        <li class="apps__chip">{app.short}</li>
+        <li class="apps__tag">{app.short}</li>
       ))}
     </ul>
 
-    <div class="grid grid--3">
-      {t.items.map((app) => (
-        <article class="card apps__card reveal">
-          <h3>
+    {/* the index of the paper: every application is an entry */}
+    <ol class="apps__index">
+      {t.items.map((app, i) => (
+        <li class="apps__row reveal">
+          <span class="apps__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="apps__name">
             <span class="apps__prefix">{t.surfacesForLabel}</span>
-            {app.name}<span class="apps__dot" aria-hidden="true">.</span>
+            <span class="apps__word">{app.name}<span class="apps__dot" aria-hidden="true">.</span></span>
           </h3>
-          <p>{app.text}</p>
-        </article>
+          <p class="apps__text">{app.text}</p>
+        </li>
       ))}
-    </div>
+    </ol>
 
     <div class="apps__open reveal">
       <p>{t.openEnded}</p>
@@ -42,69 +44,118 @@ const ctaButton = content.conversion.applications.button;
 </section>
 
 <style>
-  .apps__chips {
+  .apps__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
+    gap: 0.5rem 1.4rem;
     list-style: none;
-    margin: 0 0 2rem;
+    margin: 0 0 2.4rem;
     padding: 0;
   }
 
-  .apps__chip {
-    padding: 0.32rem 0.9rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    font-size: 0.82rem;
-    color: var(--text-2);
-    background: rgba(21, 30, 40, 0.55);
+  .apps__tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
   }
 
-  .apps__card {
-    background:
-      linear-gradient(160deg, rgba(47, 217, 195, 0.05), transparent 45%),
-      var(--bg-raised);
+  .apps__tag::before {
+    content: '·';
+    color: var(--accent);
+    margin-right: 0.5rem;
   }
 
-  .apps__card:hover {
-    border-color: rgba(47, 217, 195, 0.45);
+  .apps__index {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .apps__row {
+    display: grid;
+    grid-template-columns: 3rem 1fr minmax(16rem, 24rem);
+    gap: 1rem 2.5rem;
+    align-items: baseline;
+    padding: 1.7rem 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .apps__row:last-child {
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .apps__num {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+
+  .apps__name {
+    margin: 0;
+    font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
   }
 
   .apps__prefix {
     display: block;
-    font-family: var(--font-body);
-    font-size: 0.74rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--text-3);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
   }
 
-  .apps__card h3 {
-    font-size: 1.25rem;
+  /* teal underline sweeps in — the layer deposits under the word */
+  .apps__word {
+    background: linear-gradient(var(--accent), var(--accent)) no-repeat left 96% / 0 0.08em;
+    padding-bottom: 0.05em;
+    transition: background-size var(--dur-slow) var(--ease-out);
+  }
+
+  .apps__row:hover .apps__word {
+    background-size: 100% 0.08em;
   }
 
   .apps__dot {
     color: var(--accent);
   }
 
+  .apps__text {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.95rem;
+  }
+
   .apps__open {
-    margin-top: 2.2rem;
-    border: 1px dashed var(--line-strong);
-    border-radius: var(--radius-m);
-    padding: 1.5rem 1.6rem;
-    max-width: 46rem;
+    margin-top: 2.6rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
+    max-width: 52rem;
   }
 
   .apps__open p {
     margin: 0;
     color: var(--text-2);
     flex: 1 1 18rem;
+  }
+
+  @media (max-width: 48rem) {
+    .apps__row {
+      grid-template-columns: 3rem 1fr;
+    }
+
+    .apps__text {
+      grid-column: 2;
+    }
   }
 </style>

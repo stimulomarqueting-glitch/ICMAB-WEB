@@ -1,42 +1,63 @@
 /* ────────────────────────────────────────────────────────────────────────────
-   SUBLIMAT — global styles & design tokens
-   Premium graphite + teal direction. Edit tokens here to retheme the site.
+   SUBLIMAT — global styles & design tokens · "BENCH PAPER" (graphite plate)
+   Art direction (from the approved Claude Design preview): the scientific
+   paper turned brand — printed in negative. Graphite plate, warm-white ink,
+   IBM Plex Sans (display) + IBM Plex Mono (every number, unit, parameter).
+   One action colour: solid teal — the technology code IS the action.
+   No glow, no gradients, hairline structure.
    ──────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Color tokens */
-  --bg: #0b0f13;                 /* graphite / near black          */
-  --bg-alt: #10171f;             /* deep blue graphite             */
-  --bg-raised: #151e28;          /* card surface                   */
-  --bg-light: #eef3f3;           /* occasional light surface       */
+  /* ---- Colour (project palette: graphite + teal) ---- */
+  --bg: #0b0f13;                    /* graphite plate                 */
+  --bg-panel: #10171f;              /* paper sheet (panels, figures)  */
+  --bg-raised: #151e28;             /* raised surface                 */
+  --bg-inverse: #151e28;            /* chapter bands (flat)           */
+
+  --text: #f4f6f5;                  /* ink                            */
+  --text-2: #a7b8c4;                /* secondary ink                  */
+  --text-3: #74879a;                /* annotations                    */
+  --text-on-dark: #f4f6f5;
+  --text-on-dark-2: #a7b8c4;
+
   --line: rgba(148, 179, 195, 0.14);
   --line-strong: rgba(148, 179, 195, 0.26);
+  --line-ink: rgba(167, 184, 196, 0.6);
 
-  --accent: #2fd9c3;             /* tech teal                      */
-  --accent-soft: #8fe9dc;        /* scientific mint                */
-  --accent-2: #5aa9ff;           /* soft electric blue             */
-  --accent-ink: #052e2a;         /* text on accent backgrounds     */
+  --accent: #2fd9c3;                /* the technology code = the action */
+  --accent-90: #29c2ae;             /* pressed / hover (darken)         */
+  --accent-soft: #8fe9dc;           /* mint — deposited layer, data     */
+  --accent-2: #5aa9ff;              /* electric blue — structure, d     */
+  --accent-ink: #052e2a;            /* ink on accent                    */
+  --accent-dim: rgba(47, 217, 195, 0.13);
 
-  --text: #f4f6f5;               /* warm white                     */
-  --text-2: #a7b8c4;             /* light blue-grey                */
-  --text-3: #74879a;             /* muted                         */
+  --error: #ff7a7a;
+  --error-strong: #ff9d9d;
 
-  --gradient-accent: linear-gradient(96deg, var(--accent) 0%, var(--accent-2) 100%);
-  --gradient-panel: linear-gradient(180deg, rgba(47, 217, 195, 0.07), rgba(90, 169, 255, 0.03) 60%, transparent);
+  /* ---- Typography ---- */
+  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* Typography */
-  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Space Grotesk Variable', 'Inter Variable', system-ui, sans-serif;
-
-  /* Layout */
-  --container: 72rem;
-  --radius-s: 0.5rem;
-  --radius-m: 0.875rem;
-  --radius-l: 1.25rem;
+  /* ---- Layout ---- */
+  --container: 75rem;
+  --narrow: 47.5rem;
+  --radius-xs: 2px;
+  --radius-s: 4px;
+  --radius-m: 8px;
   --header-h: 4.25rem;
 
-  /* Motion */
-  --ease: cubic-bezier(0.22, 0.9, 0.3, 1);
+  /* ---- Elevation (near-flat) ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+  /* ---- Motion: instruments settle, they don't spring ---- */
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 360ms;
 
   color-scheme: dark;
 }
@@ -57,10 +78,10 @@ html {
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-2);
   font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.65;
+  line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -78,9 +99,10 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-  margin: 0 0 0.6em;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 0.55em;
   text-wrap: balance;
 }
 
@@ -90,20 +112,23 @@ p {
 
 a {
   color: var(--accent-soft);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 
 a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--text);
+  text-decoration-color: var(--accent);
 }
 
 ::selection {
-  background: rgba(47, 217, 195, 0.35);
+  background: rgba(47, 217, 195, 0.3);
   color: var(--text);
 }
 
-/* Visible focus for keyboard users */
+/* Visible focus for keyboard users — calm teal ring */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -120,13 +145,13 @@ a:hover {
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 600;
+  text-decoration: none;
   border-radius: var(--radius-s);
   transition: top 0.2s var(--ease);
 }
 
 .skip-link:focus-visible {
   top: 1rem;
-  text-decoration: none;
 }
 
 /* Layout helpers */
@@ -136,80 +161,131 @@ a:hover {
 }
 
 .section {
-  padding-block: clamp(4rem, 9vw, 7rem);
+  padding-block: clamp(4.5rem, 10vw, 8.5rem);
   position: relative;
 }
 
-.section--alt {
-  background: var(--bg-alt);
-  border-block: 1px solid var(--line);
+/* chapters are divided by thin rules, not filled bands */
+.section + .section {
+  border-top: 1px solid var(--line);
 }
 
-/* Section headings */
-.kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+/* ---- Signature motif: mono technical label / eyebrow ---- */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 1.1rem;
+  color: var(--text-3);
 }
 
-.kicker::before {
+/* ---- Signature motif: surface line with deposition dots ---- */
+.surface-line {
+  height: 0;
+  border-top: 1px solid var(--line-ink);
+  position: relative;
+}
+
+.surface-line--dots::before {
   content: '';
-  width: 1.6rem;
-  height: 1px;
-  background: var(--accent);
-  opacity: 0.7;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -3px;
+  height: 3px;
+  background-image: radial-gradient(circle, var(--accent-soft) 1.2px, transparent 1.4px);
+  background-size: 12px 3px;
+  background-repeat: repeat-x;
+  opacity: 0.5;
+}
+
+/* ---- Deposition-dot paper texture ---- */
+.texture-dots {
+  background-image: radial-gradient(circle, rgba(143, 233, 220, 0.07) 1.1px, transparent 1.3px);
+  background-size: 14px 14px;
+}
+
+/* ---- Section headers: numbered figures of the paper ---- */
+.sec-head__label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin: 0 0 1.6rem;
+}
+
+.sec-head__num {
+  color: var(--accent);
+}
+
+.sec-head__label::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--line);
 }
 
 .section-title {
-  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
-  max-width: 42rem;
+  font-size: clamp(2rem, 4.4vw, 3.3rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  max-width: 46rem;
 }
 
 .section-intro {
   color: var(--text-2);
-  font-size: 1.075rem;
+  font-size: 1.1rem;
+  line-height: 1.65;
   max-width: 40rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
-/* Buttons */
+/* ---- Buttons: rectangular, instrument-like. Solid teal = the action ---- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.5rem;
-  border-radius: 999px;
+  gap: 0.55rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--radius-s);
   border: 1px solid transparent;
   font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+  text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease),
-    background-color 0.18s var(--ease), border-color 0.18s var(--ease);
-}
-
-.btn:hover {
-  text-decoration: none;
-  transform: translateY(-1px);
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
 
 .btn--primary {
-  background: var(--gradient-accent);
+  background: var(--accent);
   color: var(--accent-ink);
-  box-shadow: 0 8px 24px -10px rgba(47, 217, 195, 0.55);
+}
+
+.btn--primary::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--accent-ink);
+  opacity: 0.85;
 }
 
 .btn--primary:hover {
-  box-shadow: 0 12px 30px -10px rgba(47, 217, 195, 0.7);
+  background: var(--accent-90);
+  color: var(--accent-ink);
+}
+
+.btn--primary:active {
+  transform: translateY(1px);
 }
 
 .btn--ghost {
@@ -219,8 +295,9 @@ a:hover {
 }
 
 .btn--ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent-soft);
+  border-color: var(--text-3);
+  background: var(--bg-panel);
+  color: var(--text);
 }
 
 /* Long localized CTA labels must wrap instead of overflowing on small screens */
@@ -231,52 +308,18 @@ a:hover {
   }
 }
 
-/* Cards */
-.card {
-  background: var(--bg-raised);
+/* ---- Panels: plate sheet with hairline, near-flat ---- */
+.panel {
+  background: var(--bg-panel);
   border: 1px solid var(--line);
-  border-radius: var(--radius-m);
-  padding: 1.6rem;
-  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  border-color: var(--line-strong);
-}
-
-.card__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
   border-radius: var(--radius-s);
-  background: rgba(47, 217, 195, 0.1);
-  color: var(--accent);
-  margin-bottom: 1rem;
-}
-
-.card__icon svg {
-  width: 1.35rem;
-  height: 1.35rem;
-}
-
-.card h3 {
-  font-size: 1.08rem;
-  margin-bottom: 0.45rem;
-}
-
-.card p {
-  color: var(--text-2);
-  font-size: 0.95rem;
-  margin: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Grids */
 .grid {
   display: grid;
-  gap: 1.15rem;
+  gap: 1.25rem;
 }
 
 .grid--2 { grid-template-columns: repeat(2, 1fr); }
@@ -294,24 +337,51 @@ a:hover {
   .grid--4 { grid-template-columns: 1fr; }
 }
 
-/* Microtexture: faint dotted "deposition" pattern for select surfaces */
-.texture-dots {
-  background-image: radial-gradient(rgba(143, 233, 220, 0.055) 1px, transparent 1px);
-  background-size: 22px 22px;
+/* ---- Technical line icons ---- */
+svg.ic {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* Scroll reveal (JS adds .is-visible; motion-safe only) */
+/* Scroll reveal (JS adds .is-visible; motion-safe only). Instruments settle. */
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
     opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    transform: translateY(14px);
+    transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+    transition-delay: var(--rd, 0s);
   }
 
   .reveal.is-visible {
     opacity: 1;
     transform: none;
   }
+
+  /* staggered settle for sibling items */
+  .grid > .reveal:nth-child(2),
+  ol > .reveal:nth-child(2),
+  ul > .reveal:nth-child(2),
+  div > .reveal:nth-child(2) { --rd: 60ms; }
+  .grid > .reveal:nth-child(3),
+  ol > .reveal:nth-child(3),
+  ul > .reveal:nth-child(3),
+  div > .reveal:nth-child(3) { --rd: 120ms; }
+  .grid > .reveal:nth-child(4),
+  ol > .reveal:nth-child(4),
+  ul > .reveal:nth-child(4),
+  div > .reveal:nth-child(4) { --rd: 180ms; }
+  .grid > .reveal:nth-child(5),
+  ol > .reveal:nth-child(5),
+  ul > .reveal:nth-child(5) { --rd: 240ms; }
+  .grid > .reveal:nth-child(6),
+  ol > .reveal:nth-child(6),
+  ul > .reveal:nth-child(6) { --rd: 300ms; }
+  .grid > .reveal:nth-child(7),
+  ol > .reveal:nth-child(7),
+  ul > .reveal:nth-child(7) { --rd: 360ms; }
 }
 
 @media (prefers-reduced-motion: reduce) {

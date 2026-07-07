@@ -1,6 +1,5 @@
 ---
 import { getContent, type Locale } from '../content';
-import Icon from './Icon.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -9,38 +8,50 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = getContent(locale).technology;
+
+/* step glyphs: load → deposit → land → inspect (technical line icons) */
+const stepGlyphs = [
+  'M7 14h10v5H7zM12 5v6M9.5 8.5 12 11l2.5-2.5',
+  'M8 5v3M12 5v3M16 5v3M8 11v3M12 11v3M16 11v3M6 19h12',
+  'M12 4v10M8.5 10.5 12 14l3.5-3.5M5 19h14',
+  'M5 16h14M8 13.5h.01M12 13.5h.01M16 13.5h.01M17 6l3 3M14.5 8.5a3 3 0 1 0 4.2-4.2 3 3 0 0 0-4.2 4.2Z',
+];
 ---
 
 <section class="section" id="technology" aria-labelledby="technology-title">
   <div class="container">
-    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="technology-title" />
+    <SectionHeader num="03" kicker={t.kicker} title={t.title} intro={t.intro} id="technology-title" />
 
     <div class="tech__what reveal">
-      <h3>{t.whatIsIt.title}</h3>
+      <h3 class="mono-label">{t.whatIsIt.title}</h3>
       <p>{t.whatIsIt.text}</p>
     </div>
 
-    <h3 class="tech__steps-title reveal">{t.stepsTitle}</h3>
-    <ol class="tech__steps" role="list" aria-label={t.schematicAlt}>
+    <h3 class="tech__steps-title reveal">
+      <span class="tech__fig-num" aria-hidden="true">FIG. 02</span>
+      {t.stepsTitle}
+    </h3>
+    <ol class="tech__steps" aria-label={t.schematicAlt}>
       {t.steps.map((step, i) => (
-        <li class="tech__step card reveal">
+        <li class="tech__step reveal">
           <span class="tech__step-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="tech__step-glyph" aria-hidden="true">
+            <svg class="ic" viewBox="0 0 24 24"><path d={stepGlyphs[i] ?? stepGlyphs[0]}></path></svg>
+          </span>
           <h4>{step.title}</h4>
           <p>{step.text}</p>
-          {i < t.steps.length - 1 && (
-            <span class="tech__step-arrow" aria-hidden="true"><Icon name="arrow" /></span>
-          )}
         </li>
       ))}
     </ol>
+    <div class="tech__steps-base surface-line surface-line--dots" aria-hidden="true"></div>
     <p class="tech__note reveal">{t.schematicNote}</p>
 
     <h3 class="tech__features-title reveal">{t.featuresTitle}</h3>
-    <div class="grid grid--4">
-      {t.features.map((f) => (
-        <article class="card reveal">
-          <span class="card__icon"><Icon name={f.icon ?? 'spark'} /></span>
-          <h3 class="tech__feature-h">{f.title}</h3>
+    <div class="tech__features">
+      {t.features.map((f, i) => (
+        <article class="tech__feature reveal">
+          <span class="tech__feature-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{f.title}</h3>
           <p>{f.text}</p>
         </article>
       ))}
@@ -50,92 +61,143 @@ const t = getContent(locale).technology;
 
 <style>
   .tech__what {
-    background: var(--gradient-panel), var(--bg-raised);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--radius-m);
-    padding: 1.8rem 2rem;
-    max-width: 52rem;
-    margin-bottom: 3rem;
+    max-width: var(--narrow);
+    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+    padding-left: 1.6rem;
+    border-left: 2px solid var(--text);
   }
 
   .tech__what h3 {
-    font-size: 1.1rem;
-    color: var(--accent-soft);
+    margin-bottom: 0.9rem;
   }
 
   .tech__what p {
-    color: var(--text-2);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--text);
+    letter-spacing: -0.01em;
     margin: 0;
   }
 
   .tech__steps-title,
   .tech__features-title {
-    font-size: 1.2rem;
-    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    font-size: 1.25rem;
+    margin-bottom: 1.8rem;
   }
 
-  .tech__features-title { margin-top: 3rem; }
+  .tech__fig-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--accent-2);
+    white-space: nowrap;
+  }
+
+  .tech__features-title { margin-top: clamp(3rem, 6vw, 4.5rem); }
 
   .tech__steps {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.15rem;
     list-style: none;
     margin: 0;
     padding: 0;
-    counter-reset: step;
   }
 
   .tech__step {
-    position: relative;
+    padding: 0 1.4rem 1.8rem 0;
+  }
+
+  .tech__step + .tech__step {
+    border-left: 1px solid var(--line);
+    padding-left: 1.4rem;
   }
 
   .tech__step-num {
     display: block;
-    font-family: var(--font-display);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     color: var(--accent);
+    margin-bottom: 0.9rem;
+  }
+
+  .tech__step-glyph {
+    display: inline-flex;
+    width: 1.7rem;
+    height: 1.7rem;
+    color: var(--accent-2);
     margin-bottom: 0.8rem;
   }
 
   .tech__step h4 {
-    font-size: 1.02rem;
+    font-size: 1.05rem;
     margin-bottom: 0.4rem;
   }
 
   .tech__step p {
     color: var(--text-2);
-    font-size: 0.92rem;
+    font-size: 0.93rem;
     margin: 0;
   }
 
-  .tech__step-arrow {
-    position: absolute;
-    top: 50%;
-    right: -1rem;
-    transform: translateY(-50%);
-    color: var(--accent);
-    opacity: 0.7;
-    width: 1.1rem;
-    z-index: 1;
+  .tech__note {
+    margin: 1.1rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
   }
 
-  .tech__note {
-    margin: 1rem 0 0;
-    font-size: 0.78rem;
+  /* features: a 2×2 ledger, hairlines instead of cards */
+  .tech__features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 clamp(2rem, 5vw, 4rem);
+  }
+
+  .tech__feature {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .tech__feature-num {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
     color: var(--text-3);
+    line-height: 2;
+  }
+
+  .tech__feature h3 {
+    grid-column: 2;
+    font-size: 1.1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .tech__feature p {
+    grid-column: 2;
+    color: var(--text-2);
+    font-size: 0.95rem;
+    margin: 0;
   }
 
   @media (max-width: 56rem) {
     .tech__steps { grid-template-columns: repeat(2, 1fr); }
-    .tech__step-arrow { display: none; }
+    .tech__step:nth-child(3) { border-left: 0; padding-left: 0; }
+    .tech__steps-base { display: none; }
+    .tech__features { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 36rem) {
     .tech__steps { grid-template-columns: 1fr; }
-    .tech__what { padding: 1.4rem 1.4rem; }
+    .tech__step + .tech__step { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 1.4rem; }
   }
 </style>

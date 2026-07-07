@@ -278,6 +278,7 @@ export const es: SiteContent = {
       'Estar entre los primeros laboratorios y partners implicados',
     ],
     form: {
+      groups: { about: 'Sobre ti', organisation: 'Tu organización', project: 'Tu proyecto' },
       fullName: { label: 'Nombre completo', placeholder: 'Tu nombre completo', error: 'Introduce tu nombre.' },
       email: { label: 'Email de trabajo', placeholder: 'tu@institucion.org', error: 'Introduce una dirección de email válida.' },
       organization: { label: 'Organización', placeholder: 'Universidad, empresa o institución', error: 'Introduce tu organización.' },

@@ -1,7 +1,6 @@
 ---
 /**
- * Contextual conversion band. Placed between sections to offer a
- * mid-scroll path to the waitlist form, with intent-specific copy.
+ * Contextual conversion band — a flat raised chapter band, no gradients.
  * `source` feeds the cta_source lead-tracking (see scripts/leadTracking.ts).
  */
 interface Props {
@@ -26,32 +25,30 @@ const { title, text, button, source } = Astro.props;
 
 <style>
   .ctaband {
-    padding-block: 0.5rem 3.5rem;
+    background: var(--bg-inverse);
+    padding-block: clamp(3rem, 6vw, 4.5rem);
   }
 
   .ctaband__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
-    padding: 1.8rem 2.2rem;
-    border: 1px solid rgba(47, 217, 195, 0.28);
-    border-radius: var(--radius-l);
-    background:
-      linear-gradient(115deg, rgba(47, 217, 195, 0.1), rgba(90, 169, 255, 0.05) 65%),
-      var(--bg-raised);
+    gap: 2.5rem;
   }
 
   .ctaband__copy h2 {
-    font-size: 1.25rem;
-    margin-bottom: 0.35rem;
+    color: var(--text-on-dark);
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
   }
 
   .ctaband__copy p {
     margin: 0;
-    color: var(--text-2);
-    font-size: 0.95rem;
-    max-width: 36rem;
+    color: var(--text-on-dark-2);
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: 38rem;
   }
 
   .ctaband__inner > .btn {
@@ -62,7 +59,6 @@ const { title, text, button, source } = Astro.props;
     .ctaband__inner {
       flex-direction: column;
       align-items: flex-start;
-      padding: 1.5rem 1.4rem;
     }
 
     .ctaband__inner > .btn {

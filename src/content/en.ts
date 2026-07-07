@@ -277,6 +277,7 @@ export const en: SiteContent = {
       'Be among the first labs and partners involved',
     ],
     form: {
+      groups: { about: 'About you', organisation: 'Your organisation', project: 'Your project' },
       fullName: { label: 'Full name', placeholder: 'Your full name', error: 'Please enter your name.' },
       email: { label: 'Work email', placeholder: 'you@institution.org', error: 'Please enter a valid email address.' },
       organization: { label: 'Organization', placeholder: 'University, company or institution', error: 'Please enter your organization.' },

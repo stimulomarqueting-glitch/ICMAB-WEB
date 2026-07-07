@@ -1,6 +1,5 @@
 ---
 import { getContent, type Locale } from '../content';
-import Icon from './Icon.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -11,28 +10,106 @@ const { locale } = Astro.props;
 const t = getContent(locale).problem;
 ---
 
-<section class="section section--alt" id="problem" aria-labelledby="problem-title">
-  <div class="container">
-    <SectionHeader kicker={t.kicker} title={t.title} intro={t.intro} id="problem-title" />
-    <div class="grid grid--4">
-      {t.points.map((point) => (
-        <article class="card reveal">
-          <span class="card__icon"><Icon name={point.icon ?? 'spark'} /></span>
-          <h3>{point.title}</h3>
-          <p>{point.text}</p>
-        </article>
-      ))}
+<section class="section" id="problem" aria-labelledby="problem-title">
+  <div class="container prob__layout">
+    <div class="prob__side">
+      <SectionHeader num="02" kicker={t.kicker} title={t.title} intro={t.intro} id="problem-title" />
     </div>
+    <ol class="prob__list">
+      {t.points.map((point, i) => (
+        <li class="prob__item reveal">
+          <span class="prob__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <div class="prob__body">
+            <h3>{point.title}</h3>
+            <p>{point.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+  <div class="container">
     <p class="problem__bridge reveal">{t.bridge}</p>
   </div>
 </section>
 
 <style>
-  .problem__bridge {
-    margin: 2.6rem 0 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  .prob__layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+  }
+
+  .prob__side {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+  }
+
+  .prob__side :global(.section-intro) {
+    margin-bottom: 0;
+  }
+
+  .prob__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .prob__item {
+    display: flex;
+    gap: 1.6rem;
+    padding: 1.9rem 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .prob__item:last-child {
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .prob__num {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--accent-soft);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    line-height: 2;
+    flex: 0 0 2rem;
+  }
+
+  .prob__body h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .prob__body p {
+    color: var(--text-2);
+    font-size: 0.98rem;
+    margin: 0;
+  }
+
+  /* the conclusion of the argument — a display statement */
+  .problem__bridge {
+    margin: clamp(3rem, 6vw, 4.5rem) 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--text);
+    max-width: 30ch;
+  }
+
+  .problem__bridge::after {
+    content: '';
+    display: block;
+    width: 5rem;
+    height: 0.35rem;
+    margin-top: 1.2rem;
+    background: var(--accent);
+  }
+
+  @media (max-width: 56rem) {
+    .prob__layout { grid-template-columns: 1fr; }
+    .prob__side { position: static; }
   }
 </style>

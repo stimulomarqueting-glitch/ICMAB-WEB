@@ -126,6 +126,8 @@ export interface SiteContent {
     /** Why leaving your data is worth it (early access, pilots, tech talk…). */
     reasons: string[];
     form: {
+      /** numbered fieldset group titles of the "application dossier" */
+      groups: { about: string; organisation: string; project: string };
       fullName: FormField;
       email: FormField;
       organization: FormField;

@@ -1,16 +1,24 @@
 ---
+/**
+ * Numbered section header — sections read as chapters/figures of a paper.
+ * `num` is a decorative chapter number from the page composition.
+ */
 interface Props {
   kicker: string;
   title: string;
   intro?: string;
   id?: string;
+  num?: string;
 }
 
-const { kicker, title, intro, id } = Astro.props;
+const { kicker, title, intro, id, num } = Astro.props;
 ---
 
 <div class="reveal">
-  <p class="kicker">{kicker}</p>
+  <p class="sec-head__label">
+    {num && <span class="sec-head__num" aria-hidden="true">{num}</span>}
+    <span>{kicker}</span>
+  </p>
   <h2 class="section-title" id={id}>{title}</h2>
   {intro && <p class="section-intro">{intro}</p>}
 </div>
