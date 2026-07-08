@@ -1,7 +1,7 @@
 ---
 import { brand } from '../config/brand';
 import { getContent, type Locale } from '../content';
-import DepositionVisual from './DepositionVisual.astro';
+import ParamChip from './ParamChip.astro';
 
 interface Props {
   locale: Locale;
@@ -9,182 +9,156 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = getContent(locale);
+const { claim, claimEs } = brand;
 ---
 
-<section class="hero" aria-labelledby="hero-title">
-  <div class="container">
-    {/* datasheet meta bar: name · claim · origin, under a strong rule */}
-    <p class="hero__meta">
-      <span class="hero__meta-name">{brand.projectName}</span>
-      <span class="hero__meta-claim">{t.hero.eyebrow}</span>
-      <span class="hero__meta-fill" aria-hidden="true"></span>
-      <span class="hero__meta-origin">{t.hero.microcopy}</span>
-    </p>
-
-    <h1 class="hero__title" id="hero-title">
-      {t.hero.headline}
-      <span class="hero__title-accent">{t.hero.headlineAccent}</span>
-    </h1>
-
-    <div class="hero__row">
-      <div class="hero__lead">
-        <p class="hero__sub">{t.hero.subheadline}</p>
-        <div class="hero__ctas">
-          <a class="btn btn--primary" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
-          <a class="btn btn--ghost" href="#technology">{t.hero.ctaSecondary}</a>
-        </div>
-
-        <dl class="hero__stats">
-          {t.hero.stats.map((s) => (
-            <div class="hero__stat">
-              <dt>{s.label}</dt>
-              <dd>{s.value}</dd>
-            </div>
-          ))}
-        </dl>
+<section aria-labelledby="hero-title">
+  <div class="container hero">
+    <div>
+      <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
+      <h1 class="hero__title" id="hero-title">{t.hero.headline}</h1>
+      <p class="hero__descriptor">{t.hero.descriptor}</p>
+      <p class="lead">{t.hero.lead}</p>
+      <div class="hero__ctas">
+        <a class="btn" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
+        <a class="btn btn--ghost" href="#technology">{t.hero.ctaSecondary}</a>
       </div>
+      <p class="hero__claim">
+        <span class="hero__claim-line" aria-hidden="true"></span>
+        {locale === 'es' ? claimEs : claim}
+      </p>
+    </div>
 
-      <div class="hero__visual">
-        <DepositionVisual alt={t.hero.visualAlt} caption={t.hero.visualCaption} />
-      </div>
+    {/* PLACEHOLDER photography from the design source — replace when final
+        brand photography is approved (public/img/hero-device.jpg). */}
+    <img
+      class="hero__photo"
+      src="/img/hero-device.jpg"
+      alt={t.hero.photoAlt}
+      width="1100"
+      height="1647"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="container hero__specstrip">
+    <div class="hero__divider">
+      <span class="eyebrow">{t.hero.paramsLabel}</span>
+      <span class="surface-line surface-line--dots hero__divider-line" aria-hidden="true"></span>
+    </div>
+    <div class="chips">
+      {t.hero.chips.map((c) => (
+        <ParamChip {...c} />
+      ))}
     </div>
   </div>
-  <div class="hero__baseline surface-line surface-line--dots" aria-hidden="true"></div>
 </section>
 
 <style>
   .hero {
-    padding-block: clamp(3rem, 7vw, 5.5rem) 0;
-    background: var(--bg);
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: 3.5rem;
+    align-items: center;
+    padding-block: clamp(3rem, 6vw, 5.5rem) 4rem;
   }
 
-  .hero__meta {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    flex-wrap: wrap;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    border-top: 2px solid var(--text);
-    padding-top: 0.8rem;
-    margin: 0 0 clamp(2rem, 5vw, 3.5rem);
-  }
-
-  .hero__meta-name {
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .hero__meta-claim {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .hero__meta-fill {
-    flex: 1;
-    min-width: 2rem;
-  }
-
-  .hero__meta-origin {
-    text-align: right;
+  .hero__eyebrow {
+    color: var(--text-muted);
   }
 
   .hero__title {
-    font-size: clamp(2.7rem, 7.4vw, 5.9rem);
-    font-weight: 600;
+    font-size: clamp(2.5rem, 5.4vw, 4.25rem);
     line-height: 1.02;
-    letter-spacing: -0.035em;
-    max-width: 20ch;
-    margin: 0 0 clamp(2rem, 4.5vw, 3.2rem);
+    margin-top: 0.9rem;
   }
 
-  /* the accent phrase carries the deposited layer: a thick teal underline */
-  .hero__title-accent {
-    display: inline;
-    background: linear-gradient(var(--accent), var(--accent)) no-repeat left 96% / 100% 0.09em;
-    padding-bottom: 0.06em;
-  }
-
-  .hero__row {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: clamp(2.5rem, 6vw, 5.5rem);
-    align-items: start;
-  }
-
-  .hero__sub {
-    font-size: 1.18rem;
-    line-height: 1.65;
-    color: var(--text-2);
-    max-width: 33rem;
-    margin-bottom: 2rem;
+  .hero__descriptor {
+    font-family: var(--font-mono);
+    font-size: 0.94rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 1.25rem;
+    letter-spacing: 0.01em;
   }
 
   .hero__ctas {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem;
+    gap: 0.75rem;
+    margin-top: 2rem;
   }
 
-  /* readout table: three columns divided by hairlines, mono values */
-  .hero__stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.4rem;
-    margin: clamp(2rem, 4vw, 3rem) 0 0;
-    border-top: 1px solid var(--line-strong);
-    padding-top: 1.3rem;
-  }
-
-  .hero__stat + .hero__stat {
-    border-left: 1px solid var(--line);
-    padding-left: 1.4rem;
-  }
-
-  .hero__stat dd {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 1.45rem;
+  .hero__claim {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 2.25rem;
+    font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--accent-2);
+    font-size: 0.94rem;
+    color: var(--ink);
   }
 
-  .hero__stat dt {
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    order: 2;
-    margin-top: 0.3rem;
+  /* the gradient IS the sublimation — process moments only */
+  .hero__claim-line {
+    display: inline-block;
+    width: 2.75rem;
+    height: 3px;
+    background: var(--grad-vapor-line);
+    border-radius: 2px;
   }
 
-  .hero__baseline {
-    margin-top: clamp(3rem, 6vw, 4.5rem);
+  .hero__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center 30%;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .hero__specstrip {
+    padding-bottom: clamp(3.5rem, 6vw, 5.5rem);
+  }
+
+  .hero__divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero__divider-line {
+    flex: 1;
+  }
+
+  .hero__specstrip .chips {
+    margin-top: 1rem;
   }
 
   @media (max-width: 56rem) {
-    .hero__row { grid-template-columns: 1fr; }
-    .hero__visual { max-width: 27rem; }
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+      padding-block: 3rem 2.5rem;
+    }
+
+    .hero__photo {
+      aspect-ratio: 16 / 10;
+      object-position: center 40%;
+    }
+
+    /* the mono descriptor and CTA reach the first screen sooner on mobile */
+    .hero__eyebrow {
+      font-size: 0.62rem;
+    }
   }
 
-  @media (max-width: 36rem) {
-    .hero__stats {
-      grid-template-columns: 1fr;
-      gap: 0.9rem;
+  @media (max-width: 40rem) {
+    .hero__ctas .btn {
+      width: 100%;
     }
-
-    .hero__stat + .hero__stat {
-      border-left: 0;
-      padding-left: 0;
-      border-top: 1px solid var(--line);
-      padding-top: 0.9rem;
-    }
-
-    .hero__meta-origin { text-align: left; }
   }
 </style>

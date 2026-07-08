@@ -1,216 +1,134 @@
 ---
 import { brand } from '../config/brand';
 import { getContent, type Locale } from '../content';
+import BrandMark from './BrandMark.astro';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const content = getContent(locale);
-const t = content.footer;
-const ctaButton = content.conversion.footer.button;
-const claim = locale === 'es' ? brand.claimEs : brand.claim;
-const year = new Date().getFullYear();
+const t = getContent(locale).footer;
 ---
 
 <footer class="footer">
   <div class="container">
-    <div class="footer__grid">
+    <div class="footer__top">
       <div class="footer__brand">
-        <p class="footer__name">
-          <span class="footer__mark" aria-hidden="true">
-            <svg viewBox="0 0 32 32" fill="none">
-              <path d="M4 25.5h24" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              <path d="M8 25.5C13 21 15 14 24 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="0.1 4.5" />
-              <circle cx="24" cy="8" r="2.6" fill="currentColor" />
-              <circle cx="13" cy="21.5" r="1.7" fill="#2fd9c3" />
-            </svg>
-          </span>
+        <a class="footer__logo" href="#top">
+          <BrandMark />
           {brand.projectName}
-        </p>
-        <p class="footer__claim">{claim}</p>
+        </a>
         <p class="footer__desc">{t.description}</p>
+        <a class="btn btn--sm footer__cta" href="#waitlist" data-cta-source="footer">{t.cta}</a>
       </div>
 
-      <nav aria-label={t.navTitle}>
-        <h2 class="footer__title">{t.navTitle}</h2>
-        <ul role="list">
-          {t.nav.map((item) => (
-            <li><a href={item.href}>{item.label}</a></li>
-          ))}
-        </ul>
-      </nav>
-
-      <div>
-        <h2 class="footer__title">{t.contactTitle}</h2>
-        <p class="footer__desc">{t.contactText}</p>
-        {/* TODO(client): replace placeholder email in src/config/brand.ts */}
-        <a class="footer__mail" href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
-        <a class="btn btn--ghost footer__cta" href="#waitlist" data-cta-source="footer">{ctaButton}</a>
-      </div>
-
-      <div>
-        <h2 class="footer__title">{t.legalTitle}</h2>
-        <ul role="list">
-          {/* TODO(client): link real privacy policy & legal notice pages */}
-          {t.legal.map((item) => (
-            <li><a href={item.href}>{item.label}</a></li>
-          ))}
-        </ul>
-        <h2 class="footer__title footer__title--lang">{t.languageTitle}</h2>
-        <ul role="list" class="footer__langs">
-          <li><a href="/" aria-current={locale === 'en' ? 'true' : undefined}>English</a></li>
-          <li><a href="/es/" aria-current={locale === 'es' ? 'true' : undefined}>Español</a></li>
-        </ul>
+      <div class="footer__nav">
+        {t.columns.map((col) => (
+          <div>
+            <span class="eyebrow">{col.title}</span>
+            {col.links.map((link) => (
+              <a href={link.href}>{link.label}</a>
+            ))}
+          </div>
+        ))}
+        <div>
+          <span class="eyebrow">{t.languageTitle}</span>
+          <a href="/" aria-current={locale === 'en' ? 'true' : undefined}>English</a>
+          <a href="/es/" aria-current={locale === 'es' ? 'true' : undefined}>Español</a>
+        </div>
       </div>
     </div>
 
     <div class="footer__bottom">
-      <p>© {year} · {t.copyright}</p>
+      <span>{t.copyright}</span>
+      <span class="mono">{t.bottomMono}</span>
     </div>
   </div>
 </footer>
 
 <style>
   .footer {
-    background: var(--bg-inverse);
-    color: var(--text-on-dark-2);
-    padding: 4rem 0 2rem;
-    position: relative;
+    border-top: 1px solid var(--silica);
+    padding: 4rem 0 2.5rem;
+    margin-top: 2rem;
   }
 
-  /* deposition dots resting on the footer's top edge — the last surface */
-  .footer::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-image: radial-gradient(circle, var(--accent-2) 1.2px, transparent 1.4px);
-    background-size: 12px 3px;
-    background-repeat: repeat-x;
-    opacity: 0.55;
-  }
-
-  .footer__grid {
-    display: grid;
-    grid-template-columns: 1.4fr 0.8fr 1fr 0.8fr;
-    gap: 2.5rem;
-  }
-
-  .footer__name {
+  .footer__top {
     display: flex;
+    justify-content: space-between;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .footer__brand {
+    max-width: 21rem;
+  }
+
+  .footer__logo {
+    display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     font-family: var(--font-display);
-    font-size: 1.2rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--text-on-dark);
-    margin: 0;
+    font-size: 1.1rem;
+    color: var(--ink);
   }
 
-  .footer__mark {
-    display: inline-flex;
-    width: 1.7rem;
-    height: 1.7rem;
-    color: var(--text-on-dark);
-  }
-
-  .footer__claim {
-    font-family: var(--font-mono);
-    color: var(--accent);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    margin: 0.45rem 0 1rem;
+  .footer__logo:hover {
+    color: var(--ink);
   }
 
   .footer__desc {
-    color: var(--text-on-dark-2);
-    font-size: 0.9rem;
-    max-width: 22rem;
-  }
-
-  .footer__title {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #74879a;
-    margin-bottom: 0.9rem;
-  }
-
-  .footer__title--lang { margin-top: 1.6rem; }
-
-  .footer ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .footer a:not(.btn) {
-    color: var(--text-on-dark-2);
-    font-size: 0.92rem;
-    text-decoration: none;
-  }
-
-  .footer a:not(.btn):hover {
-    color: var(--text-on-dark);
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
-    text-underline-offset: 3px;
-  }
-
-  .footer ul a[aria-current='true'] {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .footer__mail {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
+    margin-top: 0.9rem;
   }
 
   .footer__cta {
-    display: inline-flex;
-    margin-top: 1.1rem;
-    font-size: 0.88rem;
-    padding: 0.6rem 1.2rem;
-    color: var(--text-on-dark);
-    border-color: rgba(148, 179, 195, 0.3);
+    margin-top: 1.25rem;
   }
 
-  .footer__cta:hover {
-    background: rgba(244, 246, 245, 0.06);
-    border-color: var(--text-on-dark-2);
-    color: var(--text-on-dark);
+  .footer__nav {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .footer__nav div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    min-width: 8rem;
+  }
+
+  .footer__nav a {
+    color: var(--text-body);
+  }
+
+  .footer__nav a:hover {
+    color: var(--ink);
+  }
+
+  .footer__nav a[aria-current='true'] {
+    color: var(--coral-dark);
+    font-weight: 600;
   }
 
   .footer__bottom {
-    margin-top: 3rem;
-    padding-top: 1.4rem;
-    border-top: 1px solid rgba(148, 179, 195, 0.18);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 3.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.81rem;
+    color: var(--text-muted);
   }
 
-  .footer__bottom p {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.03em;
-    color: #74879a;
-  }
-
-  @media (max-width: 56rem) {
-    .footer__grid { grid-template-columns: 1fr 1fr; }
-  }
-
-  @media (max-width: 36rem) {
-    .footer__grid { grid-template-columns: 1fr; gap: 2rem; }
+  .footer__bottom .mono {
+    font-size: 0.75rem;
   }
 </style>

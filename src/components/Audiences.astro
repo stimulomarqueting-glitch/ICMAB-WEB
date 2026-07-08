@@ -7,19 +7,29 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const content = getContent(locale);
-const t = content.audiences;
-const ctaButton = content.conversion.audiences.button;
+const t = getContent(locale).audiences;
+
+/* line icons per audience, drawn in the system's stroke style */
+const icons: Record<string, string> = {
+  surface: 'M3 20h22M8 20c3-2.5 4.5-7 10-10.5M18 9.5m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M7 17.5h.01M11 15h.01',
+  lab: 'M11 3h6M12.5 3v6.5L7 20a1.3 1.3 0 0 0 1.2 1.8h11.6A1.3 1.3 0 0 0 21 20l-5.5-10.5V3M9.5 15.5h9',
+  insitu: 'M4 14h20M4 14v6h20v-6M9 14V9a5 5 0 0 1 10 0v5M12 20h4',
+  modularity: 'M4 4h8v8H4zM16 4h8v8h-8zM4 16h8v8H4zM18 18h4v4',
+};
 ---
 
-<section class="section" id="who-is-it-for" aria-labelledby="audiences-title">
+<section class="sec hairtop" id="who-is-it-for" aria-labelledby="audiences-title">
   <div class="container">
-    <SectionHeader num="06" kicker={t.kicker} title={t.title} intro={t.intro} id="audiences-title" />
+    <SectionHeader kicker={t.kicker} title={t.title} id="audiences-title" />
 
     <div class="aud__grid">
-      {t.groups.map((g, i) => (
-        <article class="aud__item reveal">
-          <span class="aud__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+      {t.groups.map((g) => (
+        <article class="panel aud__card reveal">
+          <span class="aud__icon" aria-hidden="true">
+            <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d={icons[g.icon] ?? icons.lab}></path>
+            </svg>
+          </span>
           <div>
             <h3>{g.title}</h3>
             <p>{g.text}</p>
@@ -28,11 +38,10 @@ const ctaButton = content.conversion.audiences.button;
       ))}
     </div>
 
-    {/* the pull-quote of the paper */}
-    <blockquote class="aud__quote reveal">
-      <p>{t.quote}</p>
-      <a class="btn btn--primary aud__cta" href="#waitlist" data-cta-source="audiences">{ctaButton}</a>
-    </blockquote>
+    <div class="aud__ctaline reveal">
+      <a class="btn btn--ghost" href="#waitlist" data-cta-source="audiences">{t.ctaButton}</a>
+      <span>{t.ctaNote}</span>
+    </div>
   </div>
 </section>
 
@@ -40,59 +49,49 @@ const ctaButton = content.conversion.audiences.button;
   .aud__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0 clamp(2rem, 4vw, 3.5rem);
+    gap: 1.5rem;
+    margin-top: 3rem;
   }
 
-  .aud__item {
+  .aud__card {
+    padding: 1.75rem;
     display: flex;
-    gap: 1.3rem;
-    padding: 1.2rem 0;
-    border-bottom: 1px solid var(--line);
+    gap: 1.25rem;
+    align-items: flex-start;
   }
 
-  .aud__num {
-    flex: 0 0 2rem;
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: var(--text-3);
-    line-height: 1.9;
+  .aud__icon {
+    color: var(--coral-dark);
+    flex: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-top: 0.15rem;
   }
 
-  .aud__item h3 {
-    font-size: 1.02rem;
-    margin-bottom: 0.25rem;
+  .aud__card h3 {
+    font-family: var(--font-body);
+    font-size: 1.19rem;
   }
 
-  .aud__item p {
-    margin: 0;
-    color: var(--text-2);
-    font-size: 0.93rem;
+  .aud__card p {
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
   }
 
-  .aud__quote {
-    margin: clamp(3rem, 6vw, 4.5rem) 0 0;
-    padding-left: clamp(1.5rem, 4vw, 2.6rem);
-    border-left: 3px solid var(--accent);
-    max-width: 56rem;
+  .aud__ctaline {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
   }
 
-  .aud__quote p {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.3rem, 2.6vw, 1.8rem);
-    font-weight: 500;
-    line-height: 1.45;
-    letter-spacing: -0.015em;
-    color: var(--text);
-    text-wrap: pretty;
+  .aud__ctaline span {
+    font-size: 0.94rem;
+    color: var(--text-body);
   }
 
-  .aud__cta {
-    margin-top: 1.8rem;
-  }
-
-  @media (max-width: 48rem) {
+  @media (max-width: 56rem) {
     .aud__grid { grid-template-columns: 1fr; }
   }
 </style>

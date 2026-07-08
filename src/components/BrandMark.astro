@@ -1,0 +1,18 @@
+---
+/**
+ * Coral Vapor brand mark: the surface line with three deposited dots —
+ * coral (material) · violet (vapour) · lavender (layer).
+ */
+interface Props {
+  size?: number;
+}
+
+const { size = 22 } = Astro.props;
+---
+
+<svg width={size} height={size} viewBox="0 0 22 22" aria-hidden="true">
+  <line x1="1" y1="15.5" x2="21" y2="15.5" stroke="#26241F" stroke-width="1.6" />
+  <circle cx="6.5" cy="13" r="1.9" fill="#F0532F" />
+  <circle cx="11.5" cy="13" r="1.9" fill="#6C4BD8" />
+  <circle cx="16.5" cy="13" r="1.9" fill="#C9BCF2" />
+</svg>

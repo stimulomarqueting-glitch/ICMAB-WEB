@@ -1,0 +1,156 @@
+---
+/**
+ * Accessible accordion for expanded/technical detail.
+ * The page must be understandable without opening any item — these hold
+ * the "go deeper" layer only.
+ *
+ * A11y: <button aria-expanded aria-controls> toggles a labelled region;
+ * fully keyboard-operable (native button), motion-safe.
+ */
+interface Props {
+  title: string;
+  items: { q: string; a: string }[];
+  /** unique prefix so multiple accordions could coexist */
+  idPrefix?: string;
+}
+
+const { title, items, idPrefix = 'acc' } = Astro.props;
+---
+
+<div class="acc reveal">
+  <p class="eyebrow">{title}</p>
+  <ul class="acc__list" role="list">
+    {items.map((item, i) => (
+      <li class="acc__item">
+        <h3 class="acc__heading">
+          <button
+            type="button"
+            class="acc__trigger"
+            id={`${idPrefix}-t-${i}`}
+            aria-expanded="false"
+            aria-controls={`${idPrefix}-p-${i}`}
+          >
+            {item.q}
+            <span class="acc__icon" aria-hidden="true"></span>
+          </button>
+        </h3>
+        <div
+          class="acc__panel"
+          id={`${idPrefix}-p-${i}`}
+          role="region"
+          aria-labelledby={`${idPrefix}-t-${i}`}
+          hidden
+        >
+          <p>{item.a}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .acc {
+    margin-top: 3rem;
+  }
+
+  .acc__list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .acc__item {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .acc__heading {
+    margin: 0;
+  }
+
+  .acc__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 1.1rem 0.25rem;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color var(--dur-fast) var(--ease);
+  }
+
+  .acc__trigger:hover {
+    color: var(--coral-dark);
+  }
+
+  /* plus → minus, drawn with borders (no icon font) */
+  .acc__icon {
+    position: relative;
+    flex: none;
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .acc__icon::before,
+  .acc__icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    background: var(--coral);
+    transition: transform var(--dur-base) var(--ease);
+  }
+
+  .acc__icon::before {
+    width: 100%;
+    height: 2px;
+  }
+
+  .acc__icon::after {
+    width: 2px;
+    height: 100%;
+  }
+
+  .acc__trigger[aria-expanded='true'] .acc__icon::after {
+    transform: scaleY(0);
+  }
+
+  .acc__panel {
+    padding: 0 0.25rem 1.35rem;
+  }
+
+  .acc__panel p {
+    max-width: 70ch;
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .acc__panel:not([hidden]) {
+      animation: acc-open var(--dur-base) var(--ease-out);
+    }
+
+    @keyframes acc-open {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.acc__trigger').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const panel = document.getElementById(btn.getAttribute('aria-controls') ?? '');
+      btn.setAttribute('aria-expanded', String(!expanded));
+      if (panel) panel.hidden = expanded;
+    });
+  });
+</script>

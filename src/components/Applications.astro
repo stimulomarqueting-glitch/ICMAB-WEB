@@ -7,155 +7,86 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const content = getContent(locale);
-const t = content.applications;
-const ctaButton = content.conversion.applications.button;
+const t = getContent(locale).applications;
 ---
 
-<section class="section" id="applications" aria-labelledby="applications-title">
+<section class="sec hairtop mist" id="applications" aria-labelledby="applications-title">
   <div class="container">
-    <SectionHeader num="05" kicker={t.kicker} title={t.title} intro={t.intro} id="applications-title" />
+    <SectionHeader
+      kicker={t.kicker}
+      kickerNote={t.kickerNote}
+      title={t.title}
+      id="applications-title"
+    />
 
-    <ul class="apps__tags reveal" role="list" aria-hidden="true">
+    <div class="apps__grid">
       {t.items.map((app) => (
-        <li class="apps__tag">{app.short}</li>
+        <article class="panel apps__card reveal">
+          <span class="apps__sub">{app.sub}</span>
+          <h3>{app.name}</h3>
+          <p>{app.text}</p>
+        </article>
       ))}
-    </ul>
+    </div>
 
-    {/* the index of the paper: every application is an entry */}
-    <ol class="apps__index">
-      {t.items.map((app, i) => (
-        <li class="apps__row reveal">
-          <span class="apps__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-          <h3 class="apps__name">
-            <span class="apps__prefix">{t.surfacesForLabel}</span>
-            <span class="apps__word">{app.name}<span class="apps__dot" aria-hidden="true">.</span></span>
-          </h3>
-          <p class="apps__text">{app.text}</p>
-        </li>
-      ))}
-    </ol>
-
-    <div class="apps__open reveal">
-      <p>{t.openEnded}</p>
-      <a class="btn btn--ghost" href="#waitlist" data-cta-source="applications">{ctaButton}</a>
+    <div class="apps__ctaline reveal">
+      <a class="btn" href="#waitlist" data-cta-source="applications">{t.ctaButton}</a>
+      <span>{t.ctaNote}</span>
     </div>
   </div>
 </section>
 
 <style>
-  .apps__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.4rem;
-    list-style: none;
-    margin: 0 0 2.4rem;
-    padding: 0;
-  }
-
-  .apps__tag {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-
-  .apps__tag::before {
-    content: '·';
-    color: var(--accent);
-    margin-right: 0.5rem;
-  }
-
-  .apps__index {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .apps__row {
+  .apps__grid {
     display: grid;
-    grid-template-columns: 3rem 1fr minmax(16rem, 24rem);
-    gap: 1rem 2.5rem;
-    align-items: baseline;
-    padding: 1.7rem 0;
-    border-top: 1px solid var(--line-strong);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
   }
 
-  .apps__row:last-child {
-    border-bottom: 1px solid var(--line-strong);
+  .apps__card {
+    padding: 1.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
   }
 
-  .apps__num {
+  .apps__sub {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-3);
+    font-size: 0.69rem;
+    color: var(--violet-dark);
+    letter-spacing: 0.02em;
   }
 
-  .apps__name {
-    margin: 0;
-    font-size: clamp(1.5rem, 3.4vw, 2.5rem);
-    font-weight: 600;
-    letter-spacing: -0.025em;
-    line-height: 1.1;
+  .apps__card h3 {
+    font-family: var(--font-body);
+    font-size: 1.19rem;
   }
 
-  .apps__prefix {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 0.4rem;
+  .apps__card p {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    flex: 1;
   }
 
-  /* teal underline sweeps in — the layer deposits under the word */
-  .apps__word {
-    background: linear-gradient(var(--accent), var(--accent)) no-repeat left 96% / 0 0.08em;
-    padding-bottom: 0.05em;
-    transition: background-size var(--dur-slow) var(--ease-out);
-  }
-
-  .apps__row:hover .apps__word {
-    background-size: 100% 0.08em;
-  }
-
-  .apps__dot {
-    color: var(--accent);
-  }
-
-  .apps__text {
-    margin: 0;
-    color: var(--text-2);
-    font-size: 0.95rem;
-  }
-
-  .apps__open {
-    margin-top: 2.6rem;
+  .apps__ctaline {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    margin-top: 3rem;
     flex-wrap: wrap;
-    max-width: 52rem;
   }
 
-  .apps__open p {
-    margin: 0;
-    color: var(--text-2);
-    flex: 1 1 18rem;
+  .apps__ctaline span {
+    font-size: 0.94rem;
+    color: var(--text-body);
   }
 
-  @media (max-width: 48rem) {
-    .apps__row {
-      grid-template-columns: 3rem 1fr;
-    }
+  @media (max-width: 56rem) {
+    .apps__grid { grid-template-columns: 1fr 1fr; }
+  }
 
-    .apps__text {
-      grid-column: 2;
-    }
+  @media (max-width: 40rem) {
+    .apps__grid { grid-template-columns: 1fr; }
   }
 </style>

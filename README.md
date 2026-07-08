@@ -1,8 +1,10 @@
-# SUBLIMAT — Landing Page
+# The MatSurfer — Landing Page
 
-First iteration of the website for **SUBLIMAT** (provisional name), an ICMAB-CSIC
-technology-transfer project: a family of compact devices for direct material
-deposition on surfaces.
+Website for **The MatSurfer** (formerly SUBLIMAT), an ICMAB-CSIC
+technology-transfer project: a compact device for direct material deposition
+on surfaces by sublimation, at lab scale. Visual identity: "Coral Vapor"
+design system (Sora / Manrope / IBM Plex Mono, coral–violet–lavender on warm
+white).
 
 Built with [Astro](https://astro.build) — fully static output, no client-side
 framework, minimal JavaScript (mobile menu, form validation, scroll reveal).
@@ -89,7 +91,7 @@ Any service that accepts a **JSON POST** works:
 
 ```json
 {
-  "project": "SUBLIMAT",
+  "project": "The MatSurfer",
   "language": "en | es",
   "sourcePage": "/ | /es/",
   "ctaSource": "hero | header | technology | applications | audiences | footer | lead-magnet | direct",
@@ -97,11 +99,11 @@ Any service that accepts a **JSON POST** works:
   "email": "…",
   "organization": "…",
   "role": "…",
-  "country": "…",
-  "organizationType": "university-research | corporate-rd | startup-spinoff | distributor | investor-tt | other",
-  "areaOfInterest": "oleds | sensors | organic-electronics | coatings | biomaterials | advanced-materials | other | ''",
-  "currentNeed": "test-device | technical-info | research-application | distribution-partnership | evaluating-equipment | other",
-  "timeline": "now-3-months | 3-6-months | 6-12-months | exploring | ''",
+  "country": "country name (English value in both locales)",
+  "organizationType": "academic-research-group | public-research-centre | corporate-rd | testing-services | distributor | tech-transfer | other",
+  "areaOfInterest": "oleds | solar-cells | sensors | organic-electronics | coatings | new-surface-materials | other",
+  "currentNeed": "exploring | evaluating-project | active-pilot | distribution-partnership | ''",
+  "timeline": "within-3-months | 3-6-months | 6-12-months | beyond-12-months | following | ''",
   "message": "…",
   "consent": true,
   "utm": { "source": "", "medium": "", "campaign": "", "content": "", "term": "" },
@@ -109,9 +111,10 @@ Any service that accepts a **JSON POST** works:
 }
 ```
 
-Required fields: full name, work email, organization, organization type,
-current need, consent. The rest are optional to keep friction low; they still
-feed lead qualification when filled.
+Required fields: full name, work email, organisation, country, organisation
+type, area of interest, consent. Role, current need, timeline and message are
+optional (labelled as such) to keep friction low; they still feed lead
+qualification when filled.
 
 ### CTA source tracking & conversion events
 

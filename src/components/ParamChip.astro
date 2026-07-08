@@ -1,0 +1,18 @@
+---
+/**
+ * Technical parameter chip: mono symbol + value/unit, or symbol + short label.
+ * Signature motif of the Coral Vapor system.
+ */
+import type { ParamChip } from '../content/types';
+
+type Props = ParamChip;
+
+const { symbol, value, unit, label } = Astro.props;
+---
+
+<span class="param-chip">
+  <span class="k">{symbol}</span>
+  {value && <span>{value}</span>}
+  {unit && <span class="u">{unit}</span>}
+  {label && <span class="u">{label}</span>}
+</span>

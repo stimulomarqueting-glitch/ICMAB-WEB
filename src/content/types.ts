@@ -1,29 +1,12 @@
 /**
  * Shared shape for all locale content files (en.ts / es.ts).
- * Adding a new language = create a new file implementing `SiteContent`
- * and register it in src/content/index.ts.
+ * v2 — "Coral Vapor" low-density layout: short visible copy per section,
+ * expanded detail lives in the technology accordion.
  */
 
 export interface NavItem {
   label: string;
   href: string;
-}
-
-export interface Stat {
-  value: string;
-  label: string;
-}
-
-export interface Card {
-  title: string;
-  text: string;
-  /** key used to pick an inline SVG icon in the component layer */
-  icon?: string;
-}
-
-export interface Step {
-  title: string;
-  text: string;
 }
 
 export interface SelectOption {
@@ -35,6 +18,14 @@ export interface FormField {
   label: string;
   placeholder?: string;
   error?: string;
+}
+
+/** Technical parameter chip: symbol in mono + value/unit or a short label. */
+export interface ParamChip {
+  symbol: string;
+  value?: string;
+  unit?: string;
+  label?: string;
 }
 
 export interface SiteContent {
@@ -53,114 +44,102 @@ export interface SiteContent {
   hero: {
     eyebrow: string;
     headline: string;
-    headlineAccent: string;
-    subheadline: string;
+    /** category descriptor line under the H1, mono */
+    descriptor: string;
+    lead: string;
     ctaPrimary: string;
     ctaSecondary: string;
-    microcopy: string;
-    stats: Stat[];
-    visualCaption: string;
-    visualAlt: string;
+    photoAlt: string;
+    /** label on the spec divider line */
+    paramsLabel: string;
+    chips: ParamChip[];
   };
   problem: {
     kicker: string;
     title: string;
-    intro: string;
-    points: Card[];
-    bridge: string;
+    lead: string;
+    cards: { tag: string; title: string; text: string }[];
   };
   technology: {
     kicker: string;
     title: string;
-    intro: string;
-    whatIsIt: { title: string; text: string };
-    steps: Step[];
-    stepsTitle: string;
-    features: Card[];
-    featuresTitle: string;
-    schematicAlt: string;
-    schematicNote: string;
+    lead: string;
+    diagramAlt: string;
+    /** phase captions under the process diagram, in order */
+    diagramCaption: string[];
+    steps: { title: string; text: string }[];
+    facts: { value: string; text: string }[];
+    factImgAlt: string;
+    /** expanded detail accordion ("understand without opening; open to go deeper") */
+    accordionTitle: string;
+    accordion: { q: string; a: string }[];
+    ctaBandText: string;
+    ctaBandButton: string;
   };
   benefits: {
     kicker: string;
     title: string;
-    intro: string;
-    items: Card[];
+    specsHead: string;
+    specs: { sym: string; text: string }[];
+    outcomesHead: string;
+    outcomes: { title: string; text: string }[];
   };
   applications: {
     kicker: string;
+    kickerNote: string;
     title: string;
-    intro: string;
-    /** rendered as "Surfaces for {name}" cards */
-    surfacesForLabel: string;
-    items: { name: string; short: string; text: string }[];
-    openEnded: string;
+    items: { sub: string; name: string; text: string }[];
+    ctaButton: string;
+    ctaNote: string;
   };
   audiences: {
     kicker: string;
     title: string;
-    intro: string;
-    groups: Card[];
-    quote: string;
+    groups: { icon: string; title: string; text: string }[];
+    ctaButton: string;
+    ctaNote: string;
   };
   credibility: {
     kicker: string;
     title: string;
-    intro: string;
-    facts: Card[];
-    logosTitle: string;
-    logoPlaceholders: string[];
-    phaseNote: string;
-  };
-  /** Contextual conversion CTAs distributed across the page (all → #waitlist). */
-  conversion: {
-    technology: { title: string; text: string; button: string };
-    applications: { button: string };
-    audiences: { button: string };
-    footer: { button: string };
+    lead: string;
+    photoAlt: string;
+    chips: ParamChip[];
+    heritage: { title: string; body: string; logos: string[]; note: string };
   };
   waitlist: {
     kicker: string;
     title: string;
-    intro: string;
-    /** Why leaving your data is worth it (early access, pilots, tech talk…). */
-    reasons: string[];
+    lead: string;
+    steps: string[];
     form: {
-      /** numbered fieldset group titles of the "application dossier" */
-      groups: { about: string; organisation: string; project: string };
       fullName: FormField;
       email: FormField;
       organization: FormField;
       role: FormField;
-      country: FormField;
+      country: FormField & { options: SelectOption[] };
       organizationType: FormField & { options: SelectOption[] };
       areaOfInterest: FormField & { options: SelectOption[] };
       currentNeed: FormField & { options: SelectOption[] };
       timeline: FormField & { options: SelectOption[] };
       message: FormField;
-      /** Consent sentence is split so the privacy-policy link can be injected. */
       consent: { labelBefore: string; privacyLabel: string; labelAfter: string; error: string };
+      optionalTag: string;
+      selectPlaceholder: string;
       submit: string;
       submitting: string;
-      noSpam: string;
       successTitle: string;
       successText: string;
       /** Ends mid-sentence; the contact email link is appended in markup. */
       errorText: string;
-      requiredHint: string;
     };
-    /** Optional download block, rendered only when leadCapture.leadMagnet.enabled. */
-    leadMagnet: { title: string; text: string; button: string };
   };
   footer: {
     description: string;
-    navTitle: string;
-    nav: NavItem[];
-    contactTitle: string;
-    contactText: string;
-    legalTitle: string;
-    legal: NavItem[];
+    cta: string;
+    columns: { title: string; links: NavItem[] }[];
     languageTitle: string;
     copyright: string;
+    bottomMono: string;
   };
 }

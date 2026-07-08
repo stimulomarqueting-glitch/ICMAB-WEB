@@ -1,24 +1,44 @@
 ---
 /**
- * Numbered section header — sections read as chapters/figures of a paper.
- * `num` is a decorative chapter number from the page composition.
+ * Compact section header: mono eyebrow + short title + optional short lead.
+ * Low density by design — titles cap at ~22ch, leads at ~58ch (see global.css).
  */
 interface Props {
   kicker: string;
+  /** optional right-aligned mono note on the eyebrow row */
+  kickerNote?: string;
   title: string;
-  intro?: string;
+  lead?: string;
   id?: string;
-  num?: string;
 }
 
-const { kicker, title, intro, id, num } = Astro.props;
+const { kicker, kickerNote, title, lead, id } = Astro.props;
 ---
 
 <div class="reveal">
-  <p class="sec-head__label">
-    {num && <span class="sec-head__num" aria-hidden="true">{num}</span>}
-    <span>{kicker}</span>
-  </p>
-  <h2 class="section-title" id={id}>{title}</h2>
-  {intro && <p class="section-intro">{intro}</p>}
+  {kickerNote ? (
+    <div class="sec-head__row">
+      <p class="eyebrow">{kicker}</p>
+      <p class="eyebrow sec-head__note">{kickerNote}</p>
+    </div>
+  ) : (
+    <p class="eyebrow">{kicker}</p>
+  )}
+  <h2 class="h2" id={id}>{title}</h2>
+  {lead && <p class="lead">{lead}</p>}
 </div>
+
+<style>
+  .sec-head__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 40rem) {
+    .sec-head__note {
+      display: none;
+    }
+  }
+</style>

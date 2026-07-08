@@ -1,6 +1,7 @@
 ---
 import { brand } from '../config/brand';
 import { getContent, localePath, type Locale } from '../content';
+import BrandMark from './BrandMark.astro';
 
 interface Props {
   locale: Locale;
@@ -9,9 +10,7 @@ interface Props {
 const { locale } = Astro.props;
 const t = getContent(locale);
 const home = `${localePath(locale)}/`;
-const claim = locale === 'es' ? brand.claimEs : brand.claim;
 
-/** Language switcher targets (anchor-less: switching language returns to top). */
 const langLinks: { code: Locale; label: string; href: string }[] = [
   { code: 'en', label: 'EN', href: '/' },
   { code: 'es', label: 'ES', href: '/es/' },
@@ -21,19 +20,8 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
 <header class="header">
   <div class="container header__inner">
     <a class="header__logo" href={home} aria-label={`${brand.projectName} — home`}>
-      {/* Brand mark: the surface line, the particle trajectory, the molecule */}
-      <span class="header__mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none">
-          <path d="M4 25.5h24" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <path d="M8 25.5C13 21 15 14 24 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="0.1 4.5" />
-          <circle cx="24" cy="8" r="2.6" fill="currentColor" />
-          <circle cx="13" cy="21.5" r="1.7" fill="#2fd9c3" />
-        </svg>
-      </span>
-      <span class="header__name">
-        {brand.projectName}
-        <small>{claim}</small>
-      </span>
+      <BrandMark />
+      {brand.projectName}
     </a>
 
     <nav class="header__nav" aria-label="Main">
@@ -55,12 +43,12 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
           ))}
         </li>
         <li class="header__menu-cta">
-          <a class="btn btn--primary" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
+          <a class="btn" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
         </li>
       </ul>
     </nav>
 
-    <a class="btn btn--primary header__cta" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
+    <a class="btn btn--sm header__cta" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
 
     <button
       class="header__burger"
@@ -80,12 +68,12 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
   .header {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 40;
     height: var(--header-h);
-    background: rgba(11, 15, 19, 0.85);
+    background: rgba(248, 246, 243, 0.88);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .header__inner {
@@ -96,102 +84,70 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
   }
 
   .header__logo {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    color: var(--text);
-    margin-right: auto;
-    text-decoration: none;
-  }
-
-  .header__mark {
-    width: 2.1rem;
-    height: 2.1rem;
-    color: var(--text);
     display: inline-flex;
-  }
-
-  .header__name {
-    display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.02rem;
-    letter-spacing: 0.03em;
-    line-height: 1.1;
-    color: var(--text);
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-right: auto;
   }
 
-  .header__name small {
-    font-family: var(--font-mono);
-    font-weight: 500;
-    white-space: nowrap;
-    font-size: 0.6rem;
-    letter-spacing: 0.16em;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-top: 0.18rem;
+  .header__logo:hover {
+    color: var(--ink);
   }
 
   .header__menu {
     display: flex;
     align-items: center;
-    gap: 1.7rem;
+    gap: 1.75rem;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .header__menu > li > a:not(.btn) {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
+    font-size: 0.88rem;
     font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-2);
-    text-decoration: none;
-    padding-bottom: 0.25rem;
-    border-bottom: 1px solid transparent;
-    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+    color: var(--text-body);
   }
 
   .header__menu > li > a:not(.btn):hover {
-    color: var(--text);
-    border-bottom-color: var(--accent);
+    color: var(--ink);
   }
 
   .header__lang {
     display: flex;
     gap: 0.15rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-s);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
     padding: 0.18rem;
     background: var(--bg-panel);
   }
 
   .header__lang-link {
-    padding: 0.12rem 0.55rem;
-    border-radius: var(--radius-xs);
+    padding: 0.14rem 0.55rem;
+    border-radius: 3px;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     font-weight: 600;
-    color: var(--text-3);
-    text-decoration: none;
+    color: var(--text-muted);
   }
 
-  .header__lang-link:hover { color: var(--text); }
+  .header__lang-link:hover {
+    color: var(--ink);
+  }
 
   .header__lang-link.is-active {
-    background: var(--text);
-    color: var(--bg);
+    background: var(--ink);
+    color: var(--bg-page);
   }
 
-  .header__cta {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.88rem;
+  .header__menu-cta {
+    display: none;
   }
-
-  .header__menu-cta { display: none; }
 
   .visually-hidden {
     position: absolute;
@@ -211,8 +167,8 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
     height: 2.6rem;
     padding: 0.6rem;
     background: transparent;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-s);
+    border: 1px solid var(--silica);
+    border-radius: var(--radius-sm);
     cursor: pointer;
   }
 
@@ -220,7 +176,7 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
     display: block;
     height: 2px;
     width: 100%;
-    background: var(--text);
+    background: var(--ink);
     border-radius: 2px;
     transition: transform var(--dur-base) var(--ease), opacity var(--dur-fast) var(--ease);
   }
@@ -236,10 +192,10 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
     .header__nav {
       position: absolute;
       inset: var(--header-h) 0 auto 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--line);
+      background: var(--bg-page);
+      border-bottom: 1px solid var(--border-subtle);
       display: none;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-md);
     }
 
     .header__nav.is-open { display: block; }
@@ -248,14 +204,14 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
       flex-direction: column;
       align-items: stretch;
       gap: 0;
-      padding: 0.75rem 1.25rem 1.25rem;
+      padding: 0.75rem 1.5rem 1.5rem;
     }
 
     .header__menu > li > a:not(.btn) {
       display: block;
       padding: 0.9rem 0.25rem;
-      font-size: 0.85rem;
-      border-bottom: 1px solid var(--line);
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .header__lang {
@@ -290,7 +246,6 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
       setOpen(burger.getAttribute('aria-expanded') !== 'true');
     });
 
-    // Close the mobile menu when a link is chosen or Escape is pressed.
     nav.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).closest('a')) setOpen(false);
     });

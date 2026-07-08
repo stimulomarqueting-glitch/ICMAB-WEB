@@ -1,5 +1,6 @@
 ---
 import { getContent, type Locale } from '../content';
+import ParamChip from './ParamChip.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -10,128 +11,104 @@ const { locale } = Astro.props;
 const t = getContent(locale).credibility;
 ---
 
-<section class="section" id="credibility" aria-labelledby="credibility-title">
-  <div class="container">
-    <SectionHeader num="07" kicker={t.kicker} title={t.title} intro={t.intro} id="credibility-title" />
-
-    <ul class="cred__facts" role="list">
-      {t.facts.map((fact, i) => (
-        <li class="cred__fact reveal">
-          <span class="cred__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-          <h3>{fact.title}</h3>
-          <p>{fact.text}</p>
-        </li>
-      ))}
-    </ul>
-
-    <div class="cred__logos reveal">
-      <h3 class="mono-label">{t.logosTitle}</h3>
-      <ul role="list">
-        {/* PLACEHOLDER: replace text blocks with official ICMAB / CSIC / FGCSIC
-            logos once institutional approval and files are available. */}
-        {t.logoPlaceholders.map((logo) => (
-          <li class="cred__logo" aria-label={`${logo} (logo placeholder)`}>{logo}</li>
+<section class="sec hairtop" id="credibility" aria-labelledby="credibility-title">
+  <div class="container cred">
+    {/* PLACEHOLDER photography from the design source */}
+    <img
+      class="cred__photo reveal"
+      src="/img/icmab-researcher.jpg"
+      alt={t.photoAlt}
+      width="1000"
+      height="667"
+      loading="lazy"
+    />
+    <div>
+      <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="credibility-title" />
+      <div class="chips cred__chips reveal">
+        {t.chips.map((c) => (
+          <ParamChip {...c} />
         ))}
-      </ul>
-      <p class="cred__note">{t.phaseNote}</p>
+      </div>
+      <div class="panel cred__heritage reveal">
+        <p class="eyebrow">{t.heritage.title}</p>
+        <p class="cred__heritage-body">{t.heritage.body}</p>
+        <ul class="cred__logos" role="list">
+          {/* PLACEHOLDER: swap for official logos once approved */}
+          {t.heritage.logos.map((logo) => (
+            <li aria-label={`${logo} (logo placeholder)`}>{logo}</li>
+          ))}
+        </ul>
+        <p class="cred__note">{t.heritage.note}</p>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .cred__facts {
+  .cred {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0 clamp(1.6rem, 3vw, 2.6rem);
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    grid-template-columns: 5fr 7fr;
+    gap: 4rem;
+    align-items: center;
   }
 
-  .cred__fact {
-    border-top: 1px solid var(--line-strong);
-    padding-top: 1.3rem;
-    position: relative;
+  .cred__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
   }
 
-  .cred__fact::before {
-    content: '';
-    position: absolute;
-    top: -2.5px;
-    left: 0;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent-2);
+  .cred__chips {
+    margin-top: 1.5rem;
   }
 
-  .cred__num {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    font-weight: 600;
-    color: var(--text-3);
-    margin-bottom: 0.9rem;
+  .cred__heritage {
+    margin-top: 2rem;
+    padding: 1.5rem 1.75rem;
+    border-left: 3px solid var(--lavender);
   }
 
-  .cred__fact h3 {
-    font-size: 1.02rem;
-    margin-bottom: 0.4rem;
-  }
-
-  .cred__fact p {
-    color: var(--text-2);
-    font-size: 0.92rem;
-    margin: 0;
+  .cred__heritage-body {
+    font-size: 0.94rem;
+    margin-top: 0.7rem;
+    max-width: 52ch;
   }
 
   .cred__logos {
-    margin-top: clamp(2.5rem, 5vw, 4rem);
-    border-top: 1px solid var(--line);
-    padding-top: 2.2rem;
-  }
-
-  .cred__logos h3 {
-    margin-bottom: 1.2rem;
-  }
-
-  .cred__logos ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.75rem;
     list-style: none;
-    margin: 0;
+    margin: 1.15rem 0 0;
     padding: 0;
   }
 
-  .cred__logo {
+  .cred__logos li {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 9rem;
-    padding: 1rem 1.6rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-s);
-    background: var(--bg-panel);
+    padding: 0.5rem 1.15rem;
+    border: 1px dashed var(--silica);
+    border-radius: var(--radius-sm);
     font-family: var(--font-mono);
     font-weight: 600;
-    letter-spacing: 0.2em;
-    color: var(--text-2);
+    font-size: 0.81rem;
+    letter-spacing: 0.16em;
+    color: var(--text-body);
   }
 
   .cred__note {
-    margin: 1rem 0 0;
-    font-size: 0.8rem;
-    color: var(--text-3);
-    max-width: 40rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.7rem;
   }
 
   @media (max-width: 56rem) {
-    .cred__facts { grid-template-columns: repeat(2, 1fr); }
-    .cred__fact { margin-bottom: 1.6rem; }
-  }
-
-  @media (max-width: 36rem) {
-    .cred__facts { grid-template-columns: 1fr; }
+    .cred {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
   }
 </style>

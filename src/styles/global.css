@@ -1,56 +1,60 @@
 /* ────────────────────────────────────────────────────────────────────────────
-   SUBLIMAT — global styles & design tokens · "BENCH PAPER" (graphite plate)
-   Art direction (from the approved Claude Design preview): the scientific
-   paper turned brand — printed in negative. Graphite plate, warm-white ink,
-   IBM Plex Sans (display) + IBM Plex Mono (every number, unit, parameter).
-   One action colour: solid teal — the technology code IS the action.
-   No glow, no gradients, hairline structure.
+   The MatSurfer — global styles & design tokens · "CORAL VAPOR"
+   From the approved Claude Design system: each colour is a phase of the
+   process — solid material (coral) → heat → vapour (violet) → deposited
+   layer (lavender) → structure (warm graphite) on translucent white.
+   Usage ratio: ~70% neutrals · 15% graphite · 9% coral · 5% violet/lavender.
+   Sora (headings) · Manrope (body/UI) · IBM Plex Mono (params, data).
    ──────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* ---- Colour (project palette: graphite + teal) ---- */
-  --bg: #0b0f13;                    /* graphite plate                 */
-  --bg-panel: #10171f;              /* paper sheet (panels, figures)  */
-  --bg-raised: #151e28;             /* raised surface                 */
-  --bg-inverse: #151e28;            /* chapter bands (flat)           */
+  /* ---- Coral Vapor palette ---- */
+  --coral: #F0532F;                 /* solid material, heat, action, CTA */
+  --coral-dark: #C93E1E;            /* hover / small accessible text     */
+  --violet: #6C4BD8;                /* vapour, transformation, process   */
+  --violet-dark: #5638B8;           /* hover / dark emphasis             */
+  --lavender: #C9BCF2;              /* deposited layer, soft emphasis    */
+  --ink: #26241F;                   /* warm graphite — text, structure   */
+  --valve-red: #E3342B;             /* functional alert ONLY             */
 
-  --text: #f4f6f5;                  /* ink                            */
-  --text-2: #a7b8c4;                /* secondary ink                  */
-  --text-3: #74879a;                /* annotations                    */
-  --text-on-dark: #f4f6f5;
-  --text-on-dark-2: #a7b8c4;
+  /* ---- Support neutrals ---- */
+  --bg-page: #F8F6F3;               /* translucent white                 */
+  --bg-panel: #ffffff;
+  --bg-mist: #EFEBE4;               /* warm glass panel                  */
+  --bg-inverse: #1D1B24;            /* plum-graphite dark sections       */
+  --silica: #D8D2C8;                /* hairlines, disabled               */
+  --border-subtle: #E3DED6;
 
-  --line: rgba(148, 179, 195, 0.14);
-  --line-strong: rgba(148, 179, 195, 0.26);
-  --line-ink: rgba(167, 184, 196, 0.6);
+  --text-strong: var(--ink);
+  --text-body: #57534A;
+  --text-muted: #8A857A;
+  --text-on-dark: #F8F6F3;
+  --text-on-dark-2: #ABA5B8;
 
-  --accent: #2fd9c3;                /* the technology code = the action */
-  --accent-90: #29c2ae;             /* pressed / hover (darken)         */
-  --accent-soft: #8fe9dc;           /* mint — deposited layer, data     */
-  --accent-2: #5aa9ff;              /* electric blue — structure, d     */
-  --accent-ink: #052e2a;            /* ink on accent                    */
-  --accent-dim: rgba(47, 217, 195, 0.13);
+  /* ---- Tints ---- */
+  --coral-tint: #FDE5DE;
+  --violet-tint: #F1EDFB;
+  --valve-red-90: #C92A22;
 
-  --error: #ff7a7a;
-  --error-strong: #ff9d9d;
+  /* ---- The gradient IS the sublimation (process moments only) ---- */
+  --grad-vapor: linear-gradient(120deg, var(--coral) 0%, var(--violet) 58%, var(--lavender) 100%);
+  --grad-vapor-line: linear-gradient(90deg, var(--coral), var(--violet));
 
   /* ---- Typography ---- */
-  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-display: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /* ---- Layout ---- */
   --container: 75rem;
-  --narrow: 47.5rem;
-  --radius-xs: 2px;
-  --radius-s: 4px;
-  --radius-m: 8px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
   --header-h: 4.25rem;
 
-  /* ---- Elevation (near-flat) ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+  /* ---- Elevation — subtle, no heavy shadows ---- */
+  --shadow-sm: 0 1px 2px rgba(23, 26, 26, 0.05);
+  --shadow-md: 0 2px 8px rgba(23, 26, 26, 0.06), 0 1px 2px rgba(23, 26, 26, 0.04);
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(23, 59, 70, 0.06);
 
   /* ---- Motion: instruments settle, they don't spring ---- */
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
@@ -59,7 +63,9 @@
   --dur-base: 200ms;
   --dur-slow: 360ms;
 
-  color-scheme: dark;
+  --focus-ring: var(--violet);
+
+  color-scheme: light;
 }
 
 /* Reset */
@@ -73,17 +79,17 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 1rem);
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text-2);
+  background: var(--bg-page);
+  color: var(--text-body);
   font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.6;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
 }
 
 img,
@@ -100,38 +106,34 @@ h4 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  margin: 0 0 0.55em;
+  letter-spacing: -0.025em;
+  color: var(--text-strong);
+  margin: 0;
   text-wrap: balance;
 }
 
 p {
-  margin: 0 0 1em;
+  margin: 0;
 }
 
 a {
-  color: var(--accent-soft);
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-underline-offset: 3px;
-  transition: text-decoration-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  color: var(--coral-dark);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease);
 }
 
 a:hover {
-  color: var(--text);
-  text-decoration-color: var(--accent);
+  color: var(--coral);
 }
 
 ::selection {
-  background: rgba(47, 217, 195, 0.3);
-  color: var(--text);
+  background: var(--lavender);
+  color: var(--ink);
 }
 
-/* Visible focus for keyboard users — calm teal ring */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
   border-radius: 2px;
 }
 
@@ -142,11 +144,10 @@ a:hover {
   top: -3.5rem;
   z-index: 100;
   padding: 0.6rem 1rem;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: var(--radius-s);
+  background: var(--ink);
+  color: var(--bg-page);
+  font-weight: 700;
+  border-radius: var(--radius-sm);
   transition: top 0.2s var(--ease);
 }
 
@@ -154,36 +155,142 @@ a:hover {
   top: 1rem;
 }
 
-/* Layout helpers */
+/* Layout */
 .container {
-  width: min(100% - 2.5rem, var(--container));
+  width: min(100% - 4rem, var(--container));
   margin-inline: auto;
 }
 
-.section {
-  padding-block: clamp(4.5rem, 10vw, 8.5rem);
-  position: relative;
+.sec {
+  padding-block: clamp(4rem, 8vw, 6rem);
 }
 
-/* chapters are divided by thin rules, not filled bands */
-.section + .section {
-  border-top: 1px solid var(--line);
+.hairtop {
+  border-top: 1px solid var(--border-subtle);
 }
 
-/* ---- Signature motif: mono technical label / eyebrow ---- */
-.mono-label {
+.mist {
+  background: var(--bg-mist);
+}
+
+/* ---- Signature motif: uppercase mono eyebrow ---- */
+.eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.69rem;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Section title + lead (short by design — density is the enemy) */
+.h2 {
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  margin: 0.75rem 0 0;
+  max-width: 22ch;
+}
+
+.lead {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  max-width: 58ch;
+  margin: 1rem 0 0;
+}
+
+/* ---- Buttons: solid coral = the action ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--coral);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.94rem;
+  line-height: 1;
+  padding: 0.95rem 1.75rem;
+  border-radius: var(--radius-md);
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease);
+}
+
+.btn:hover {
+  background: var(--coral-dark);
+  color: #fff;
+}
+
+.btn--sm {
+  padding: 0.7rem 1.15rem;
+  font-size: 0.88rem;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--silica);
+}
+
+.btn--ghost:hover {
+  background: transparent;
+  border-color: var(--text-body);
+  color: var(--ink);
+}
+
+@media (max-width: 40rem) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* ---- Panels ---- */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- Signature motif: parameter chip (s, w, d, m, TRL…) ---- */
+.param-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-strong);
+  padding: 4px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+  white-space: nowrap;
+}
+
+.param-chip .k {
+  color: var(--violet-dark);
+  font-weight: 600;
+}
+
+.param-chip .u {
+  color: var(--text-muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
 /* ---- Signature motif: surface line with deposition dots ---- */
 .surface-line {
   height: 0;
-  border-top: 1px solid var(--line-ink);
+  border-top: 1px solid var(--text-body);
   position: relative;
 }
 
@@ -194,163 +301,21 @@ a:hover {
   right: 0;
   top: -3px;
   height: 3px;
-  background-image: radial-gradient(circle, var(--accent-soft) 1.2px, transparent 1.4px);
+  background-image: radial-gradient(circle, var(--violet) 1.2px, transparent 1.4px);
   background-size: 12px 3px;
   background-repeat: repeat-x;
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
-/* ---- Deposition-dot paper texture ---- */
-.texture-dots {
-  background-image: radial-gradient(circle, rgba(143, 233, 220, 0.07) 1.1px, transparent 1.3px);
-  background-size: 14px 14px;
-}
-
-/* ---- Section headers: numbered figures of the paper ---- */
-.sec-head__label {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
+.mono {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin: 0 0 1.6rem;
 }
 
-.sec-head__num {
-  color: var(--accent);
-}
-
-.sec-head__label::after {
-  content: '';
-  flex: 1;
-  border-top: 1px solid var(--line);
-}
-
-.section-title {
-  font-size: clamp(2rem, 4.4vw, 3.3rem);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  max-width: 46rem;
-}
-
-.section-intro {
-  color: var(--text-2);
-  font-size: 1.1rem;
-  line-height: 1.65;
-  max-width: 40rem;
-  margin-bottom: 3rem;
-}
-
-/* ---- Buttons: rectangular, instrument-like. Solid teal = the action ---- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  padding: 0.85rem 1.6rem;
-  border-radius: var(--radius-s);
-  border: 1px solid transparent;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
-}
-
-.btn--primary {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
-.btn--primary::before {
-  content: '';
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: var(--accent-ink);
-  opacity: 0.85;
-}
-
-.btn--primary:hover {
-  background: var(--accent-90);
-  color: var(--accent-ink);
-}
-
-.btn--primary:active {
-  transform: translateY(1px);
-}
-
-.btn--ghost {
-  background: transparent;
-  color: var(--text);
-  border-color: var(--line-strong);
-}
-
-.btn--ghost:hover {
-  border-color: var(--text-3);
-  background: var(--bg-panel);
-  color: var(--text);
-}
-
-/* Long localized CTA labels must wrap instead of overflowing on small screens */
-@media (max-width: 40rem) {
-  .btn {
-    white-space: normal;
-    text-align: center;
-  }
-}
-
-/* ---- Panels: plate sheet with hairline, near-flat ---- */
-.panel {
-  background: var(--bg-panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-s);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Grids */
-.grid {
-  display: grid;
-  gap: 1.25rem;
-}
-
-.grid--2 { grid-template-columns: repeat(2, 1fr); }
-.grid--3 { grid-template-columns: repeat(3, 1fr); }
-.grid--4 { grid-template-columns: repeat(4, 1fr); }
-
-@media (max-width: 56rem) {
-  .grid--3,
-  .grid--4 { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 36rem) {
-  .grid--2,
-  .grid--3,
-  .grid--4 { grid-template-columns: 1fr; }
-}
-
-/* ---- Technical line icons ---- */
-svg.ic {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* Scroll reveal (JS adds .is-visible; motion-safe only). Instruments settle. */
+/* Scroll reveal (JS adds .is-visible; motion-safe only) */
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
     transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
     transition-delay: var(--rd, 0s);
   }
@@ -360,28 +325,19 @@ svg.ic {
     transform: none;
   }
 
-  /* staggered settle for sibling items */
-  .grid > .reveal:nth-child(2),
+  div > .reveal:nth-child(2),
   ol > .reveal:nth-child(2),
-  ul > .reveal:nth-child(2),
-  div > .reveal:nth-child(2) { --rd: 60ms; }
-  .grid > .reveal:nth-child(3),
+  ul > .reveal:nth-child(2) { --rd: 60ms; }
+  div > .reveal:nth-child(3),
   ol > .reveal:nth-child(3),
-  ul > .reveal:nth-child(3),
-  div > .reveal:nth-child(3) { --rd: 120ms; }
-  .grid > .reveal:nth-child(4),
+  ul > .reveal:nth-child(3) { --rd: 120ms; }
+  div > .reveal:nth-child(4),
   ol > .reveal:nth-child(4),
-  ul > .reveal:nth-child(4),
-  div > .reveal:nth-child(4) { --rd: 180ms; }
-  .grid > .reveal:nth-child(5),
-  ol > .reveal:nth-child(5),
+  ul > .reveal:nth-child(4) { --rd: 180ms; }
+  div > .reveal:nth-child(5),
   ul > .reveal:nth-child(5) { --rd: 240ms; }
-  .grid > .reveal:nth-child(6),
-  ol > .reveal:nth-child(6),
+  div > .reveal:nth-child(6),
   ul > .reveal:nth-child(6) { --rd: 300ms; }
-  .grid > .reveal:nth-child(7),
-  ol > .reveal:nth-child(7),
-  ul > .reveal:nth-child(7) { --rd: 360ms; }
 }
 
 @media (prefers-reduced-motion: reduce) {

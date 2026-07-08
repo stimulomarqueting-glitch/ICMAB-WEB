@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # TODO(client): update host when the final domain is confirmed.
-Sitemap: https://sublimat.icmab.es/sitemap-index.xml
+Sitemap: https://matsurfer.icmab.es/sitemap-index.xml
