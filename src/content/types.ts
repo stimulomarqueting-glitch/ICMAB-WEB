@@ -79,9 +79,6 @@ export interface SiteContent {
   benefits: {
     kicker: string;
     title: string;
-    specsHead: string;
-    specs: { sym: string; text: string }[];
-    outcomesHead: string;
     outcomes: { title: string; text: string }[];
   };
   applications: {
@@ -98,14 +95,6 @@ export interface SiteContent {
     groups: { icon: string; title: string; text: string }[];
     ctaButton: string;
     ctaNote: string;
-  };
-  credibility: {
-    kicker: string;
-    title: string;
-    lead: string;
-    photoAlt: string;
-    chips: ParamChip[];
-    heritage: { title: string; body: string; logos: string[]; note: string };
   };
   waitlist: {
     kicker: string;
@@ -138,7 +127,6 @@ export interface SiteContent {
     description: string;
     cta: string;
     columns: { title: string; links: NavItem[] }[];
-    languageTitle: string;
     copyright: string;
     bottomMono: string;
   };

@@ -390,21 +390,17 @@ if (isMisconfigured) {
     };
 
     const validate = (): boolean => {
-      let ok = true;
-      let firstInvalid: HTMLElement | null = null;
+      const invalid: HTMLElement[] = [];
 
       form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]').forEach((el) => {
         let valid = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.value.trim() !== '';
         if (valid && el.type === 'email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
         showFieldError(el, !valid);
-        if (!valid) {
-          ok = false;
-          firstInvalid ??= el;
-        }
+        if (!valid) invalid.push(el);
       });
 
-      firstInvalid?.focus();
-      return ok;
+      invalid[0]?.focus();
+      return invalid.length === 0;
     };
 
     /** Structured lead payload — keep in sync with README "Lead capture setup". */

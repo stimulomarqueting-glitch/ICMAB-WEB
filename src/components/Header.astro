@@ -10,11 +10,6 @@ interface Props {
 const { locale } = Astro.props;
 const t = getContent(locale);
 const home = `${localePath(locale)}/`;
-
-const langLinks: { code: Locale; label: string; href: string }[] = [
-  { code: 'en', label: 'EN', href: '/' },
-  { code: 'es', label: 'ES', href: '/es/' },
-];
 ---
 
 <header class="header">
@@ -29,19 +24,6 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
         {t.header.nav.map((item) => (
           <li><a href={item.href}>{item.label}</a></li>
         ))}
-        <li class="header__lang" role="presentation">
-          <span class="visually-hidden">{t.header.langLabel}</span>
-          {langLinks.map((l) => (
-            <a
-              href={l.href}
-              class:list={['header__lang-link', { 'is-active': l.code === locale }]}
-              aria-current={l.code === locale ? 'true' : undefined}
-              lang={l.code}
-            >
-              {l.label}
-            </a>
-          ))}
-        </li>
         <li class="header__menu-cta">
           <a class="btn" href="#waitlist" data-cta-source="header">{t.header.cta}</a>
         </li>
@@ -118,33 +100,6 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
     color: var(--ink);
   }
 
-  .header__lang {
-    display: flex;
-    gap: 0.15rem;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    padding: 0.18rem;
-    background: var(--bg-panel);
-  }
-
-  .header__lang-link {
-    padding: 0.14rem 0.55rem;
-    border-radius: 3px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--text-muted);
-  }
-
-  .header__lang-link:hover {
-    color: var(--ink);
-  }
-
-  .header__lang-link.is-active {
-    background: var(--ink);
-    color: var(--bg-page);
-  }
-
   .header__menu-cta {
     display: none;
   }
@@ -212,11 +167,6 @@ const langLinks: { code: Locale; label: string; href: string }[] = [
       padding: 0.9rem 0.25rem;
       font-size: 1rem;
       border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .header__lang {
-      align-self: flex-start;
-      margin: 1rem 0.25rem;
     }
 
     .header__menu-cta {

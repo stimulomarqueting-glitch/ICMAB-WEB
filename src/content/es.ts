@@ -17,7 +17,6 @@ export const es: SiteContent = {
       { label: 'Beneficios', href: '#benefits' },
       { label: 'Aplicaciones', href: '#applications' },
       { label: 'Para quién', href: '#who-is-it-for' },
-      { label: 'Sobre el proyecto', href: '#credibility' },
     ],
     cta: 'Únete a la lista',
     menuOpen: 'Abrir menú',
@@ -114,33 +113,23 @@ export const es: SiteContent = {
 
   benefits: {
     kicker: 'Beneficios',
-    title: 'Un hecho de diseño no es un beneficio. Aquí están los dos.',
-    specsHead: 'El instrumento — hechos de diseño',
-    specs: [
-      { sym: 's', text: 'Trabaja sobre muestras de 1–3 cm² — tu sustrato final, no un sustituto.' },
-      { sym: 'w', text: 'Formato de sobremesa de menos de 20 cm; funciona sin sala blanca ni línea de vacío grande.' },
-      { sym: 'd', text: 'La distancia fuente–sustrato se ajusta durante la preparación.' },
-      { sym: 'm', text: 'Cargas de miligramos; la deposición ocurre donde está la muestra.' },
-      { sym: 'mod', text: 'Piezas modulares, reemplazables a bajo coste.' },
-      { sym: 'IP', text: 'Protegido por patente: familia española y europea EP 23711114.1.' },
-    ],
-    outcomesHead: 'Tu equipo — resultados',
+    title: 'Lo que gana tu equipo.',
     outcomes: [
       {
         title: 'Menos material por respuesta',
-        text: 'Criba una molécula candidata sin comprometer gramos — los compuestos caros o escasos siguen siendo viables de probar.',
+        text: 'Criba una molécula candidata con miligramos, no gramos — los compuestos caros siguen siendo viables de probar.',
       },
       {
         title: 'Más condiciones probadas por semana',
-        text: 'Ciclos cortos y directos en la mesa: los barridos de parámetros que esperaban hueco de instalación ocurren el mismo día.',
+        text: 'Los ciclos directos en la mesa sustituyen a las colas de instalación — los barridos ocurren el mismo día.',
       },
       {
         title: 'Autonomía para todo el grupo',
-        text: 'Cualquier investigador puede hacer una deposición en su propio laboratorio — sin reservas, sin desplazamientos, sin operador especialista entre la idea y el resultado.',
+        text: 'Cualquiera puede hacer una deposición en su propio laboratorio. Sin reservas, sin operador especialista.',
       },
       {
         title: 'Resultados defendibles',
-        text: 'Las películas crecidas sobre el sustrato real eliminan los artefactos de transferencia de la discusión — lo que mides es lo que has hecho.',
+        text: 'Películas crecidas sobre el sustrato real — lo que mides es lo que has hecho.',
       },
     ],
   },
@@ -212,24 +201,6 @@ export const es: SiteContent = {
     ],
     ctaButton: 'Únete a la lista',
     ctaNote: 'Las unidades de acceso anticipado se asignan por encaje, por orden de solicitud.',
-  },
-
-  credibility: {
-    kicker: 'Credibilidad',
-    title: 'Nacido en el ICMAB-CSIC.',
-    lead: `${name} se desarrolló en el Institut de Ciència de Materials de Barcelona (ICMAB-CSIC), a partir de años de práctica en ciencia de superficies. La tecnología está protegida por una familia de patentes española y europea y avanza de prototipo validado en laboratorio a demostración en entorno relevante.`,
-    photoAlt: `Investigadora del ICMAB sosteniendo el dispositivo ${name}`,
-    chips: [
-      { symbol: 'EP', value: '23711114.1' },
-      { symbol: 'TRL', value: '5 → 6' },
-      { symbol: 'IP', label: 'Patente española + europea' },
-    ],
-    heritage: {
-      title: 'Origen institucional',
-      body: 'Desarrollado en el Institut de Ciència de Materials de Barcelona, centro del Consejo Superior de Investigaciones Científicas (CSIC).',
-      logos: ['ICMAB', 'CSIC'],
-      note: 'Logos mostrados como placeholders a la espera de aprobación institucional.',
-    },
   },
 
   waitlist: {
@@ -343,7 +314,6 @@ export const es: SiteContent = {
         links: [
           { label: 'Para quién', href: '#who-is-it-for' },
           { label: 'Acceso anticipado', href: '#waitlist' },
-          { label: 'Sobre el ICMAB-CSIC', href: '#credibility' },
         ],
       },
       {
@@ -356,7 +326,6 @@ export const es: SiteContent = {
         ],
       },
     ],
-    languageTitle: 'Idioma',
     copyright: `© 2026 ${name} · ICMAB-CSIC · El nombre y la marca son provisionales.`,
     bottomMono: `EP 23711114.1 · ${brand.claimEs}`,
   },

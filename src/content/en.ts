@@ -17,7 +17,6 @@ export const en: SiteContent = {
       { label: 'Benefits', href: '#benefits' },
       { label: 'Applications', href: '#applications' },
       { label: "Who it's for", href: '#who-is-it-for' },
-      { label: 'About', href: '#credibility' },
     ],
     cta: 'Join the waitlist',
     menuOpen: 'Open menu',
@@ -46,7 +45,7 @@ export const en: SiteContent = {
   problem: {
     kicker: 'The problem',
     title: "Surface experiments shouldn't require a facility.",
-    lead: 'Depositing a material on a surface has traditionally meant large vacuum evaporators, cleanroom access, trained operators and queues — infrastructure many teams don’t have, and experiments that waste most of the material they load.',
+    lead: 'Depositing a material on a surface usually means big vacuum systems, cleanroom access, trained operators and queues — and most of the loaded material never reaches the sample.',
     cards: [
       {
         tag: 'Infrastructure',
@@ -114,33 +113,23 @@ export const en: SiteContent = {
 
   benefits: {
     kicker: 'Benefits',
-    title: 'A design fact is not a benefit. Here are both.',
-    specsHead: 'The instrument — design facts',
-    specs: [
-      { sym: 's', text: 'Works on 1–3 cm² samples — your final substrate, not a proxy.' },
-      { sym: 'w', text: 'Benchtop format under 20 cm; runs without cleanroom or large vacuum line.' },
-      { sym: 'd', text: 'Source–substrate distance is adjustable during setup.' },
-      { sym: 'm', text: 'Milligram-scale loads; deposition happens where the sample is.' },
-      { sym: 'mod', text: 'Modular pieces, economically replaceable.' },
-      { sym: 'IP', text: 'Patent-protected: Spanish and European family EP 23711114.1.' },
-    ],
-    outcomesHead: 'Your team — outcomes',
+    title: 'What your team gets.',
     outcomes: [
       {
         title: 'Less material per answer',
-        text: 'Screen a candidate molecule without committing grams of it — expensive or scarce compounds stay viable to test.',
+        text: 'Screen a candidate molecule with milligrams, not grams — costly compounds stay viable to test.',
       },
       {
         title: 'More conditions tested per week',
-        text: 'Short, direct cycles on the bench mean parameter sweeps that used to wait for facility slots happen the same day.',
+        text: 'Direct cycles on the bench replace facility queues — sweeps happen the same day.',
       },
       {
         title: 'Autonomy for the whole group',
-        text: 'Any researcher can run a deposition in their own lab — no booking, no travel, no specialist operator between idea and result.',
+        text: 'Anyone can run a deposition in their own lab. No booking, no specialist operator.',
       },
       {
-        title: 'Results you can defend',
-        text: 'Films grown on the real substrate remove transfer artefacts from the discussion — what you measure is what you made.',
+        title: 'Defensible results',
+        text: 'Films grown on the real substrate — what you measure is what you made.',
       },
     ],
   },
@@ -212,24 +201,6 @@ export const en: SiteContent = {
     ],
     ctaButton: 'Join the waitlist',
     ctaNote: 'Early-access units are allocated by fit, in order of application.',
-  },
-
-  credibility: {
-    kicker: 'Credibility',
-    title: 'Born at ICMAB-CSIC.',
-    lead: `${name} was developed at the Institut de Ciència de Materials de Barcelona (ICMAB-CSIC), from years of surface-science practice. The technology is protected by a Spanish and European patent family and is moving from validated lab prototype to relevant-environment demonstration.`,
-    photoAlt: `ICMAB researcher holding the ${name} device`,
-    chips: [
-      { symbol: 'EP', value: '23711114.1' },
-      { symbol: 'TRL', value: '5 → 6' },
-      { symbol: 'IP', label: 'Spanish + European patent' },
-    ],
-    heritage: {
-      title: 'Institutional origin',
-      body: 'Developed at the Institut de Ciència de Materials de Barcelona, a centre of the Spanish National Research Council (CSIC).',
-      logos: ['ICMAB', 'CSIC'],
-      note: 'Logos shown as placeholders pending institutional approval.',
-    },
   },
 
   waitlist: {
@@ -339,7 +310,6 @@ export const en: SiteContent = {
         links: [
           { label: "Who it's for", href: '#who-is-it-for' },
           { label: 'Early access', href: '#waitlist' },
-          { label: 'About ICMAB-CSIC', href: '#credibility' },
         ],
       },
       {
@@ -352,7 +322,6 @@ export const en: SiteContent = {
         ],
       },
     ],
-    languageTitle: 'Language',
     copyright: `© 2026 ${name} · ICMAB-CSIC · Name and brand are provisional.`,
     bottomMono: `EP 23711114.1 · ${brand.claim}`,
   },

@@ -2,7 +2,9 @@
 /**
  * Full one-page landing, locale-aware.
  * Section order: hero → problem → technology (with detail accordion + CTA
- * band) → benefits → applications → audiences → credibility → waitlist.
+ * band) → benefits → applications → audiences → waitlist.
+ * NOTE: the credibility/team section is intentionally out of this first
+ * deliverable; institutional detail lives in the "Validation & IP" accordion.
  */
 import type { Locale } from '../content';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -13,7 +15,6 @@ import Technology from './Technology.astro';
 import Benefits from './Benefits.astro';
 import Applications from './Applications.astro';
 import Audiences from './Audiences.astro';
-import Credibility from './Credibility.astro';
 import Waitlist from './Waitlist.astro';
 import Footer from './Footer.astro';
 
@@ -35,7 +36,6 @@ const skipLabel = locale === 'es' ? 'Saltar al contenido' : 'Skip to content';
     <Benefits locale={locale} />
     <Applications locale={locale} />
     <Audiences locale={locale} />
-    <Credibility locale={locale} />
     <Waitlist locale={locale} />
   </main>
   <Footer locale={locale} />

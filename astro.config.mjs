@@ -7,22 +7,11 @@ export default defineConfig({
   // TODO(client): replace with the final production domain once it is decided.
   site: SITE_URL,
   trailingSlash: 'ignore',
-  integrations: [
-    sitemap({
-      i18n: {
-        defaultLocale: 'en',
-        locales: {
-          en: 'en',
-          es: 'es',
-        },
-      },
-    }),
-  ],
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'es'],
-    routing: {
-      prefixDefaultLocale: false,
-    },
+  integrations: [sitemap()],
+  // First deliverable ships EN only. The Spanish content files are kept in
+  // src/content/es.ts; to re-enable ES, restore src/pages/es/index.astro,
+  // the i18n block and the hreflang tags (see git history).
+  redirects: {
+    '/es': '/',
   },
 });

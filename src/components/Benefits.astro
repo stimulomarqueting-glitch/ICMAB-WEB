@@ -14,68 +14,23 @@ const t = getContent(locale).benefits;
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} id="benefits-title" />
 
-    <div class="bene__split">
-      <div class="reveal">
-        <p class="bene__colhead">{t.specsHead}</p>
-        <ul class="bene__specs" role="list">
-          {t.specs.map((s) => (
-            <li>
-              <span class="bene__sym">{s.sym}</span>
-              <span>{s.text}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div class="reveal">
-        <p class="bene__colhead">{t.outcomesHead}</p>
-        {t.outcomes.map((o) => (
-          <div class="bene__outcome">
-            <h3>{o.title}</h3>
-            <p>{o.text}</p>
-          </div>
-        ))}
-      </div>
+    <div class="bene__grid">
+      {t.outcomes.map((o) => (
+        <div class="bene__outcome reveal">
+          <h3>{o.title}</h3>
+          <p>{o.text}</p>
+        </div>
+      ))}
     </div>
   </div>
 </section>
 
 <style>
-  .bene__split {
+  .bene__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    margin-top: 3rem;
-  }
-
-  .bene__colhead {
-    font-family: var(--font-mono);
-    font-size: 0.69rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 1.15rem;
-  }
-
-  .bene__specs {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .bene__specs li {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 0;
-    border-top: 1px solid var(--border-subtle);
-    font-size: 0.94rem;
-  }
-
-  .bene__sym {
-    font-family: var(--font-mono);
-    font-size: 0.81rem;
-    font-weight: 600;
-    color: var(--violet-dark);
-    min-width: 4rem;
+    gap: 0 4rem;
+    margin-top: 2.5rem;
   }
 
   .bene__outcome {
@@ -94,9 +49,9 @@ const t = getContent(locale).benefits;
   }
 
   @media (max-width: 56rem) {
-    .bene__split {
+    .bene__grid {
       grid-template-columns: 1fr;
-      gap: 2.5rem;
+      gap: 0;
     }
   }
 </style>

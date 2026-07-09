@@ -18,8 +18,23 @@ npm run build     # production build → dist/
 npm run preview   # preview the production build locally
 ```
 
-Deploy: the `dist/` folder is plain static files — works on Netlify, Vercel,
-Cloudflare Pages, GitHub Pages or any static host.
+## Deploy to staging
+
+The site is fully static — no server, no environment variables needed.
+
+1. `npm install && npm run build`
+2. Upload the **entire contents of the `dist/` folder** to any static host
+   (Netlify, Vercel, Cloudflare Pages, GitHub Pages, or a plain web server).
+   - Netlify (drag & drop or CLI): publish directory = `dist`
+   - Vercel: framework preset "Astro", output = `dist`
+   - Plain server: copy `dist/*` to the web root
+3. `/es` redirects to `/` (this first deliverable is EN-only; a static
+   meta-refresh page is generated at `dist/es/index.html`).
+
+Staging notes: canonical URLs point to the placeholder production domain
+(`src/config/site.mjs`), which prevents a test URL from competing in search.
+If the staging host allows it, also send an `X-Robots-Tag: noindex` header
+until launch.
 
 ## Where to edit things
 
@@ -37,13 +52,12 @@ Cloudflare Pages, GitHub Pages or any static host.
 
 ## Languages
 
-- English (default) → `/`
-- Spanish → `/es/`
+**This first deliverable ships English only** (`/`). `/es` redirects to `/`.
 
-Both locales are fully translated. `hreflang` alternates and a localized
-sitemap are generated automatically. To add a language: create
-`src/content/<lang>.ts`, register it in `src/content/index.ts`, add
-`src/pages/<lang>/index.astro`, and add the locale in `astro.config.mjs`.
+The Spanish translation is fully maintained in `src/content/es.ts` — to
+re-enable it: restore `src/pages/es/index.astro` (see git history), re-add
+the `i18n` block and hreflang tags in `astro.config.mjs` /
+`BaseLayout.astro`, and bring back the language switcher in Header/Footer.
 
 ## Lead capture setup
 
