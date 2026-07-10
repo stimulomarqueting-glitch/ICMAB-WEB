@@ -13,28 +13,44 @@ const t = getContent(locale).problem;
 <section class="sec hairtop mist" id="problem" aria-labelledby="problem-title">
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="problem-title" />
-    <div class="prob__cards">
-      {t.cards.map((card) => (
-        <article class="panel prob__card reveal">
-          <span class="prob__tag">{card.tag}</span>
-          <h3>{card.title}</h3>
-          <p>{card.text}</p>
-        </article>
-      ))}
+    <div class="prob__layout">
+      <div class="prob__cards">
+        {t.cards.map((card) => (
+          <article class="panel prob__card reveal">
+            <span class="prob__tag">{card.tag}</span>
+            <h3>{card.title}</h3>
+            <p>{card.text}</p>
+          </article>
+        ))}
+      </div>
+      <img
+        class="prob__photo reveal"
+        src="/img/lab-corridor.jpg"
+        alt={t.photoAlt}
+        width="1000"
+        height="563"
+        loading="lazy"
+      />
     </div>
   </div>
 </section>
 
 <style>
-  .prob__cards {
+  .prob__layout {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 7fr 5fr;
     gap: 1.5rem;
     margin-top: 2.25rem;
+    align-items: stretch;
+  }
+
+  .prob__cards {
+    display: grid;
+    gap: 1.5rem;
   }
 
   .prob__card {
-    padding: 1.75rem;
+    padding: 1.5rem 1.75rem;
   }
 
   .prob__tag {
@@ -48,20 +64,34 @@ const t = getContent(locale).problem;
   .prob__card h3 {
     font-family: var(--font-body);
     font-size: 1.19rem;
-    margin: 0.85rem 0 0;
+    margin: 0.7rem 0 0;
   }
 
   .prob__card p {
     font-size: 0.88rem;
     line-height: 1.55;
     margin-top: 0.5rem;
+    max-width: 52ch;
+  }
+
+  .prob__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% center;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
   }
 
   @media (max-width: 56rem) {
-    .prob__cards { grid-template-columns: 1fr 1fr; }
-  }
+    .prob__layout {
+      grid-template-columns: 1fr;
+    }
 
-  @media (max-width: 40rem) {
-    .prob__cards { grid-template-columns: 1fr; }
+    .prob__photo {
+      aspect-ratio: 16 / 9;
+      height: auto;
+      order: -1;
+    }
   }
 </style>

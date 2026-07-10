@@ -31,13 +31,14 @@ export const en: SiteContent = {
     lead: 'Deposit, screen and characterise materials by sublimation, directly on the surfaces that matter — on your bench, without a cleanroom or a large vacuum system.',
     ctaPrimary: 'Request early access',
     ctaSecondary: 'See how it works',
-    photoAlt: `The ${name} glass deposition device on a bench, with a sample substrate`,
+    photoAlt: `The ${name} glass deposition device on a table, next to its documentation and a sample substrate`,
   },
 
   problem: {
     kicker: 'The problem',
     title: "Surface experiments shouldn't require a facility.",
     lead: 'Depositing a material on a surface usually means big vacuum systems, cleanroom access, trained operators and queues — and most of the loaded material never reaches the sample.',
+    photoAlt: 'A dedicated laboratory corridor lined with fume hoods — the infrastructure surface work usually requires',
     cards: [
       {
         tag: 'Infrastructure',
@@ -164,6 +165,7 @@ export const en: SiteContent = {
   audiences: {
     kicker: "Who it's for",
     title: 'Built for four kinds of teams.',
+    photoAlt: `A researcher holding the compact ${name} glass chamber in one hand`,
     groups: [
       {
         icon: 'surface',
@@ -199,6 +201,7 @@ export const en: SiteContent = {
       'We contact you as pilot units become available.',
       'You get priority access to the first production run.',
     ],
+    photoAlt: `A standard lab bench with an analytical balance — the only infrastructure ${name} needs`,
     form: {
       fullName: { label: 'Full name', error: 'Please enter your full name.' },
       email: { label: 'Work email', error: 'Please enter a valid email address.' },

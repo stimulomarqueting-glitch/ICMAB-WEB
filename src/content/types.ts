@@ -47,6 +47,7 @@ export interface SiteContent {
     kicker: string;
     title: string;
     lead: string;
+    photoAlt: string;
     cards: { tag: string; title: string; text: string }[];
   };
   technology: {
@@ -78,6 +79,7 @@ export interface SiteContent {
   audiences: {
     kicker: string;
     title: string;
+    photoAlt: string;
     groups: { icon: string; title: string; text: string }[];
     ctaButton: string;
     ctaNote: string;
@@ -87,6 +89,7 @@ export interface SiteContent {
     title: string;
     lead: string;
     steps: string[];
+    photoAlt: string;
     form: {
       fullName: FormField;
       email: FormField;

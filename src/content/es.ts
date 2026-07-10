@@ -31,13 +31,14 @@ export const es: SiteContent = {
     lead: 'Deposita, criba y caracteriza materiales por sublimación, directamente sobre las superficies que importan — en tu mesa, sin sala blanca ni grandes sistemas de vacío.',
     ctaPrimary: 'Solicita acceso anticipado',
     ctaSecondary: 'Cómo funciona',
-    photoAlt: `El dispositivo de deposición de vidrio ${name} sobre una mesa de laboratorio, con un sustrato de muestra`,
+    photoAlt: `El dispositivo de deposición de vidrio ${name} sobre una mesa, junto a su documentación y un sustrato de muestra`,
   },
 
   problem: {
     kicker: 'El problema',
     title: 'Un experimento de superficie no debería exigir una instalación.',
     lead: 'Depositar un material sobre una superficie ha significado tradicionalmente grandes evaporadores de vacío, acceso a sala blanca, operadores formados y colas — infraestructura que muchos equipos no tienen, y experimentos que desperdician la mayor parte del material cargado.',
+    photoAlt: 'Un pasillo de laboratorio dedicado con vitrinas de gases — la infraestructura que suele exigir el trabajo de superficies',
     cards: [
       {
         tag: 'Infraestructura',
@@ -164,6 +165,7 @@ export const es: SiteContent = {
   audiences: {
     kicker: 'Para quién',
     title: 'Pensado para cuatro tipos de equipos.',
+    photoAlt: `Un investigador sosteniendo la cámara de vidrio compacta de ${name} en una mano`,
     groups: [
       {
         icon: 'surface',
@@ -199,6 +201,7 @@ export const es: SiteContent = {
       'Te contactamos a medida que haya unidades piloto disponibles.',
       'Obtienes acceso prioritario a la primera serie de producción.',
     ],
+    photoAlt: `Una mesa de laboratorio estándar con una balanza analítica — la única infraestructura que necesita ${name}`,
     form: {
       fullName: { label: 'Nombre completo', error: 'Introduce tu nombre completo.' },
       email: { label: 'Email de trabajo', error: 'Introduce una dirección de email válida.' },

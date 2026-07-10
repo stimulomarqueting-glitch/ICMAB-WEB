@@ -34,6 +34,14 @@ if (isMisconfigured) {
           </li>
         ))}
       </ol>
+      <img
+        class="wl__photo reveal"
+        src="/img/lab-bench.jpg"
+        alt={t.photoAlt}
+        width="1000"
+        height="563"
+        loading="lazy"
+      />
     </div>
 
     <div>
@@ -182,6 +190,16 @@ if (isMisconfigured) {
     color: var(--coral-dark);
     min-width: 1.5rem;
     line-height: 1.8;
+  }
+
+  .wl__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin-top: 1.5rem;
   }
 
   .wl__card {
