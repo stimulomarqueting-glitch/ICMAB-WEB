@@ -162,7 +162,7 @@ a:hover {
 }
 
 .sec {
-  padding-block: clamp(4rem, 8vw, 6rem);
+  padding-block: clamp(2.75rem, 5.5vw, 4.25rem);
 }
 
 .hairtop {
@@ -254,37 +254,6 @@ a:hover {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-}
-
-/* ---- Signature motif: parameter chip (s, w, d, m, TRL…) ---- */
-.param-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-strong);
-  padding: 4px 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--bg-panel);
-  white-space: nowrap;
-}
-
-.param-chip .k {
-  color: var(--violet-dark);
-  font-weight: 600;
-}
-
-.param-chip .u {
-  color: var(--text-muted);
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
 }
 
 /* ---- Signature motif: surface line with deposition dots ---- */

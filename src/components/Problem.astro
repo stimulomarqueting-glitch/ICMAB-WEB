@@ -10,7 +10,7 @@ const { locale } = Astro.props;
 const t = getContent(locale).problem;
 ---
 
-<section class="sec hairtop" id="problem" aria-labelledby="problem-title">
+<section class="sec hairtop mist" id="problem" aria-labelledby="problem-title">
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="problem-title" />
     <div class="prob__cards">
@@ -30,7 +30,7 @@ const t = getContent(locale).problem;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-top: 3rem;
+    margin-top: 2.25rem;
   }
 
   .prob__card {

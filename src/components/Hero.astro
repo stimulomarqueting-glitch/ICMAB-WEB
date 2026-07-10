@@ -1,7 +1,6 @@
 ---
 import { brand } from '../config/brand';
 import { getContent, type Locale } from '../content';
-import ParamChip from './ParamChip.astro';
 
 interface Props {
   locale: Locale;
@@ -40,18 +39,6 @@ const { claim, claimEs } = brand;
       fetchpriority="high"
     />
   </div>
-
-  <div class="container hero__specstrip">
-    <div class="hero__divider">
-      <span class="eyebrow">{t.hero.paramsLabel}</span>
-      <span class="surface-line surface-line--dots hero__divider-line" aria-hidden="true"></span>
-    </div>
-    <div class="chips">
-      {t.hero.chips.map((c) => (
-        <ParamChip {...c} />
-      ))}
-    </div>
-  </div>
 </section>
 
 <style>
@@ -60,7 +47,7 @@ const { claim, claimEs } = brand;
     grid-template-columns: 7fr 5fr;
     gap: 3.5rem;
     align-items: center;
-    padding-block: clamp(3rem, 6vw, 5.5rem) 4rem;
+    padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2.75rem, 5vw, 4rem);
   }
 
   .hero__eyebrow {
@@ -118,24 +105,6 @@ const { claim, claimEs } = brand;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-glass);
-  }
-
-  .hero__specstrip {
-    padding-bottom: clamp(3.5rem, 6vw, 5.5rem);
-  }
-
-  .hero__divider {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .hero__divider-line {
-    flex: 1;
-  }
-
-  .hero__specstrip .chips {
-    margin-top: 1rem;
   }
 
   @media (max-width: 56rem) {

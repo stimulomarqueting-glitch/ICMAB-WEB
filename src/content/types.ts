@@ -20,14 +20,6 @@ export interface FormField {
   error?: string;
 }
 
-/** Technical parameter chip: symbol in mono + value/unit or a short label. */
-export interface ParamChip {
-  symbol: string;
-  value?: string;
-  unit?: string;
-  label?: string;
-}
-
 export interface SiteContent {
   meta: {
     title: string;
@@ -50,9 +42,6 @@ export interface SiteContent {
     ctaPrimary: string;
     ctaSecondary: string;
     photoAlt: string;
-    /** label on the spec divider line */
-    paramsLabel: string;
-    chips: ParamChip[];
   };
   problem: {
     kicker: string;
@@ -64,12 +53,9 @@ export interface SiteContent {
     kicker: string;
     title: string;
     lead: string;
-    diagramAlt: string;
-    /** phase captions under the process diagram, in order */
-    diagramCaption: string[];
+    /** device video block (auto-activates when the mp4 exists, see Technology.astro) */
+    video: { caption: string; placeholder: string };
     steps: { title: string; text: string }[];
-    facts: { value: string; text: string }[];
-    factImgAlt: string;
     /** expanded detail accordion ("understand without opening; open to go deeper") */
     accordionTitle: string;
     accordion: { q: string; a: string }[];

@@ -32,14 +32,6 @@ export const es: SiteContent = {
     ctaPrimary: 'Solicita acceso anticipado',
     ctaSecondary: 'Cómo funciona',
     photoAlt: `El dispositivo de deposición de vidrio ${name} sobre una mesa de laboratorio, con un sustrato de muestra`,
-    paramsLabel: 'parámetros del dispositivo',
-    chips: [
-      { symbol: 's', value: '1–3', unit: 'cm²' },
-      { symbol: 'w', value: '< 20', unit: 'cm de sobremesa' },
-      { symbol: 'd', label: 'distancia fuente–sustrato ajustable' },
-      { symbol: 'm', label: 'consumo de material en miligramos' },
-      { symbol: 'TRL', value: '5 → 6' },
-    ],
   },
 
   problem: {
@@ -69,21 +61,16 @@ export const es: SiteContent = {
     kicker: 'La tecnología',
     title: 'La sublimación, llevada a la mesa de laboratorio.',
     lead: `${name} calienta una fuente sólida hasta que sublima y deposita el vapor directamente sobre tu sustrato final a una distancia ajustable — en una cámara de vidrio de sobremesa, con mínimos pasos, energía y pérdida de material.`,
-    diagramAlt:
-      'Diagrama del proceso: el material sólido se calienta, sublima a vapor y se deposita como capa sobre el sustrato a una distancia ajustable d',
-    diagramCaption: ['material sólido', '→ calor', '→ vapor', '→ superficie', '→ deposición'],
+    video: {
+      caption: `${name} en funcionamiento — del material sólido a la capa depositada.`,
+      placeholder: 'Próximamente: vídeo del dispositivo.',
+    },
     steps: [
       { title: 'Carga miligramos', text: 'Coloca una pequeña cantidad de tu material sólido en el portamuestras de la fuente.' },
       { title: 'Ajusta los parámetros', text: 'Temperatura, presión, tiempo — y la distancia fuente–sustrato d.' },
       { title: 'Sublima en directo', text: 'El vapor se deposita directamente sobre tu sustrato final. Sin transferencia, sin disolventes.' },
       { title: 'Caracteriza', text: 'Lleva la muestra de 1–3 cm² a análisis, o criba la siguiente condición.' },
     ],
-    facts: [
-      { value: '< 20 cm', text: 'Formato de sobremesa. Portátil entre laboratorios.' },
-      { value: 'd ↕', text: 'Distancia fuente–sustrato ajustable para afinar el depósito.' },
-      { value: 'Modular', text: 'Piezas reemplazables a bajo coste. Sin sala blanca.' },
-    ],
-    factImgAlt: `Mecanizado de precisión de un componente de ${name}`,
     accordionTitle: 'En más detalle',
     accordion: [
       {

@@ -1,4 +1,6 @@
 ---
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { getContent, type Locale } from '../content';
 import Accordion from './Accordion.astro';
 import SectionHeader from './SectionHeader.astro';
@@ -9,51 +11,42 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = getContent(locale).technology;
+
+/**
+ * VIDEO SLOT — auto-activates at build time.
+ * Drop the device video at public/video/sublimat-subtitles.mp4 and rebuild:
+ * the placeholder below is replaced by a native <video> player.
+ */
+const VIDEO_SRC = '/video/sublimat-subtitles.mp4';
+const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, import.meta.url)));
 ---
 
 <section class="sec hairtop" id="technology" aria-labelledby="technology-title">
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="technology-title" />
 
-    {/* Process diagram: solid → heat → vapour → surface → deposition */}
-    <div class="panel tech__diagram reveal">
-      <svg class="tech__svg" viewBox="0 0 1080 240" role="img" aria-label={t.diagramAlt}>
-        <defs>
-          <linearGradient id="gv" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0" stop-color="#F0532F" />
-            <stop offset="0.55" stop-color="#6C4BD8" />
-            <stop offset="1" stop-color="#C9BCF2" />
-          </linearGradient>
-        </defs>
-        <line x1="40" y1="200" x2="330" y2="200" stroke="#26241F" stroke-width="2" />
-        <rect x="150" y="176" width="70" height="24" rx="3" fill="#26241F" />
-        <path d="M158 172h54" stroke="#F0532F" stroke-width="3" />
-        <text x="185" y="226" font-family="IBM Plex Mono,monospace" font-size="13" fill="#57534A" text-anchor="middle">solid · m</text>
-        <text x="185" y="160" font-family="IBM Plex Mono,monospace" font-size="13" fill="#C93E1E" text-anchor="middle">heat · T</text>
-        <g class="tech__vapour" stroke="url(#gv)" stroke-width="2.4" fill="none" stroke-linecap="round">
-          <path d="M400 200 C 420 150, 400 110, 430 60" />
-          <path d="M460 200 C 480 150, 455 105, 490 55" />
-          <path d="M520 200 C 540 150, 515 110, 548 60" />
-        </g>
-        <text x="472" y="34" font-family="IBM Plex Mono,monospace" font-size="13" fill="#5638B8" text-anchor="middle">vapour · P, t</text>
-        <path d="M620 120 h150" stroke="#57534A" stroke-width="1.4" stroke-dasharray="5 5" />
-        <path d="M620 112v16M770 112v16" stroke="#57534A" stroke-width="1.4" />
-        <text x="695" y="106" font-family="IBM Plex Mono,monospace" font-size="13" fill="#26241F" text-anchor="middle">d · adjustable</text>
-        <line x1="640" y1="200" x2="1040" y2="200" stroke="#26241F" stroke-width="2" />
-        <g fill="#6C4BD8">
-          <circle cx="820" cy="194" r="4" /><circle cx="844" cy="194" r="4" /><circle cx="868" cy="194" r="4" /><circle cx="892" cy="194" r="4" /><circle cx="916" cy="194" r="4" />
-        </g>
-        <g fill="#C9BCF2">
-          <circle cx="832" cy="184" r="4" /><circle cx="856" cy="184" r="4" /><circle cx="880" cy="184" r="4" /><circle cx="904" cy="184" r="4" />
-        </g>
-        <text x="880" y="226" font-family="IBM Plex Mono,monospace" font-size="13" fill="#57534A" text-anchor="middle">deposited layer</text>
-      </svg>
-      <div class="tech__cap" aria-hidden="true">
-        {t.diagramCaption.map((c) => (
-          <span>{c}</span>
-        ))}
-      </div>
-    </div>
+    <figure class="tech__media reveal">
+      {hasVideo ? (
+        <video
+          class="tech__video"
+          controls
+          preload="metadata"
+          poster="/img/tech-detail.jpg"
+          src={VIDEO_SRC}
+        ></video>
+      ) : (
+        <div class="tech__video-ph" role="img" aria-label={t.video.placeholder}>
+          <span class="tech__video-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M10 8.5v7l6-3.5-6-3.5Z"></path>
+            </svg>
+            {t.video.placeholder}
+          </span>
+        </div>
+      )}
+      <figcaption class="tech__media-cap">{t.video.caption}</figcaption>
+    </figure>
 
     <ol class="tech__steps" role="list">
       {t.steps.map((step, i) => (
@@ -65,17 +58,6 @@ const t = getContent(locale).technology;
       ))}
     </ol>
 
-    <div class="tech__facts">
-      {/* PLACEHOLDER photography from the design source */}
-      <img class="tech__img reveal" src="/img/tech-detail.jpg" alt={t.factImgAlt} width="800" height="464" loading="lazy" />
-      {t.facts.map((f) => (
-        <div class="panel tech__fact reveal">
-          <div class="tech__fv">{f.value}</div>
-          <p>{f.text}</p>
-        </div>
-      ))}
-    </div>
-
     <Accordion title={t.accordionTitle} items={t.accordion} idPrefix="tech" />
 
     <div class="tech__ctaband reveal">
@@ -86,36 +68,57 @@ const t = getContent(locale).technology;
 </section>
 
 <style>
-  .tech__diagram {
-    margin-top: 3rem;
-    padding: 2.5rem 2.5rem 0;
-    overflow: hidden;
+  .tech__media {
+    margin: 2.25rem 0 0;
   }
 
-  .tech__svg {
+  .tech__video,
+  .tech__video-ph {
     width: 100%;
-    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-inverse);
+    display: block;
+    object-fit: cover;
   }
 
-  .tech__cap {
+  .tech__video-ph {
+    position: relative;
+    background:
+      linear-gradient(rgba(29, 27, 36, 0.55), rgba(29, 27, 36, 0.75)),
+      url('/img/tech-detail.jpg') center / cover;
     display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.9rem 0.25rem 1.15rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tech__video-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.1rem;
+    border: 1px solid rgba(248, 246, 243, 0.35);
+    border-radius: 999px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    color: var(--text-body);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-on-dark);
+    background: rgba(29, 27, 36, 0.45);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .tech__vapour path {
-      stroke-dasharray: 4 7;
-      animation: tech-rise 2.6s linear infinite;
-    }
+  .tech__video-badge svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
 
-    @keyframes tech-rise {
-      to { stroke-dashoffset: -22; }
-    }
+  .tech__media-cap {
+    margin-top: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
   }
 
   .tech__steps {
@@ -123,7 +126,7 @@ const t = getContent(locale).technology;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     list-style: none;
-    margin: 3rem 0 0;
+    margin: 2.25rem 0 0;
     padding: 0;
   }
 
@@ -149,46 +152,13 @@ const t = getContent(locale).technology;
     margin-top: 0.4rem;
   }
 
-  .tech__facts {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr 1fr 1fr;
-    gap: 1.5rem;
-    margin-top: 3rem;
-    align-items: stretch;
-  }
-
-  .tech__img {
-    width: 100%;
-    height: 100%;
-    min-height: 140px;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-subtle);
-  }
-
-  .tech__fact {
-    padding: 1.5rem;
-  }
-
-  .tech__fv {
-    font-family: var(--font-mono);
-    font-size: 1.35rem;
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  .tech__fact p {
-    font-size: 0.88rem;
-    margin-top: 0.4rem;
-  }
-
   .tech__ctaband {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-    margin-top: 3.5rem;
-    padding: 1.75rem 2rem;
+    margin-top: 2.5rem;
+    padding: 1.6rem 2rem;
     background: var(--bg-inverse);
     border-radius: var(--radius-md);
   }
@@ -202,14 +172,10 @@ const t = getContent(locale).technology;
 
   @media (max-width: 56rem) {
     .tech__steps { grid-template-columns: 1fr 1fr; }
-    .tech__facts { grid-template-columns: 1fr 1fr; }
-    .tech__diagram { padding: 1.5rem 1.25rem 0; }
   }
 
   @media (max-width: 40rem) {
-    .tech__steps,
-    .tech__facts { grid-template-columns: 1fr; }
+    .tech__steps { grid-template-columns: 1fr; }
     .tech__ctaband { flex-direction: column; align-items: flex-start; }
-    .tech__cap { flex-wrap: wrap; }
   }
 </style>

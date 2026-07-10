@@ -32,14 +32,6 @@ export const en: SiteContent = {
     ctaPrimary: 'Request early access',
     ctaSecondary: 'See how it works',
     photoAlt: `The ${name} glass deposition device on a bench, with a sample substrate`,
-    paramsLabel: 'device parameters',
-    chips: [
-      { symbol: 's', value: '1–3', unit: 'cm²' },
-      { symbol: 'w', value: '< 20', unit: 'cm benchtop' },
-      { symbol: 'd', label: 'adjustable source–substrate distance' },
-      { symbol: 'm', label: 'milligram-scale material use' },
-      { symbol: 'TRL', value: '5 → 6' },
-    ],
   },
 
   problem: {
@@ -69,21 +61,16 @@ export const en: SiteContent = {
     kicker: 'The technology',
     title: 'Sublimation, brought to the bench.',
     lead: `${name} heats a solid source until it sublimes, and deposits the vapour directly onto your final substrate across an adjustable distance — in a benchtop glass chamber, with minimal steps, energy and material loss.`,
-    diagramAlt:
-      'Process diagram: solid material is heated, sublimes into vapour, and deposits as a layer on the substrate across an adjustable distance d',
-    diagramCaption: ['solid material', '→ heat', '→ vapour', '→ surface', '→ deposition'],
+    video: {
+      caption: `The ${name} in operation — from solid material to deposited layer.`,
+      placeholder: 'Device video coming soon.',
+    },
     steps: [
       { title: 'Load milligrams', text: 'Place a small amount of your solid material in the source holder.' },
       { title: 'Set the parameters', text: 'Temperature, pressure, time — and the source–substrate distance d.' },
       { title: 'Sublimate directly', text: 'The vapour deposits straight onto your final substrate. No transfer, no solvent.' },
       { title: 'Characterise', text: 'Take the 1–3 cm² sample to analysis, or screen the next condition.' },
     ],
-    facts: [
-      { value: '< 20 cm', text: 'Benchtop footprint. Portable between labs.' },
-      { value: 'd ↕', text: 'Adjustable source–substrate distance to tune the deposit.' },
-      { value: 'Modular', text: 'Economically replaceable pieces. No cleanroom required.' },
-    ],
-    factImgAlt: `Precision machining of a ${name} component`,
     accordionTitle: 'In more detail',
     accordion: [
       {

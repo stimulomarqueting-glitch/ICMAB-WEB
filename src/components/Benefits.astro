@@ -10,7 +10,8 @@ const { locale } = Astro.props;
 const t = getContent(locale).benefits;
 ---
 
-<section class="sec hairtop" id="benefits" aria-labelledby="benefits-title">
+{/* The dark beat of the page — plum-graphite band for visual rhythm */}
+<section class="sec bene--dark" id="benefits" aria-labelledby="benefits-title">
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} id="benefits-title" />
 
@@ -26,26 +27,59 @@ const t = getContent(locale).benefits;
 </section>
 
 <style>
+  .bene--dark {
+    background: var(--bg-inverse);
+  }
+
+  /* deposition dots resting on the section's top edge */
+  .bene--dark::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-top: calc(-1 * clamp(2.75rem, 5.5vw, 4.25rem));
+    height: 3px;
+    background-image: radial-gradient(circle, var(--lavender) 1.2px, transparent 1.4px);
+    background-size: 12px 3px;
+    background-repeat: repeat-x;
+    opacity: 0.6;
+  }
+
+  .bene--dark {
+    position: relative;
+  }
+
+  .bene--dark :global(.eyebrow) {
+    color: var(--lavender);
+  }
+
+  .bene--dark :global(.h2) {
+    color: var(--text-on-dark);
+  }
+
   .bene__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0 4rem;
-    margin-top: 2.5rem;
+    margin-top: 2rem;
   }
 
   .bene__outcome {
-    padding: 1.35rem 0;
-    border-top: 1px solid var(--border-subtle);
+    padding: 1.25rem 0;
+    border-top: 1px solid rgba(248, 246, 243, 0.16);
   }
 
   .bene__outcome h3 {
     font-size: 1.19rem;
+    color: var(--text-on-dark);
   }
 
   .bene__outcome p {
     font-size: 0.94rem;
     margin-top: 0.5rem;
     max-width: 48ch;
+    color: var(--text-on-dark-2);
   }
 
   @media (max-width: 56rem) {
