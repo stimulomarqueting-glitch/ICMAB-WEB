@@ -63,7 +63,7 @@ export const en: SiteContent = {
     title: 'Sublimation, brought to the bench.',
     lead: `${name} heats a solid source until it sublimes, and deposits the vapour directly onto your final substrate across an adjustable distance — in a benchtop glass chamber, with minimal steps, energy and material loss.`,
     video: {
-      caption: `The ${name} in operation — from solid material to deposited layer.`,
+      caption: `${name} in operation — from solid material to deposited layer.`,
       placeholder: 'Device video coming soon.',
     },
     steps: [
