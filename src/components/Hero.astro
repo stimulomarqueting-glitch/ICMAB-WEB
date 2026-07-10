@@ -14,49 +14,46 @@ const claim = locale === 'es' ? brand.claimEs : brand.claim;
 {/* HeroBlock (design system): dark process panel with subtle vapour glow
     and the material→vapour→layer gradient strip on its bottom edge.
     The gradient appears because the hero IS a process-narrative moment. */}
-<section aria-labelledby="hero-title">
+<section class="hero-band" aria-labelledby="hero-title">
   <div class="container">
-    <div class="hero-panel">
-      <div class="hero">
-        <div>
-          <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
-          <h1 class="hero__title" id="hero-title">{t.hero.headline}</h1>
-          <p class="hero__descriptor">{t.hero.descriptor}</p>
-          <p class="hero__lead">{t.hero.lead}</p>
-          <div class="hero__ctas">
-            <a class="btn" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
-            <a class="btn btn--ghost-dark" href="#technology">{t.hero.ctaSecondary}</a>
-          </div>
-          <p class="hero__claim">{claim}</p>
+    <div class="hero">
+      <div>
+        <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
+        <h1 class="hero__title" id="hero-title">{t.hero.headline}</h1>
+        <p class="hero__descriptor">{t.hero.descriptor}</p>
+        <p class="hero__lead">{t.hero.lead}</p>
+        <div class="hero__ctas">
+          <a class="btn" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
+          <a class="btn btn--ghost-dark" href="#technology">{t.hero.ctaSecondary}</a>
         </div>
-
-        <img
-          class="hero__photo"
-          src="/img/product-table.jpg"
-          alt={t.hero.photoAlt}
-          width="1100"
-          height="619"
-          fetchpriority="high"
-        />
+        <p class="hero__claim">{claim}</p>
       </div>
-      <div class="hero-panel__strip" aria-hidden="true"></div>
+
+      <img
+        class="hero__photo"
+        src="/img/product-table.jpg"
+        alt={t.hero.photoAlt}
+        width="1100"
+        height="619"
+        fetchpriority="high"
+      />
     </div>
   </div>
+  <div class="hero-band__strip" aria-hidden="true"></div>
 </section>
 
 <style>
-  .hero-panel {
+  /* full-bleed dark process band, edge to edge */
+  .hero-band {
     position: relative;
     overflow: hidden;
     background: var(--bg-inverse);
     color: var(--text-on-dark);
-    border-radius: 16px;
-    margin-block: clamp(1.25rem, 2.5vw, 2rem) clamp(2.25rem, 4vw, 3.25rem);
-    padding: clamp(1.75rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem) 0;
+    padding-top: clamp(2.5rem, 5vw, 4rem);
   }
 
   /* vapour glow — violet rising from the top-right corner */
-  .hero-panel::before {
+  .hero-band::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -65,11 +62,11 @@ const claim = locale === 'es' ? brand.claimEs : brand.claim;
   }
 
   /* the process strip: solid material → vapour → deposited layer */
-  .hero-panel__strip {
+  .hero-band__strip {
     position: relative;
     height: 6px;
     background: var(--grad-vapor);
-    margin: clamp(1.75rem, 3.5vw, 2.75rem) calc(-1 * clamp(1.5rem, 4vw, 3rem)) 0;
+    margin-top: clamp(2.25rem, 4.5vw, 3.5rem);
   }
 
   .hero {
