@@ -9,7 +9,7 @@
 
 export const brand = {
   /** Product/brand name (v2 branding — "Coral Vapor" identity). */
-  projectName: 'The MatSurfer',
+  projectName: 'MatSurfer',
 
   /** Short brand claim shown next to the logo and in meta content (EN). */
   claim: 'Surfaces for all.',

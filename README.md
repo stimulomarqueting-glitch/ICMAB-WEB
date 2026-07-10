@@ -1,6 +1,6 @@
-# The MatSurfer — Landing Page
+# MatSurfer — Landing Page
 
-Website for **The MatSurfer** (formerly SUBLIMAT), an ICMAB-CSIC
+Website for **MatSurfer** (formerly SUBLIMAT), an ICMAB-CSIC
 technology-transfer project: a compact device for direct material deposition
 on surfaces by sublimation, at lab scale. Visual identity: "Coral Vapor"
 design system (Sora / Manrope / IBM Plex Mono, coral–violet–lavender on warm
@@ -105,7 +105,7 @@ Any service that accepts a **JSON POST** works:
 
 ```json
 {
-  "project": "The MatSurfer",
+  "project": "MatSurfer",
   "language": "en | es",
   "sourcePage": "/ | /es/",
   "ctaSource": "hero | header | technology | applications | audiences | footer | lead-magnet | direct",
