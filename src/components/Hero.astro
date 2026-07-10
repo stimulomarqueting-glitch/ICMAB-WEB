@@ -8,63 +8,104 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = getContent(locale);
-const { claim, claimEs } = brand;
+const claim = locale === 'es' ? brand.claimEs : brand.claim;
 ---
 
+{/* HeroBlock (design system): dark process panel with subtle vapour glow
+    and the material→vapour→layer gradient strip on its bottom edge.
+    The gradient appears because the hero IS a process-narrative moment. */}
 <section aria-labelledby="hero-title">
-  <div class="container hero">
-    <div>
-      <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
-      <h1 class="hero__title" id="hero-title">{t.hero.headline}</h1>
-      <p class="hero__descriptor">{t.hero.descriptor}</p>
-      <p class="lead">{t.hero.lead}</p>
-      <div class="hero__ctas">
-        <a class="btn" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
-        <a class="btn btn--ghost" href="#technology">{t.hero.ctaSecondary}</a>
-      </div>
-      <p class="hero__claim">
-        <span class="hero__claim-line" aria-hidden="true"></span>
-        {locale === 'es' ? claimEs : claim}
-      </p>
-    </div>
+  <div class="container">
+    <div class="hero-panel">
+      <div class="hero">
+        <div>
+          <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
+          <h1 class="hero__title" id="hero-title">{t.hero.headline}</h1>
+          <p class="hero__descriptor">{t.hero.descriptor}</p>
+          <p class="hero__lead">{t.hero.lead}</p>
+          <div class="hero__ctas">
+            <a class="btn" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
+            <a class="btn btn--ghost-dark" href="#technology">{t.hero.ctaSecondary}</a>
+          </div>
+          <p class="hero__claim">{claim}</p>
+        </div>
 
-    <img
-      class="hero__photo"
-      src="/img/product-table.jpg"
-      alt={t.hero.photoAlt}
-      width="1100"
-      height="619"
-      fetchpriority="high"
-    />
+        <img
+          class="hero__photo"
+          src="/img/product-table.jpg"
+          alt={t.hero.photoAlt}
+          width="1100"
+          height="619"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="hero-panel__strip" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
 
 <style>
+  .hero-panel {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-inverse);
+    color: var(--text-on-dark);
+    border-radius: 16px;
+    margin-block: clamp(1.25rem, 2.5vw, 2rem) clamp(2.25rem, 4vw, 3.25rem);
+    padding: clamp(1.75rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem) 0;
+  }
+
+  /* vapour glow — violet rising from the top-right corner */
+  .hero-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glow-vapor);
+    pointer-events: none;
+  }
+
+  /* the process strip: solid material → vapour → deposited layer */
+  .hero-panel__strip {
+    position: relative;
+    height: 6px;
+    background: var(--grad-vapor);
+    margin: clamp(1.75rem, 3.5vw, 2.75rem) calc(-1 * clamp(1.5rem, 4vw, 3rem)) 0;
+  }
+
   .hero {
+    position: relative;
     display: grid;
     grid-template-columns: 7fr 5fr;
-    gap: 3.5rem;
+    gap: clamp(2rem, 4vw, 3.5rem);
     align-items: center;
-    padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2.75rem, 5vw, 4rem);
   }
 
   .hero__eyebrow {
-    color: var(--text-muted);
+    color: var(--text-on-dark-2);
   }
 
   .hero__title {
-    font-size: clamp(2.5rem, 5.4vw, 4.25rem);
+    font-size: clamp(2.4rem, 5vw, 4rem);
     line-height: 1.02;
     margin-top: 0.9rem;
+    color: var(--text-on-dark);
   }
 
   .hero__descriptor {
     font-family: var(--font-mono);
     font-size: 0.94rem;
     font-weight: 500;
-    color: var(--ink);
+    color: var(--text-on-dark);
     margin-top: 1.25rem;
     letter-spacing: 0.01em;
+  }
+
+  .hero__lead {
+    font-size: 1.125rem;
+    line-height: 1.55;
+    max-width: 34rem;
+    margin-top: 1rem;
+    color: var(--text-on-dark-2);
   }
 
   .hero__ctas {
@@ -74,24 +115,14 @@ const { claim, claimEs } = brand;
     margin-top: 2rem;
   }
 
+  /* the claim, set in mono caps and the deposited-layer lavender */
   .hero__claim {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-    margin-top: 2.25rem;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.94rem;
-    color: var(--ink);
-  }
-
-  /* the gradient IS the sublimation — process moments only */
-  .hero__claim-line {
-    display: inline-block;
-    width: 2.75rem;
-    height: 3px;
-    background: var(--grad-vapor-line);
-    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lavender);
+    margin-top: 1.6rem;
   }
 
   .hero__photo {
@@ -100,16 +131,14 @@ const { claim, claimEs } = brand;
     aspect-ratio: 4 / 5;
     object-fit: cover;
     object-position: 62% center;
-    border: 1px solid var(--border-subtle);
+    border: 1px solid rgba(248, 246, 243, 0.18);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-glass);
   }
 
   @media (max-width: 56rem) {
     .hero {
       grid-template-columns: 1fr;
-      gap: 2.25rem;
-      padding-block: 3rem 2.5rem;
+      gap: 1.75rem;
     }
 
     .hero__photo {
@@ -117,7 +146,6 @@ const { claim, claimEs } = brand;
       object-position: center 40%;
     }
 
-    /* the mono descriptor and CTA reach the first screen sooner on mobile */
     .hero__eyebrow {
       font-size: 0.62rem;
     }

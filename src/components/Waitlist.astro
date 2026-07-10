@@ -22,7 +22,8 @@ if (isMisconfigured) {
 }
 ---
 
-<section class="sec hairtop mist" id="waitlist" aria-labelledby="waitlist-title">
+{/* highlighted section: the vapour-subtle gradient marks the conversion moment */}
+<section class="sec hairtop wl-sec" id="waitlist" aria-labelledby="waitlist-title">
   <div class="container wl">
     <div>
       <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="waitlist-title" />
@@ -162,6 +163,10 @@ if (isMisconfigured) {
 </section>
 
 <style>
+  .wl-sec {
+    background: var(--grad-vapor-subtle), var(--bg-mist);
+  }
+
   .wl {
     display: grid;
     grid-template-columns: 5fr 7fr;

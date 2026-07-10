@@ -152,15 +152,29 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
     margin-top: 0.4rem;
   }
 
+  /* CTASection (design system): dark panel with the process strip on its
+     bottom edge — a conversion moment framed as process narrative */
   .tech__ctaband {
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
     margin-top: 2.5rem;
-    padding: 1.6rem 2rem;
+    padding: 1.75rem 2rem 2.1rem;
     background: var(--bg-inverse);
-    border-radius: var(--radius-md);
+    border-radius: 16px;
+  }
+
+  .tech__ctaband::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6px;
+    background: var(--grad-vapor);
   }
 
   .tech__ctaband p {

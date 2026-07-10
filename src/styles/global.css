@@ -36,9 +36,13 @@
   --violet-tint: #F1EDFB;
   --valve-red-90: #C92A22;
 
-  /* ---- The gradient IS the sublimation (process moments only) ---- */
+  /* ---- The gradient IS the sublimation (process moments only) ----
+     grad-vapor: heroes, covers, process strips · grad-vapor-subtle:
+     highlighted section backgrounds · grad-vapor-line: technical dividers */
   --grad-vapor: linear-gradient(120deg, var(--coral) 0%, var(--violet) 58%, var(--lavender) 100%);
+  --grad-vapor-subtle: linear-gradient(120deg, rgba(240, 83, 47, 0) 40%, rgba(108, 75, 216, 0.1) 78%, rgba(201, 188, 242, 0.28) 100%);
   --grad-vapor-line: linear-gradient(90deg, var(--coral), var(--violet));
+  --glow-vapor: linear-gradient(300deg, rgba(108, 75, 216, 0.35) 0%, rgba(108, 75, 216, 0) 45%);
 
   /* ---- Typography ---- */
   --font-display: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -211,7 +215,7 @@ a:hover {
   font-size: 0.94rem;
   line-height: 1;
   padding: 0.95rem 1.75rem;
-  border-radius: var(--radius-md);
+  border-radius: 10px;
   border: 0;
   cursor: pointer;
   white-space: nowrap;
@@ -239,6 +243,19 @@ a:hover {
   background: transparent;
   border-color: var(--text-body);
   color: var(--ink);
+}
+
+/* ghost variant on dark process panels (hero, CTA blocks) */
+.btn--ghost-dark {
+  background: transparent;
+  color: var(--text-on-dark);
+  border: 1.5px solid rgba(248, 246, 243, 0.35);
+}
+
+.btn--ghost-dark:hover {
+  background: rgba(248, 246, 243, 0.08);
+  border-color: rgba(248, 246, 243, 0.6);
+  color: var(--text-on-dark);
 }
 
 @media (max-width: 40rem) {
