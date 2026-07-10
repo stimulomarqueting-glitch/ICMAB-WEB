@@ -65,6 +65,7 @@ export const es: SiteContent = {
     video: {
       caption: `${name} en funcionamiento — del material sólido a la capa depositada.`,
       placeholder: 'Próximamente: vídeo del dispositivo.',
+      playLabel: 'Reproducir el vídeo del dispositivo',
     },
     steps: [
       { title: 'Carga miligramos', text: 'Coloca una pequeña cantidad de tu material sólido en el portamuestras de la fuente.' },

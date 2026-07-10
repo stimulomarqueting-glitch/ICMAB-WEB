@@ -65,6 +65,7 @@ export const en: SiteContent = {
     video: {
       caption: `${name} in operation — from solid material to deposited layer.`,
       placeholder: 'Device video coming soon.',
+      playLabel: 'Play the device video',
     },
     steps: [
       { title: 'Load milligrams', text: 'Place a small amount of your solid material in the source holder.' },

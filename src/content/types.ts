@@ -55,7 +55,7 @@ export interface SiteContent {
     title: string;
     lead: string;
     /** device video block (auto-activates when the mp4 exists, see Technology.astro) */
-    video: { caption: string; placeholder: string };
+    video: { caption: string; placeholder: string; playLabel: string };
     steps: { title: string; text: string }[];
     /** expanded detail accordion ("understand without opening; open to go deeper") */
     accordionTitle: string;

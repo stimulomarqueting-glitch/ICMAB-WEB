@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { getContent, type Locale } from '../content';
 import Accordion from './Accordion.astro';
+import BrandMark from './BrandMark.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -27,13 +28,16 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
 
     <figure class="tech__media reveal">
       {hasVideo ? (
-        <video
-          class="tech__video"
-          controls
-          preload="metadata"
-          poster="/img/tech-detail.jpg"
-          src={VIDEO_SRC}
-        ></video>
+        <div class="tech__videobox">
+          <video class="tech__video" controls preload="none" src={VIDEO_SRC} playsinline></video>
+          {/* branded facade: capsule logo + play button; removed on first play */}
+          <button class="tech__poster" type="button" id="tech-video-poster" aria-label={t.video.playLabel}>
+            <BrandMark size={120} />
+            <span class="tech__play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 6.2v11.6c0 .8.9 1.3 1.6.9l9.2-5.8c.6-.4.6-1.4 0-1.8L10.1 5.3c-.7-.4-1.6.1-1.6.9Z"></path></svg>
+            </span>
+          </button>
+        </div>
       ) : (
         <div class="tech__video-ph" role="img" aria-label={t.video.placeholder}>
           <span class="tech__video-badge">
@@ -67,6 +71,19 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
   </div>
 </section>
 
+<script>
+  // Branded video facade: first click removes the poster and starts playback.
+  const poster = document.getElementById('tech-video-poster');
+  const video = document.querySelector<HTMLVideoElement>('.tech__video');
+
+  if (poster && video) {
+    poster.addEventListener('click', () => {
+      poster.remove();
+      video.play();
+    });
+  }
+</script>
+
 <style>
   .tech__media {
     margin: 2.25rem 0 0;
@@ -81,6 +98,73 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
     background: var(--bg-inverse);
     display: block;
     object-fit: cover;
+  }
+
+  .tech__videobox {
+    position: relative;
+  }
+
+  /* branded video facade: plum background + vapour glow + capsule + play */
+  .tech__poster {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    width: 100%;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background:
+      var(--glow-vapor),
+      var(--bg-inverse);
+    cursor: pointer;
+    transition: background-color var(--dur-base) var(--ease);
+  }
+
+  .tech__play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 50%;
+    background: var(--coral);
+    color: #fff;
+    transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+
+  .tech__play svg {
+    width: 1.9rem;
+    height: 1.9rem;
+    margin-left: 0.2rem;
+  }
+
+  .tech__poster:hover .tech__play {
+    background: var(--coral-dark);
+    transform: scale(1.05);
+  }
+
+  .tech__poster:focus-visible {
+    outline: 3px solid var(--violet);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 40rem) {
+    .tech__poster {
+      gap: 1rem;
+    }
+
+    .tech__poster :global(svg[viewBox='0 0 64 96']) {
+      height: 80px;
+      width: auto;
+    }
+
+    .tech__play {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
   }
 
   .tech__video-ph {
