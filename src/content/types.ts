@@ -73,6 +73,13 @@ export interface SiteContent {
     kicker: string;
     kickerNote: string;
     title: string;
+    /** identity-system figure: the capsule isotype with application callouts */
+    isotype: {
+      alt: string;
+      caption: string;
+      /** callout labels in order: oleds, sensors, perovskites, coatings, spm */
+      labels: [string, string, string, string, string];
+    };
     items: { sub: string; name: string; text: string }[];
     ctaButton: string;
     ctaNote: string;

@@ -1,5 +1,6 @@
 ---
 import { getContent, type Locale } from '../content';
+import AppsIsotype from './AppsIsotype.astro';
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
@@ -18,6 +19,8 @@ const t = getContent(locale).applications;
       title={t.title}
       id="applications-title"
     />
+
+    <AppsIsotype alt={t.isotype.alt} caption={t.isotype.caption} labels={t.isotype.labels} />
 
     <div class="apps__grid">
       {t.items.map((app) => (

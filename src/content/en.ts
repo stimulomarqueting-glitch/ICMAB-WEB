@@ -132,6 +132,11 @@ export const en: SiteContent = {
     kicker: 'Applications',
     kickerNote: 'confirmed use cases',
     title: "What you'd use it for, concretely",
+    isotype: {
+      alt: 'The MatSurfer capsule isotype: the device stays the same while different points of its interior light up as application fields — OLEDs, sensors, perovskites, coatings and SPM',
+      caption: 'Same device, different readings — the focus shifts to different points of the interior depending on the field.',
+      labels: ['OLEDs', 'Sensors', 'Perovskites', 'Coatings', 'SPM'],
+    },
     items: [
       {
         sub: 'emissive stacks',
