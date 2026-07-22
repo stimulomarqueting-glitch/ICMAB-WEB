@@ -13,6 +13,10 @@ interface Props {
 const { locale } = Astro.props;
 const t = getContent(locale).technology;
 
+/* items flagged published: false (e.g. Validation & IP pending Technology
+   Transfer sign-off) stay in the content files but are not rendered */
+const accordionItems = t.accordion.filter((item) => item.published !== false);
+
 /**
  * VIDEO SLOT — auto-activates at build time.
  * Drop the device video at public/video/sublimat-subtitles.mp4 and rebuild:
@@ -62,7 +66,7 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
       ))}
     </ol>
 
-    <Accordion title={t.accordionTitle} items={t.accordion} idPrefix="tech" />
+    <Accordion title={t.accordionTitle} items={accordionItems} idPrefix="tech" />
 
     <div class="tech__ctaband reveal">
       <p>{t.ctaBandText}</p>

@@ -9,12 +9,16 @@ interface Props {
 const { locale } = Astro.props;
 const t = getContent(locale).audiences;
 
-/* line icons per audience, drawn in the system's stroke style */
+/* line icons per audience — single-weight technical stroke, one per profile:
+   microscope (academic research) · flask (researchers new to surfaces) ·
+   building + flask (corporate R&D and testing) · parcel (distributors) */
 const icons: Record<string, string> = {
-  surface: 'M3 20h22M8 20c3-2.5 4.5-7 10-10.5M18 9.5m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M7 17.5h.01M11 15h.01',
+  surface:
+    'M12 3.5h5M14.5 3.5v7M11.5 10.5h6M14.5 10.5v3M14.5 13.5a6.5 6.5 0 0 1 6.5 6.5M5 24h18M8.5 20h6.5M10 16.5h.01',
   lab: 'M11 3h6M12.5 3v6.5L7 20a1.3 1.3 0 0 0 1.2 1.8h11.6A1.3 1.3 0 0 0 21 20l-5.5-10.5V3M9.5 15.5h9',
-  insitu: 'M4 14h20M4 14v6h20v-6M9 14V9a5 5 0 0 1 10 0v5M12 20h4',
-  modularity: 'M4 4h8v8H4zM16 4h8v8h-8zM4 16h8v8H4zM18 18h4v4',
+  insitu:
+    'M4 24V8.5l7.5-3V24M4 24h20M7.4 12h.01M7.4 15.5h.01M7.4 19h.01M17 10.5h4.5M18.2 10.5v3.6l-2.7 6.2a1 1 0 0 0 .9 1.4h5.7a1 1 0 0 0 .9-1.4l-2.7-6.2v-3.6',
+  modularity: 'M5 9.5 14 5l9 4.5v9L14 23l-9-4.5v-9ZM5 9.5 14 14l9-4.5M14 14v9M9.5 7.3l9 4.4',
 };
 ---
 

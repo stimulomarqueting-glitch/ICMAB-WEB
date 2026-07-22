@@ -57,9 +57,10 @@ export interface SiteContent {
     /** device video block (auto-activates when the mp4 exists, see Technology.astro) */
     video: { caption: string; placeholder: string; playLabel: string };
     steps: { title: string; text: string }[];
-    /** expanded detail accordion ("understand without opening; open to go deeper") */
+    /** expanded detail accordion ("understand without opening; open to go deeper").
+     *  Items with published: false stay in the data but are not rendered. */
     accordionTitle: string;
-    accordion: { q: string; a: string }[];
+    accordion: { q: string; a: string; published?: boolean }[];
     ctaBandText: string;
     ctaBandButton: string;
   };
@@ -111,6 +112,15 @@ export interface SiteContent {
       /** Ends mid-sentence; the contact email link is appended in markup. */
       errorText: string;
     };
+  };
+  /** compact strip near the end of the landing linking to /team and /research */
+  explore: {
+    teamTitle: string;
+    teamText: string;
+    teamCta: string;
+    researchTitle: string;
+    researchText: string;
+    researchCta: string;
   };
   footer: {
     description: string;

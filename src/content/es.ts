@@ -13,10 +13,12 @@ export const es: SiteContent = {
 
   header: {
     nav: [
-      { label: 'Tecnología', href: '#technology' },
-      { label: 'Beneficios', href: '#benefits' },
-      { label: 'Aplicaciones', href: '#applications' },
-      { label: 'Para quién', href: '#who-is-it-for' },
+      { label: 'Tecnología', href: '/#technology' },
+      { label: 'Beneficios', href: '/#benefits' },
+      { label: 'Aplicaciones', href: '/#applications' },
+      { label: 'Para quién', href: '/#who-is-it-for' },
+      { label: 'Equipo', href: '/team' },
+      { label: 'Investigación', href: '/research' },
     ],
     cta: 'Únete a la lista',
     menuOpen: 'Abrir menú',
@@ -26,7 +28,7 @@ export const es: SiteContent = {
 
   hero: {
     eyebrow: 'Tecnología ICMAB-CSIC · Patentada (EP 23711114.1)',
-    headline: 'Experimentación directa con superficies, en formato compacto.',
+    headline: 'Experimentación directa con superficies, en formato compacto',
     descriptor: 'Dispositivo compacto de deposición · I+D a escala de laboratorio',
     lead: 'Deposita, criba y caracteriza materiales por sublimación, directamente sobre las superficies que importan — en tu mesa, sin sala blanca ni grandes sistemas de vacío.',
     ctaPrimary: 'Solicita acceso anticipado',
@@ -36,7 +38,7 @@ export const es: SiteContent = {
 
   problem: {
     kicker: 'El problema',
-    title: 'Un experimento de superficie no debería exigir una instalación.',
+    title: 'Un experimento de superficie no debería exigir una instalación',
     lead: 'Depositar un material sobre una superficie ha significado tradicionalmente grandes evaporadores de vacío, acceso a sala blanca, operadores formados y colas — infraestructura que muchos equipos no tienen, y experimentos que desperdician la mayor parte del material cargado.',
     photoAlt: 'Un pasillo de laboratorio dedicado con vitrinas de gases — la infraestructura que suele exigir el trabajo de superficies',
     cards: [
@@ -60,8 +62,8 @@ export const es: SiteContent = {
 
   technology: {
     kicker: 'La tecnología',
-    title: 'La sublimación, llevada a la mesa de laboratorio.',
-    lead: `${name} calienta una fuente sólida hasta que sublima y deposita el vapor directamente sobre tu sustrato final a una distancia ajustable — en una cámara de vidrio de sobremesa, con mínimos pasos, energía y pérdida de material.`,
+    title: 'La sublimación, llevada a la mesa de laboratorio',
+    lead: `La distancia fuente–sustrato controlable permite ajustar las condiciones experimentales directamente durante la preparación. ${name} calienta una fuente sólida hasta que sublima y deposita el vapor directamente sobre tu sustrato final — en una cámara de vidrio de sobremesa, con mínimos pasos, energía y pérdida de material.`,
     video: {
       caption: `${name} en funcionamiento — del material sólido a la capa depositada.`,
       placeholder: 'Próximamente: vídeo del dispositivo.',
@@ -85,24 +87,26 @@ export const es: SiteContent = {
       },
       {
         q: '¿Para quién es?',
-        a: 'Grupos de ciencia de superficies que quieren ensayos a escala reducida junto a sus líneas de deposición; investigadores de química, biología o física que hacen su primer trabajo de superficies sin infraestructura especializada; I+D corporativo y servicios de ensayo que añaden cribado de superficies a su portafolio; y distribuidores de equipamiento que buscan un producto de sobremesa protegido por patente.',
+        a: 'Investigadores y equipos de I+D que exploran temas relacionados con superficies o que usan superficies como parte de su investigación, en el ámbito académico y en la industria — desde grupos especializados en ciencia de superficies hasta investigadores de otros campos que incorporan superficies a su trabajo, en laboratorios universitarios y en departamentos de I+D de empresas.',
       },
       {
         q: '¿Qué lo hace diferente?',
         a: 'La deposición ocurre directamente sobre el sustrato final a escala de 1–3 cm², con cargas de miligramos en lugar de gramos, en un dispositivo de menos de 20 cm que funciona sin sala blanca ni línea de vacío grande. La distancia fuente–sustrato es ajustable, las piezas son modulares y reemplazables a bajo coste, y el flujo de trabajo es tan simple que no requiere operador especialista.',
       },
       {
+        // TODO(client): copy pendiente de validación por Transferencia Tecnológica del ICMAB.
         q: 'Validación y propiedad industrial',
         a: 'La tecnología se desarrolló en el ICMAB-CSIC (Institut de Ciència de Materials de Barcelona) y está protegida por una familia de patentes española y europea (EP 23711114.1). Los prototipos funcionales están en TRL 5 avanzando hacia 6, con el apoyo de programas competitivos de investigación y transferencia, y uso experimental real en el laboratorio.',
+        published: false,
       },
     ],
-    ctaBandText: 'Véelo primero en tu propia mesa.',
+    ctaBandText: 'Véelo primero en tu propia mesa',
     ctaBandButton: 'Solicita acceso anticipado',
   },
 
   benefits: {
     kicker: 'Beneficios',
-    title: 'Lo que gana tu equipo.',
+    title: 'Lo que gana tu equipo',
     outcomes: [
       {
         title: 'Menos material por respuesta',
@@ -126,7 +130,7 @@ export const es: SiteContent = {
   applications: {
     kicker: 'Aplicaciones',
     kickerNote: 'casos de uso confirmados',
-    title: 'Para qué lo usarías, en concreto.',
+    title: 'Para qué lo usarías, en concreto',
     items: [
       {
         sub: 'pilas emisivas',
@@ -165,7 +169,7 @@ export const es: SiteContent = {
 
   audiences: {
     kicker: 'Para quién',
-    title: 'Pensado para cuatro tipos de equipos.',
+    title: 'Pensado para cuatro tipos de equipos',
     photoAlt: `Un investigador sosteniendo la cámara de vidrio compacta de ${name} en una mano`,
     groups: [
       {
@@ -195,7 +199,7 @@ export const es: SiteContent = {
 
   waitlist: {
     kicker: 'Acceso anticipado',
-    title: 'Únete a la lista de espera.',
+    title: 'Únete a la lista de espera',
     lead: 'Cuéntanos sobre tu laboratorio y qué depositarías primero. Las unidades piloto son limitadas; las asignamos por encaje, por orden de solicitud.',
     steps: [
       'Revisamos tu solicitud y tu caso de uso.',
@@ -281,11 +285,20 @@ export const es: SiteContent = {
       selectPlaceholder: 'Selecciona…',
       submit: 'Solicita acceso anticipado',
       submitting: 'Enviando…',
-      successTitle: 'Ya estás en la lista.',
+      successTitle: 'Ya estás en la lista',
       successText:
         'Gracias — hemos recibido tu solicitud. Revisamos los casos de uso por orden de llegada y te contactaremos a medida que haya unidades piloto disponibles.',
       errorText: 'Ha habido un problema al enviar tu solicitud. Inténtalo de nuevo o escríbenos directamente a',
     },
+  },
+
+  explore: {
+    teamTitle: 'Conoce al equipo',
+    teamText: 'Las personas que unen investigación de superficies, transferencia tecnológica y desarrollo de producto.',
+    teamCta: 'Conoce al equipo',
+    researchTitle: 'Investigación y validación',
+    researchText: 'Experiencias de expertos y trabajos publicados desarrollados con la tecnología.',
+    researchCta: 'Explora la investigación',
   },
 
   footer: {
@@ -295,16 +308,18 @@ export const es: SiteContent = {
       {
         title: 'Producto',
         links: [
-          { label: 'Tecnología', href: '#technology' },
-          { label: 'Beneficios', href: '#benefits' },
-          { label: 'Aplicaciones', href: '#applications' },
+          { label: 'Tecnología', href: '/#technology' },
+          { label: 'Beneficios', href: '/#benefits' },
+          { label: 'Aplicaciones', href: '/#applications' },
         ],
       },
       {
         title: 'Programa',
         links: [
-          { label: 'Para quién', href: '#who-is-it-for' },
-          { label: 'Acceso anticipado', href: '#waitlist' },
+          { label: 'Para quién', href: '/#who-is-it-for' },
+          { label: 'Acceso anticipado', href: '/#waitlist' },
+          { label: 'Equipo', href: '/team' },
+          { label: 'Investigación y validación', href: '/research' },
         ],
       },
       {

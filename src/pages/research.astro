@@ -1,0 +1,188 @@
+---
+import { brand } from '../config/brand';
+import { expertExperiences, publications, researchPage } from '../content/research';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const experiences = expertExperiences
+  .filter((e) => e.published)
+  .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+
+const papers = publications
+  .filter((p) => p.published)
+  .sort((a, b) => b.year - a.year);
+---
+
+<BaseLayout locale="en" title={researchPage.metaTitle} description={researchPage.metaDescription}>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header locale="en" />
+  <main id="main">
+    <section class="sec" aria-labelledby="research-title">
+      <div class="container">
+        <p class="eyebrow">{researchPage.kicker}</p>
+        <h1 class="h2 page__title" id="research-title">{researchPage.title}</h1>
+        <p class="lead">{researchPage.lead}</p>
+
+        {experiences.length > 0 && (
+          <section aria-labelledby="experiences-title" class="research__block">
+            <h2 class="research__head" id="experiences-title">{researchPage.experiencesTitle}</h2>
+            <div class="research__grid">
+              {experiences.map((e) => (
+                <article class="panel research__card">
+                  <span class="research__field">{e.field}</span>
+                  <blockquote class="research__quote"><p>“{e.quote}”</p></blockquote>
+                  <p class="research__who">
+                    <strong>{e.name}</strong> · {e.role}, {e.institution}
+                  </p>
+                  {e.device && <p class="research__device">{e.device}</p>}
+                  {e.link && <a class="research__link" href={e.link} target="_blank" rel="noopener">More</a>}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {papers.length > 0 && (
+          <section aria-labelledby="publications-title" class="research__block">
+            <h2 class="research__head" id="publications-title">{researchPage.publicationsTitle}</h2>
+            <ul class="research__pubs" role="list">
+              {papers.map((p) => (
+                <li class="research__pub">
+                  <h3>{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.title}</a> : p.title}</h3>
+                  <p class="research__meta">
+                    {p.authors} · <em>{p.journal}</em>, {p.year}
+                    {p.doi && <span class="research__doi"> · DOI: {p.doi}</span>}
+                  </p>
+                  {p.description && <p class="research__desc">{p.description}</p>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <div class="panel page__contact">
+          <h2>{researchPage.inviteTitle}</h2>
+          <p>
+            {researchPage.inviteText}
+            {' '}<a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer locale="en" />
+</BaseLayout>
+
+<style>
+  .page__title {
+    max-width: 26ch;
+  }
+
+  .research__block {
+    margin-top: 2.75rem;
+  }
+
+  .research__head {
+    font-size: 1.35rem;
+  }
+
+  .research__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .research__card {
+    padding: 1.75rem;
+  }
+
+  .research__field {
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--violet-dark);
+  }
+
+  .research__quote {
+    margin: 0.9rem 0 0;
+  }
+
+  .research__quote p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-strong);
+  }
+
+  .research__who {
+    font-size: 0.88rem;
+    margin-top: 0.9rem;
+  }
+
+  .research__device {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  .research__link {
+    display: inline-block;
+    margin-top: 0.7rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .research__pubs {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+  }
+
+  .research__pub {
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .research__pub h3 {
+    font-family: var(--font-body);
+    font-size: 1.06rem;
+  }
+
+  .research__meta {
+    font-size: 0.88rem;
+    margin-top: 0.4rem;
+  }
+
+  .research__doi {
+    font-family: var(--font-mono);
+    font-size: 0.81rem;
+  }
+
+  .research__desc {
+    font-size: 0.88rem;
+    margin-top: 0.4rem;
+    max-width: 68ch;
+  }
+
+  .page__contact {
+    margin-top: 2.75rem;
+    padding: 1.75rem 2rem;
+    max-width: 34rem;
+  }
+
+  .page__contact h2 {
+    font-size: 1.19rem;
+  }
+
+  .page__contact p {
+    font-size: 0.94rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 56rem) {
+    .research__grid { grid-template-columns: 1fr; }
+  }
+</style>

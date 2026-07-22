@@ -13,10 +13,12 @@ export const en: SiteContent = {
 
   header: {
     nav: [
-      { label: 'Technology', href: '#technology' },
-      { label: 'Benefits', href: '#benefits' },
-      { label: 'Applications', href: '#applications' },
-      { label: "Who it's for", href: '#who-is-it-for' },
+      { label: 'Technology', href: '/#technology' },
+      { label: 'Benefits', href: '/#benefits' },
+      { label: 'Applications', href: '/#applications' },
+      { label: "Who it's for", href: '/#who-is-it-for' },
+      { label: 'Team', href: '/team' },
+      { label: 'Research', href: '/research' },
     ],
     cta: 'Join the waitlist',
     menuOpen: 'Open menu',
@@ -26,7 +28,7 @@ export const en: SiteContent = {
 
   hero: {
     eyebrow: 'ICMAB-CSIC technology · Patented (EP 23711114.1)',
-    headline: 'Direct surface experimentation, made compact.',
+    headline: 'Direct surface experimentation, made compact',
     descriptor: 'Compact surface deposition device · lab-scale R&D',
     lead: 'Deposit, screen and characterise materials by sublimation, directly on the surfaces that matter — on your bench, without a cleanroom or a large vacuum system.',
     ctaPrimary: 'Request early access',
@@ -36,7 +38,7 @@ export const en: SiteContent = {
 
   problem: {
     kicker: 'The problem',
-    title: "Surface experiments shouldn't require a facility.",
+    title: "Surface experiments shouldn't require a facility",
     lead: 'Depositing a material on a surface usually means big vacuum systems, cleanroom access, trained operators and queues — and most of the loaded material never reaches the sample.',
     photoAlt: 'A dedicated laboratory corridor lined with fume hoods — the infrastructure surface work usually requires',
     cards: [
@@ -60,8 +62,8 @@ export const en: SiteContent = {
 
   technology: {
     kicker: 'The technology',
-    title: 'Sublimation, brought to the bench.',
-    lead: `${name} heats a solid source until it sublimes, and deposits the vapour directly onto your final substrate across an adjustable distance — in a benchtop glass chamber, with minimal steps, energy and material loss.`,
+    title: 'Sublimation, brought to the bench',
+    lead: `A controllable source–substrate distance lets researchers adjust experimental conditions directly during preparation. ${name} heats a solid source until it sublimes and deposits the vapour straight onto your final substrate — in a benchtop glass chamber, with minimal steps, energy and material loss.`,
     video: {
       caption: `${name} in operation — from solid material to deposited layer.`,
       placeholder: 'Device video coming soon.',
@@ -85,24 +87,27 @@ export const en: SiteContent = {
       },
       {
         q: 'Who is it for?',
-        a: 'Surface-science groups that want reduced-scale testing beside their existing deposition lines; researchers from chemistry, biology or physics doing their first surface work without specialist infrastructure; corporate R&D and testing services adding surface screening to their portfolio; and lab equipment distributors looking for a patent-protected, benchtop-format product.',
+        a: 'R&D researchers and teams exploring surface-related topics or using surfaces as part of their research, across academia and industry — from groups specialised in surface science to researchers from other fields bringing surfaces into their work, in university and academic laboratories as well as corporate R&D departments.',
       },
       {
         q: 'What makes it different?',
         a: 'Deposition happens directly on the final substrate at 1–3 cm² scale, with milligram loads instead of grams, in a device under 20 cm that runs without a cleanroom or a large vacuum line. The source–substrate distance is adjustable, the pieces are modular and economically replaceable, and the workflow is simple enough that no specialist operator is needed.',
       },
       {
+        // TODO(client): copy pending validation by ICMAB Technology Transfer.
+        // Flip `published` to true (or simply remove it) to show this item again.
         q: 'Validation & IP',
         a: 'The technology was developed at ICMAB-CSIC (Institut de Ciència de Materials de Barcelona) and is protected by a Spanish and European patent family (EP 23711114.1). Working prototypes are at TRL 5 moving towards 6, supported by competitive research and technology-transfer programmes, with real experimental use in the lab.',
+        published: false,
       },
     ],
-    ctaBandText: 'See it on your own bench first.',
+    ctaBandText: 'See it on your own bench first',
     ctaBandButton: 'Request early access',
   },
 
   benefits: {
     kicker: 'Benefits',
-    title: 'What your team gets.',
+    title: 'What your team gets',
     outcomes: [
       {
         title: 'Less material per answer',
@@ -126,7 +131,7 @@ export const en: SiteContent = {
   applications: {
     kicker: 'Applications',
     kickerNote: 'confirmed use cases',
-    title: "What you'd use it for, concretely.",
+    title: "What you'd use it for, concretely",
     items: [
       {
         sub: 'emissive stacks',
@@ -165,7 +170,7 @@ export const en: SiteContent = {
 
   audiences: {
     kicker: "Who it's for",
-    title: 'Built for four kinds of teams.',
+    title: 'Built for four kinds of teams',
     photoAlt: `A researcher holding the compact ${name} glass chamber in one hand`,
     groups: [
       {
@@ -195,7 +200,7 @@ export const en: SiteContent = {
 
   waitlist: {
     kicker: 'Early access',
-    title: 'Join the waitlist.',
+    title: 'Join the waitlist',
     lead: "Tell us about your lab and what you'd deposit first. Pilot units are limited; we allocate them by fit, in order of application.",
     steps: [
       'We review your application and use case.',
@@ -277,11 +282,20 @@ export const en: SiteContent = {
       selectPlaceholder: 'Select…',
       submit: 'Request early access',
       submitting: 'Sending…',
-      successTitle: "You're on the waitlist.",
+      successTitle: "You're on the waitlist",
       successText:
         "Thank you — we've received your application. We review use cases in order of arrival and will contact you as pilot units become available.",
       errorText: 'Something went wrong while sending your request. Please try again, or contact us directly at',
     },
+  },
+
+  explore: {
+    teamTitle: 'Meet the team',
+    teamText: 'The people bringing surface research, technology transfer and product development together.',
+    teamCta: 'Meet the team',
+    researchTitle: 'Research & validation',
+    researchText: 'Expert experiences and published work developed with the technology.',
+    researchCta: 'Explore the research',
   },
 
   footer: {
@@ -291,16 +305,18 @@ export const en: SiteContent = {
       {
         title: 'Product',
         links: [
-          { label: 'Technology', href: '#technology' },
-          { label: 'Benefits', href: '#benefits' },
-          { label: 'Applications', href: '#applications' },
+          { label: 'Technology', href: '/#technology' },
+          { label: 'Benefits', href: '/#benefits' },
+          { label: 'Applications', href: '/#applications' },
         ],
       },
       {
         title: 'Programme',
         links: [
-          { label: "Who it's for", href: '#who-is-it-for' },
-          { label: 'Early access', href: '#waitlist' },
+          { label: "Who it's for", href: '/#who-is-it-for' },
+          { label: 'Early access', href: '/#waitlist' },
+          { label: 'Team', href: '/team' },
+          { label: 'Research & validation', href: '/research' },
         ],
       },
       {

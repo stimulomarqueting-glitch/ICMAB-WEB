@@ -1,0 +1,130 @@
+---
+import { brand } from '../config/brand';
+import { teamMembers, teamPage } from '../content/team';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const members = teamMembers
+  .filter((m) => m.published)
+  .sort((a, b) => a.order - b.order);
+---
+
+<BaseLayout locale="en" title={teamPage.metaTitle} description={teamPage.metaDescription}>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header locale="en" />
+  <main id="main">
+    <section class="sec" aria-labelledby="team-title">
+      <div class="container">
+        <p class="eyebrow">{teamPage.kicker}</p>
+        <h1 class="h2 page__title" id="team-title">{teamPage.title}</h1>
+        <p class="lead">{teamPage.lead}</p>
+
+        {members.length > 0 && (
+          <div class="team__grid">
+            {members.map((m) => (
+              <article class="panel team__card">
+                {m.image && <img class="team__photo" src={m.image} alt={`${m.name} — ${m.role}`} loading="lazy" />}
+                <h2>{m.name}</h2>
+                <p class="team__role">{m.role}</p>
+                <p class="team__affiliation">{m.affiliation}</p>
+                {m.bio && <p class="team__bio">{m.bio}</p>}
+                {m.linkedin && (
+                  <a class="team__link" href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
+
+        <div class="panel page__contact">
+          <h2>{teamPage.contactTitle}</h2>
+          <p>
+            {teamPage.contactText}
+            {' '}<a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer locale="en" />
+</BaseLayout>
+
+<style>
+  .page__title {
+    max-width: 26ch;
+  }
+
+  .team__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .team__card {
+    padding: 1.75rem;
+  }
+
+  .team__photo {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.1rem;
+  }
+
+  .team__card h2 {
+    font-family: var(--font-body);
+    font-size: 1.19rem;
+  }
+
+  .team__role {
+    font-size: 0.94rem;
+    color: var(--text-strong);
+    margin-top: 0.25rem;
+  }
+
+  .team__affiliation {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+  }
+
+  .team__bio {
+    font-size: 0.88rem;
+    margin-top: 0.7rem;
+  }
+
+  .team__link {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .page__contact {
+    margin-top: 2.5rem;
+    padding: 1.75rem 2rem;
+    max-width: 34rem;
+  }
+
+  .page__contact h2 {
+    font-size: 1.19rem;
+  }
+
+  .page__contact p {
+    font-size: 0.94rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 56rem) {
+    .team__grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 40rem) {
+    .team__grid { grid-template-columns: 1fr; }
+  }
+</style>
