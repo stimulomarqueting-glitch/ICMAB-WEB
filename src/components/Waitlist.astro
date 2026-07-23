@@ -254,10 +254,11 @@ if (isMisconfigured) {
     border-color: var(--text-body);
   }
 
+  /* v3 focus: violet border + soft violet ring */
   .control:focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 1px;
-    border-color: var(--focus-ring);
+    outline: none;
+    border-color: var(--violet);
+    box-shadow: 0 0 0 3px rgba(108, 18, 248, 0.15);
   }
 
   .control::placeholder {

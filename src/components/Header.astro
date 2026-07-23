@@ -16,7 +16,7 @@ const home = `${localePath(locale)}/`;
   <div class="container header__inner">
     <a class="header__logo" href={home} aria-label={`${brand.projectName} — home`}>
       <BrandMark size={30} />
-      {brand.projectName}
+      <span class="wordmark">{brand.projectName}</span>
     </a>
 
     <nav class="header__nav" aria-label="Main">
@@ -47,15 +47,17 @@ const home = `${localePath(locale)}/`;
 </header>
 
 <style>
+  /* liquid glass navbar (v3) */
   .header {
     position: sticky;
     top: 0;
     z-index: 40;
     height: var(--header-h);
-    background: rgba(248, 246, 243, 0.88);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-subtle);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 1px 0 rgba(38, 36, 31, 0.04);
   }
 
   .header__inner {

@@ -17,7 +17,7 @@ const t = getContent(locale).footer;
       <div class="footer__brand">
         <a class="footer__logo" href="/">
           <BrandMark />
-          {brand.projectName}
+          <span class="wordmark">{brand.projectName}</span>
         </a>
         <p class="footer__desc">{t.description}</p>
         <a class="btn btn--sm footer__cta" href="/#waitlist" data-cta-source="footer">{t.cta}</a>
@@ -43,8 +43,10 @@ const t = getContent(locale).footer;
 </footer>
 
 <style>
+  /* v3: warm coral-tinted footer */
   .footer {
-    border-top: 1px solid var(--silica);
+    background: var(--bg-mist);
+    border-top: 1px solid var(--border-coral-soft);
     padding: 4rem 0 2.5rem;
     margin-top: 2rem;
   }

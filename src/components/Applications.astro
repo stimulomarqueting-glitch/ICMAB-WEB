@@ -54,11 +54,16 @@ const t = getContent(locale).applications;
     gap: 0.6rem;
   }
 
+  /* v3 badge: soft violet pill, mono */
   .apps__sub {
+    align-self: flex-start;
     font-family: var(--font-mono);
     font-size: 0.69rem;
     color: var(--violet-dark);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    background: var(--violet-tint);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.65rem;
   }
 
   .apps__card h3 {

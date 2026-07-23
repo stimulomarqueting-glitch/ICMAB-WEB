@@ -26,7 +26,7 @@ const VIDEO_SRC = '/video/sublimat-subtitles.mp4';
 const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, import.meta.url)));
 ---
 
-<section class="sec hairtop" id="technology" aria-labelledby="technology-title">
+<section class="sec hairtop mist--violet" id="technology" aria-labelledby="technology-title">
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="technology-title" />
 
@@ -70,7 +70,7 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
 
     <div class="tech__ctaband reveal">
       <p>{t.ctaBandText}</p>
-      <a class="btn" href="#waitlist" data-cta-source="technology">{t.ctaBandButton}</a>
+      <a class="btn btn--grad" href="#waitlist" data-cta-source="technology">{t.ctaBandButton}</a>
     </div>
   </div>
 </section>
@@ -218,14 +218,37 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
     padding: 0;
   }
 
+  /* process cards (v3): white card, phase-coloured 8px bar on top */
   .tech__step {
-    border-top: 2px solid var(--ink);
-    padding-top: 1rem;
+    position: relative;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.35rem 1.35rem 1.45rem;
+    overflow: hidden;
   }
+
+  .tech__step::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: var(--grad-vapor-line);
+  }
+
+  /* the bar walks the sublimation: solid → heating → vapour → layer */
+  .tech__step:nth-child(1)::before { background: var(--coral); }
+  .tech__step:nth-child(2)::before { background: linear-gradient(90deg, var(--coral), var(--magenta)); }
+  .tech__step:nth-child(3)::before { background: linear-gradient(90deg, var(--magenta), var(--violet)); }
+  .tech__step:nth-child(4)::before { background: var(--violet); }
 
   .tech__sn {
     font-family: var(--font-mono);
     font-size: 0.75rem;
+    letter-spacing: 0.1em;
     color: var(--violet-dark);
   }
 
@@ -250,9 +273,9 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
     justify-content: space-between;
     gap: 1.5rem;
     margin-top: 2.5rem;
-    padding: 1.75rem 2rem 2.1rem;
+    padding: 1.75rem 2rem 2.2rem;
     background: var(--bg-inverse);
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
   }
 
   .tech__ctaband::after {
@@ -261,7 +284,7 @@ const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, im
     left: 0;
     right: 0;
     bottom: 0;
-    height: 6px;
+    height: 8px;
     background: var(--grad-vapor);
   }
 
