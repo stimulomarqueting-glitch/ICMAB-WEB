@@ -1,5 +1,318 @@
 ---
-import Landing from '../components/Landing.astro';
+/**
+ * Home — strategic introduction, 8 blocks:
+ * hero → value strip → product teaser → benefits → applications teaser
+ * → who it's for → research/team strip → final CTA.
+ * Full explanations live on /product, /applications, /research, /team.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Benefits from '../components/Benefits.astro';
+import Audiences from '../components/Audiences.astro';
+import AppsIsotype from '../components/AppsIsotype.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import PageCTA from '../components/PageCTA.astro';
+import Footer from '../components/Footer.astro';
+import { home } from '../content/home';
+import { applications } from '../content/applications';
+
+const apps = applications
+  .filter((a) => a.published)
+  .sort((a, b) => a.order - b.order);
 ---
 
-<Landing locale="en" />
+<BaseLayout>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header />
+  <main id="main">
+    <Hero />
+
+    {/* value strip: Problem → MatSurfer → Result, one sentence each */}
+    <section class="sec hairtop" aria-label="Value proposition">
+      <div class="container">
+        <div class="value__grid">
+          {home.value.items.map((item, i) => (
+            <div class="value__item reveal">
+              <span class="value__tag">{item.tag}</span>
+              <p>{item.text}</p>
+              {i < home.value.items.length - 1 && <span class="value__arrow" aria-hidden="true">→</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* product teaser */}
+    <section class="sec hairtop mist--violet" id="technology" aria-labelledby="product-teaser-title">
+      <div class="container pt__grid">
+        <div>
+          <SectionHeader
+            kicker={home.product.kicker}
+            title={home.product.title}
+            lead={home.product.lead}
+            id="product-teaser-title"
+          />
+          <div class="pt__cta reveal">
+            <a class="btn" href={home.product.ctaHref} data-cta-source="home-product">{home.product.cta}</a>
+          </div>
+        </div>
+        <img
+          class="pt__photo reveal"
+          src="/img/tech-detail.jpg"
+          alt={home.product.photoAlt}
+          width="1000"
+          height="750"
+          loading="lazy"
+        />
+      </div>
+    </section>
+
+    <Benefits
+      kicker={home.benefits.kicker}
+      title={home.benefits.title}
+      outcomes={home.benefits.outcomes}
+    />
+
+    {/* applications teaser: isotype + six links into /applications */}
+    <section class="sec hairtop mist" id="applications" aria-labelledby="apps-teaser-title">
+      <div class="container">
+        <SectionHeader
+          kicker={home.applications.kicker}
+          title={home.applications.title}
+          lead={home.applications.lead}
+          id="apps-teaser-title"
+        />
+        <AppsIsotype
+          alt={home.applications.isotype.alt}
+          caption={home.applications.isotype.caption}
+          labels={home.applications.isotype.labels}
+        />
+        <ul class="apps__links reveal" role="list">
+          {apps.map((app) => (
+            <li>
+              <a class="apps__chip" href={`/applications#${app.slug}`}>
+                {app.title}
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="apps__cta reveal">
+          <a class="btn" href={home.applications.ctaHref} data-cta-source="home-applications">{home.applications.cta}</a>
+        </div>
+      </div>
+    </section>
+
+    <Audiences />
+
+    {/* research + team strip */}
+    <section class="sec hairtop explore" aria-label={`${home.explore.researchTitle} · ${home.explore.teamTitle}`}>
+      <div class="container explore__grid">
+        <div class="panel explore__card reveal">
+          <div>
+            <h2>{home.explore.researchTitle}</h2>
+            <p>{home.explore.researchText}</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href={home.explore.researchHref} data-cta-source="home-research">{home.explore.researchCta}</a>
+        </div>
+        <div class="panel explore__card reveal">
+          <div>
+            <h2>{home.explore.teamTitle}</h2>
+            <p>{home.explore.teamText}</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href={home.explore.teamHref} data-cta-source="home-team">{home.explore.teamCta}</a>
+        </div>
+      </div>
+    </section>
+
+    <PageCTA
+      title={home.finalCta.title}
+      text={home.finalCta.text}
+      button={home.finalCta.button}
+      href={home.finalCta.href}
+      ctaSource="home-final"
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ── value strip ─────────────────────────────────────────────────────── */
+  .value__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+
+  .value__item {
+    position: relative;
+  }
+
+  .value__tag {
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--coral-dark);
+  }
+
+  .value__item:nth-child(2) .value__tag {
+    color: var(--violet-dark);
+  }
+
+  .value__item p {
+    margin-top: 0.6rem;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    max-width: 34ch;
+  }
+
+  .value__arrow {
+    position: absolute;
+    top: -0.15rem;
+    right: -1.65rem;
+    color: var(--silica);
+    font-size: 1.1rem;
+  }
+
+  /* ── product teaser ──────────────────────────────────────────────────── */
+  .pt__grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+
+  .pt__cta {
+    margin-top: 1.75rem;
+  }
+
+  .pt__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border: 1px solid var(--border-violet-soft);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── applications teaser ─────────────────────────────────────────────── */
+  .apps__links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    list-style: none;
+    margin: 2.25rem 0 0;
+    padding: 0;
+  }
+
+  .apps__chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1.2rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.94rem;
+    color: var(--ink);
+    transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  }
+
+  .apps__chip span {
+    color: var(--coral);
+    transition: transform var(--dur-fast) var(--ease);
+  }
+
+  .apps__chip:hover {
+    color: var(--coral-dark);
+    border-color: var(--border-coral-soft);
+  }
+
+  .apps__chip:hover span {
+    transform: translateX(3px);
+  }
+
+  .apps__cta {
+    margin-top: 2rem;
+  }
+
+  /* ── research + team strip ───────────────────────────────────────────── */
+  .explore {
+    padding-block: clamp(2rem, 4vw, 3rem);
+  }
+
+  .explore__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .explore__card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5rem 1.75rem;
+  }
+
+  .explore__card h2 {
+    font-size: 1.19rem;
+  }
+
+  .explore__card p {
+    font-size: 0.88rem;
+    margin-top: 0.4rem;
+    max-width: 34ch;
+  }
+
+  .explore__card .btn {
+    flex: none;
+  }
+
+  /* ── responsive ──────────────────────────────────────────────────────── */
+  @media (max-width: 56rem) {
+    .value__grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .value__arrow {
+      display: none;
+    }
+
+    .pt__grid {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    .apps__links {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .explore__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .apps__links {
+      grid-template-columns: 1fr;
+    }
+
+    .explore__card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .explore__card .btn,
+    .apps__cta .btn,
+    .pt__cta .btn {
+      width: 100%;
+    }
+  }
+</style>

@@ -1,14 +1,14 @@
 ---
+/**
+ * Site footer (v3, warm coral tint): brand block + three link columns +
+ * legal line. Content comes from src/content/site.ts.
+ */
 import { brand } from '../config/brand';
-import { getContent, type Locale } from '../content';
+import { site } from '../content/site';
 import BrandMark from './BrandMark.astro';
 
-interface Props {
-  locale: Locale;
-}
-
-const { locale } = Astro.props;
-const t = getContent(locale).footer;
+const t = site.footer;
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <footer class="footer">
@@ -20,19 +20,21 @@ const t = getContent(locale).footer;
           <span class="wordmark">{brand.projectName}</span>
         </a>
         <p class="footer__desc">{t.description}</p>
-        <a class="btn btn--sm footer__cta" href="/#waitlist" data-cta-source="footer">{t.cta}</a>
+        <a class="btn btn--sm footer__cta" href={t.ctaHref} data-cta-source="footer">{t.cta}</a>
       </div>
 
-      <div class="footer__nav">
+      <nav class="footer__nav" aria-label="Footer">
         {t.columns.map((col) => (
           <div>
             <span class="eyebrow">{col.title}</span>
             {col.links.map((link) => (
-              <a href={link.href}>{link.label}</a>
+              <a href={link.href} aria-current={currentPath === link.href ? 'page' : undefined}>
+                {link.label}
+              </a>
             ))}
           </div>
         ))}
-      </div>
+      </nav>
     </div>
 
     <div class="footer__bottom">
@@ -67,8 +69,6 @@ const t = getContent(locale).footer;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    font-family: var(--font-display);
-    font-weight: 600;
     font-size: 1.1rem;
     color: var(--ink);
   }
@@ -108,7 +108,7 @@ const t = getContent(locale).footer;
     color: var(--ink);
   }
 
-  .footer__nav a[aria-current='true'] {
+  .footer__nav a[aria-current='page'] {
     color: var(--coral-dark);
     font-weight: 600;
   }
@@ -120,7 +120,7 @@ const t = getContent(locale).footer;
     flex-wrap: wrap;
     margin-top: 3.5rem;
     padding-top: 1.25rem;
-    border-top: 1px solid var(--border-subtle);
+    border-top: 1px solid var(--border-coral-soft);
     font-size: 0.81rem;
     color: var(--text-muted);
   }

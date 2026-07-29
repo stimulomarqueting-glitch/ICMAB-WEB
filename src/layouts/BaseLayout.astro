@@ -1,8 +1,8 @@
 ---
 /**
- * Base layout: HTML shell + full SEO head (meta, OG, Twitter, hreflang,
- * canonical, JSON-LD). All meta values come from the locale content files
- * and the central brand config.
+ * Base layout: HTML shell + full SEO head (meta, OG, Twitter, canonical,
+ * JSON-LD). Defaults come from src/content/site.ts; every page overrides
+ * title and description. The site ships in English only.
  */
 import '@fontsource/sora/400.css';
 import '@fontsource/sora/600.css';
@@ -16,52 +16,65 @@ import '@fontsource/ibm-plex-mono/600.css';
 import '../styles/global.css';
 import { brand } from '../config/brand';
 import { SITE_URL } from '../config/site.mjs';
-import { getContent, type Locale } from '../content';
+import { site } from '../content/site';
 
 interface Props {
-  locale: Locale;
-  /** per-page overrides (subpages like /team, /research) */
   title?: string;
   description?: string;
+  /**
+   * Interior pages pass their nav label to get a BreadcrumbList
+   * (Home → label). The home page omits it.
+   */
+  breadcrumb?: string;
+  /** extra JSON-LD nodes appended to the @graph (e.g. Product on /product) */
+  jsonLdExtra?: Record<string, unknown>[];
 }
 
-const { locale, title: titleOverride, description: descriptionOverride } = Astro.props;
-const t = getContent(locale);
-const pageTitle = titleOverride ?? t.meta.title;
-const pageDescription = descriptionOverride ?? t.meta.description;
+const { title: titleOverride, description: descriptionOverride, breadcrumb, jsonLdExtra = [] } = Astro.props;
+const pageTitle = titleOverride ?? site.meta.title;
+const pageDescription = descriptionOverride ?? site.meta.description;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).href;
-// TODO(client): replace /og-image.png with a final branded image (1200×630).
 const ogImage = new URL('/og-image.png', SITE_URL).href;
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Organization',
-      '@id': `${SITE_URL}/#organization`,
-      name: brand.projectName,
-      url: SITE_URL,
-      description: t.meta.description,
-      parentOrganization: {
-        '@type': 'ResearchOrganization',
-        name: 'ICMAB-CSIC (Institut de Ciència de Materials de Barcelona)',
-        url: 'https://icmab.es',
-      },
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    name: brand.projectName,
+    url: SITE_URL,
+  },
+  {
+    '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
+    name: brand.projectName,
+    url: SITE_URL,
+    description: site.meta.description,
+    parentOrganization: {
+      '@type': 'ResearchOrganization',
+      name: 'ICMAB-CSIC (Institut de Ciència de Materials de Barcelona)',
+      url: 'https://icmab.es',
     },
-    {
-      '@type': 'Product',
-      name: brand.projectName,
-      description: t.meta.description,
-      brand: { '@id': `${SITE_URL}/#organization` },
-      category: 'Laboratory equipment (research prototype, technology transfer phase)',
-    },
-  ],
-};
+  },
+  ...(breadcrumb
+    ? [
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+            { '@type': 'ListItem', position: 2, name: breadcrumb, item: canonicalURL },
+          ],
+        },
+      ]
+    : []),
+  ...jsonLdExtra,
+];
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -70,9 +83,7 @@ const jsonLd = {
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#F8F6F3" />
-
-    {/* First deliverable is EN-only — hreflang alternates return with ES. */}
+    <meta name="theme-color" content="#FDFBF8" />
 
     {/* Open Graph */}
     <meta property="og:type" content="website" />
@@ -83,7 +94,7 @@ const jsonLd = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={t.meta.ogAlt} />
+    <meta property="og:image:alt" content={site.meta.ogAlt} />
     <meta property="og:locale" content="en_US" />
 
     {/* Twitter */}

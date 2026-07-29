@@ -1,9 +1,17 @@
 ---
-import { brand } from '../config/brand';
-import { expertExperiences, publications, researchPage } from '../content/research';
+/**
+ * /research — research and validation: expert experiences, publications
+ * and (when Technology Transfer approves the copy) validation & IP.
+ * Every block renders only when it has published content — no fillers,
+ * no "coming soon".
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
+import PageHero from '../components/PageHero.astro';
+import PageCTA from '../components/PageCTA.astro';
 import Footer from '../components/Footer.astro';
+import { brand } from '../config/brand';
+import { expertExperiences, publications, validationItems, researchPage } from '../content/research';
 
 const experiences = expertExperiences
   .filter((e) => e.published)
@@ -11,58 +19,89 @@ const experiences = expertExperiences
 
 const papers = publications
   .filter((p) => p.published)
-  .sort((a, b) => b.year - a.year);
+  .sort((a, b) => b.year - a.year || (a.order ?? 0) - (b.order ?? 0));
+
+const validation = validationItems.filter((v) => v.published);
+
+/* ScholarlyArticle JSON-LD only for confirmed publications */
+const papersJsonLd = papers.map((p) => ({
+  '@type': 'ScholarlyArticle',
+  headline: p.title,
+  author: p.authors,
+  datePublished: String(p.year),
+  ...(p.doi ? { sameAs: `https://doi.org/${p.doi}` } : {}),
+}));
 ---
 
-<BaseLayout locale="en" title={researchPage.metaTitle} description={researchPage.metaDescription}>
+<BaseLayout
+  title={researchPage.metaTitle}
+  description={researchPage.metaDescription}
+  breadcrumb="Research"
+  jsonLdExtra={papersJsonLd}
+>
   <a class="skip-link" href="#main">Skip to content</a>
-  <Header locale="en" />
+  <Header />
   <main id="main">
-    <section class="sec" aria-labelledby="research-title">
-      <div class="container">
-        <p class="eyebrow">{researchPage.kicker}</p>
-        <h1 class="h2 page__title" id="research-title">{researchPage.title}</h1>
-        <p class="lead">{researchPage.lead}</p>
+    <PageHero kicker={researchPage.kicker} title={researchPage.title} lead={researchPage.lead} />
 
-        {experiences.length > 0 && (
-          <section aria-labelledby="experiences-title" class="research__block">
-            <h2 class="research__head" id="experiences-title">{researchPage.experiencesTitle}</h2>
-            <div class="research__grid">
-              {experiences.map((e) => (
-                <article class="panel research__card">
-                  <span class="research__field">{e.field}</span>
-                  <blockquote class="research__quote"><p>“{e.quote}”</p></blockquote>
-                  <p class="research__who">
-                    <strong>{e.name}</strong> · {e.role}, {e.institution}
-                  </p>
-                  {e.device && <p class="research__device">{e.device}</p>}
-                  {e.link && <a class="research__link" href={e.link} target="_blank" rel="noopener">More</a>}
-                </article>
-              ))}
+    {experiences.length > 0 && (
+      <section aria-labelledby="experiences-title" class="sec hairtop">
+        <div class="container">
+          <h2 class="research__head" id="experiences-title">{researchPage.experiencesTitle}</h2>
+          <div class="research__grid">
+            {experiences.map((e) => (
+              <article class="panel research__card reveal">
+                <span class="research__field">{e.field}</span>
+                <blockquote class="research__quote"><p>“{e.quote}”</p></blockquote>
+                <p class="research__who">
+                  <strong>{e.name}</strong> · {e.role}, {e.institution}
+                </p>
+                {e.device && <p class="research__device">{e.device}</p>}
+                {e.link && <a class="research__link" href={e.link} target="_blank" rel="noopener">More about this experience</a>}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {papers.length > 0 && (
+      <section aria-labelledby="publications-title" class="sec hairtop" id="publications">
+        <div class="container">
+          <h2 class="research__head" id="publications-title">{researchPage.publicationsTitle}</h2>
+          <ul class="research__pubs" role="list">
+            {papers.map((p) => (
+              <li class="research__pub reveal">
+                <h3>{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.title}</a> : p.title}</h3>
+                <p class="research__meta">
+                  {p.authors} · <em>{p.journal}</em>, {p.year}
+                  {p.doi && <span class="research__doi"> · DOI: {p.doi}</span>}
+                </p>
+                {p.description && <p class="research__desc">{p.description}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    {validation.length > 0 && (
+      <section aria-labelledby="validation-title" class="sec hairtop mist--violet" id="validation">
+        <div class="container">
+          <h2 class="research__head" id="validation-title">Validation & IP</h2>
+          {validation.map((v) => (
+            <div class="panel research__validation reveal">
+              <p>{v.text}</p>
             </div>
-          </section>
-        )}
+          ))}
+        </div>
+      </section>
+    )}
 
-        {papers.length > 0 && (
-          <section aria-labelledby="publications-title" class="research__block">
-            <h2 class="research__head" id="publications-title">{researchPage.publicationsTitle}</h2>
-            <ul class="research__pubs" role="list">
-              {papers.map((p) => (
-                <li class="research__pub">
-                  <h3>{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.title}</a> : p.title}</h3>
-                  <p class="research__meta">
-                    {p.authors} · <em>{p.journal}</em>, {p.year}
-                    {p.doi && <span class="research__doi"> · DOI: {p.doi}</span>}
-                  </p>
-                  {p.description && <p class="research__desc">{p.description}</p>}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <div class="panel page__contact">
-          <h2>{researchPage.inviteTitle}</h2>
+    <section class="sec hairtop" aria-labelledby="invite-title">
+      <div class="container">
+        <div class="panel page__contact reveal">
+          <h2 id="invite-title">{researchPage.inviteTitle}</h2>
           <p>
             {researchPage.inviteText}
             {' '}<a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
@@ -70,19 +109,19 @@ const papers = publications
         </div>
       </div>
     </section>
+
+    <PageCTA
+      title={researchPage.finalCta.title}
+      text={researchPage.finalCta.text}
+      button={researchPage.finalCta.button}
+      href={researchPage.finalCta.href}
+      ctaSource="research-final"
+    />
   </main>
-  <Footer locale="en" />
+  <Footer />
 </BaseLayout>
 
 <style>
-  .page__title {
-    max-width: 26ch;
-  }
-
-  .research__block {
-    margin-top: 2.75rem;
-  }
-
   .research__head {
     font-size: 1.35rem;
   }
@@ -167,8 +206,19 @@ const papers = publications
     max-width: 68ch;
   }
 
+  .research__validation {
+    margin-top: 1.5rem;
+    padding: 1.75rem 2rem;
+    border-color: var(--border-violet-soft);
+  }
+
+  .research__validation p {
+    font-size: 0.94rem;
+    line-height: 1.65;
+    max-width: 70ch;
+  }
+
   .page__contact {
-    margin-top: 2.75rem;
     padding: 1.75rem 2rem;
     max-width: 34rem;
   }

@@ -1,13 +1,13 @@
 ---
-import { getContent, type Locale } from '../content';
+/**
+ * Compact "who it's for" block (home): four profiles with the approved
+ * line icons, one sentence each. The full audience context lives on
+ * /product (FAQ) and /applications.
+ */
+import { home } from '../content/home';
 import SectionHeader from './SectionHeader.astro';
 
-interface Props {
-  locale: Locale;
-}
-
-const { locale } = Astro.props;
-const t = getContent(locale).audiences;
+const t = home.audiences;
 
 /* line icons per audience — single-weight technical stroke, one per profile:
    microscope (academic research) · flask (researchers new to surfaces) ·
@@ -26,16 +26,7 @@ const icons: Record<string, string> = {
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} id="audiences-title" />
 
-    <div class="aud__layout">
-      <img
-        class="aud__photo reveal"
-        src="/img/researcher-device.jpg"
-        alt={t.photoAlt}
-        width="1000"
-        height="563"
-        loading="lazy"
-      />
-      <div class="aud__grid">
+    <div class="aud__grid">
       {t.groups.map((g) => (
         <article class="panel aud__card reveal">
           <span class="aud__icon" aria-hidden="true">
@@ -49,44 +40,23 @@ const icons: Record<string, string> = {
           </div>
         </article>
       ))}
-      </div>
-    </div>
-
-    <div class="aud__ctaline reveal">
-      <a class="btn btn--ghost" href="#waitlist" data-cta-source="audiences">{t.ctaButton}</a>
-      <span>{t.ctaNote}</span>
     </div>
   </div>
 </section>
 
 <style>
-  .aud__layout {
-    display: grid;
-    grid-template-columns: 4fr 8fr;
-    gap: 1.5rem;
-    margin-top: 2.25rem;
-    align-items: stretch;
-  }
-
-  .aud__photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 40% center;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-  }
-
   .aud__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
+    margin-top: 2.25rem;
   }
 
   .aud__card {
-    padding: 1.75rem;
+    padding: 1.5rem;
     display: flex;
-    gap: 1.25rem;
+    flex-direction: column;
+    gap: 0.9rem;
     align-items: flex-start;
   }
 
@@ -95,41 +65,23 @@ const icons: Record<string, string> = {
     flex: none;
     width: 1.75rem;
     height: 1.75rem;
-    margin-top: 0.15rem;
   }
 
   .aud__card h3 {
     font-family: var(--font-body);
-    font-size: 1.19rem;
+    font-size: 1.06rem;
   }
 
   .aud__card p {
     font-size: 0.88rem;
-    margin-top: 0.5rem;
-  }
-
-  .aud__ctaline {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    margin-top: 2.25rem;
-    flex-wrap: wrap;
-  }
-
-  .aud__ctaline span {
-    font-size: 0.94rem;
-    color: var(--text-body);
+    margin-top: 0.4rem;
   }
 
   @media (max-width: 56rem) {
-    .aud__layout { grid-template-columns: 1fr; }
+    .aud__grid { grid-template-columns: 1fr 1fr; }
+  }
 
-    .aud__photo {
-      aspect-ratio: 16 / 9;
-      height: auto;
-      object-position: center 20%;
-    }
-
+  @media (max-width: 40rem) {
     .aud__grid { grid-template-columns: 1fr; }
   }
 </style>

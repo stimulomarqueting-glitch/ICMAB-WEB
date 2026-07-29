@@ -1,22 +1,26 @@
 ---
-import { getContent, type Locale } from '../content';
+/**
+ * Outcome band — the dark beat of a page (plum-violet, v3).
+ * Props-driven so home and /product can show different depths of copy.
+ */
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
-  locale: Locale;
+  kicker: string;
+  title: string;
+  outcomes: readonly { title: string; text: string }[];
+  id?: string;
 }
 
-const { locale } = Astro.props;
-const t = getContent(locale).benefits;
+const { kicker, title, outcomes, id = 'benefits-title' } = Astro.props;
 ---
 
-{/* The dark beat of the page — plum-graphite band for visual rhythm */}
-<section class="sec bene--dark" id="benefits" aria-labelledby="benefits-title">
+<section class="sec bene--dark" id="benefits" aria-labelledby={id}>
   <div class="container">
-    <SectionHeader kicker={t.kicker} title={t.title} id="benefits-title" />
+    <SectionHeader kicker={kicker} title={title} id={id} />
 
     <div class="bene__grid">
-      {t.outcomes.map((o) => (
+      {outcomes.map((o) => (
         <div class="bene__outcome reveal">
           <h3>{o.title}</h3>
           <p>{o.text}</p>
@@ -28,6 +32,7 @@ const t = getContent(locale).benefits;
 
 <style>
   .bene--dark {
+    position: relative;
     background: var(--bg-inverse);
   }
 
@@ -44,10 +49,6 @@ const t = getContent(locale).benefits;
     background-size: 12px 3px;
     background-repeat: repeat-x;
     opacity: 0.6;
-  }
-
-  .bene--dark {
-    position: relative;
   }
 
   .bene--dark :global(.eyebrow) {

@@ -1,0 +1,107 @@
+---
+/**
+ * Interior page hero: mono kicker + h1 + short lead, with optional primary
+ * CTA and optional photo column. Light background — the full-bleed process
+ * hero is reserved for the home page.
+ */
+interface Props {
+  kicker: string;
+  /** optional right-aligned mono note on the kicker row */
+  kickerNote?: string;
+  title: string;
+  lead?: string;
+  cta?: { label: string; href: string; ctaSource: string };
+  photo?: { src: string; alt: string };
+  id?: string;
+}
+
+const { kicker, kickerNote, title, lead, cta, photo, id = 'page-title' } = Astro.props;
+---
+
+<section class="sec phero" aria-labelledby={id}>
+  <div class:list={['container', 'phero__grid', { 'phero__grid--photo': !!photo }]}>
+    <div>
+      {kickerNote ? (
+        <div class="phero__row">
+          <p class="eyebrow">{kicker}</p>
+          <p class="eyebrow phero__note">{kickerNote}</p>
+        </div>
+      ) : (
+        <p class="eyebrow">{kicker}</p>
+      )}
+      <h1 class="phero__title" id={id}>{title}</h1>
+      {lead && <p class="lead">{lead}</p>}
+      {cta && (
+        <div class="phero__cta">
+          <a class="btn" href={cta.href} data-cta-source={cta.ctaSource}>{cta.label}</a>
+        </div>
+      )}
+    </div>
+    {photo && (
+      <img
+        class="phero__photo"
+        src={photo.src}
+        alt={photo.alt}
+        width="1000"
+        height="750"
+        fetchpriority="high"
+      />
+    )}
+  </div>
+</section>
+
+<style>
+  .phero {
+    padding-block: clamp(2.75rem, 5.5vw, 4.5rem) clamp(2rem, 4vw, 3rem);
+  }
+
+  .phero__grid--photo {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+
+  .phero__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .phero__title {
+    font-size: clamp(2rem, 4.2vw, 3.1rem);
+    line-height: 1.06;
+    margin-top: 0.9rem;
+    max-width: 22ch;
+  }
+
+  .phero__cta {
+    margin-top: 1.75rem;
+  }
+
+  .phero__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: 62% center;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  @media (max-width: 56rem) {
+    .phero__grid--photo {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    .phero__photo {
+      aspect-ratio: 16 / 10;
+    }
+
+    .phero__note {
+      display: none;
+    }
+  }
+</style>

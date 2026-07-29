@@ -8,7 +8,8 @@
  * fully keyboard-operable (native button), motion-safe.
  */
 interface Props {
-  title: string;
+  /** optional mono eyebrow above the list (omit when the section already has a header) */
+  title?: string;
   items: { q: string; a: string }[];
   /** unique prefix so multiple accordions could coexist */
   idPrefix?: string;
@@ -18,7 +19,7 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
 ---
 
 <div class="acc reveal">
-  <p class="eyebrow">{title}</p>
+  {title && <p class="eyebrow">{title}</p>}
   <ul class="acc__list" role="list">
     {items.map((item, i) => (
       <li class="acc__item">

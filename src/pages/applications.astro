@@ -1,0 +1,164 @@
+---
+/**
+ * /applications — help the visitor recognise their use case.
+ * One horizontal block per confirmed application (need → with MatSurfer →
+ * benefit), each with an anchor and a contextual contact CTA. Grows from
+ * src/content/applications.ts.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import PageHero from '../components/PageHero.astro';
+import PageCTA from '../components/PageCTA.astro';
+import Footer from '../components/Footer.astro';
+import { applications, applicationsPage as t } from '../content/applications';
+
+const apps = applications
+  .filter((a) => a.published)
+  .sort((a, b) => a.order - b.order);
+---
+
+<BaseLayout title={t.meta.title} description={t.meta.description} breadcrumb="Applications">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header />
+  <main id="main">
+    <PageHero
+      kicker={t.hero.kicker}
+      kickerNote={t.hero.kickerNote}
+      title={t.hero.title}
+      lead={t.hero.lead}
+    />
+
+    <section class="sec hairtop" aria-label="Use cases">
+      <div class="container apps">
+        {apps.map((app) => (
+          <article class="panel app reveal" id={app.slug} aria-labelledby={`app-${app.slug}`}>
+            <header class="app__head">
+              <span class="app__tag">{app.tag}</span>
+              <h2 id={`app-${app.slug}`}>{app.title}</h2>
+            </header>
+            <div class="app__cols">
+              <div>
+                <h3 class="app__label">{t.labels.challenge}</h3>
+                <p>{app.challenge}</p>
+              </div>
+              <div>
+                <h3 class="app__label">{t.labels.use}</h3>
+                <p>{app.use}</p>
+              </div>
+              <div>
+                <h3 class="app__label">{t.labels.benefit}</h3>
+                <p>{app.benefit}</p>
+              </div>
+            </div>
+            <a
+              class="btn btn--ghost btn--sm app__cta"
+              href={`/contact?interest=application&application=${app.slug}`}
+              data-cta-source={`applications-${app.slug}`}
+              aria-label={`${t.labels.cta} — ${app.title}`}
+            >
+              {t.labels.cta}
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    {/* for R&D people who don't identify as surface scientists */}
+    <section class="sec hairtop mist--violet" aria-labelledby="broader-title">
+      <div class="container broader">
+        <p class="eyebrow reveal">{t.broader.kicker}</p>
+        <h2 class="h2 reveal" id="broader-title">{t.broader.title}</h2>
+        <p class="broader__text reveal">{t.broader.text}</p>
+      </div>
+    </section>
+
+    <PageCTA
+      title={t.finalCta.title}
+      text={t.finalCta.text}
+      button={t.finalCta.button}
+      href={t.finalCta.href}
+      ctaSource="applications-final"
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .apps {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .app {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    /* anchor landing: keep the header below the sticky glass navbar */
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  .app__head {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .app__tag {
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    letter-spacing: 0.04em;
+    color: var(--violet-dark);
+    background: var(--violet-tint);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.65rem;
+  }
+
+  .app__head h2 {
+    font-size: 1.35rem;
+  }
+
+  .app__cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .app__label {
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--coral-dark);
+  }
+
+  .app__cols p {
+    font-size: 0.94rem;
+    line-height: 1.55;
+    margin-top: 0.5rem;
+  }
+
+  .app__cta {
+    margin-top: 1.5rem;
+  }
+
+  .broader__text {
+    margin-top: 1rem;
+    max-width: 62ch;
+    font-size: 1.06rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 56rem) {
+    .app__cols {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .app__cta {
+      width: 100%;
+    }
+  }
+</style>

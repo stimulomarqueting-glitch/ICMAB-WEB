@@ -1,44 +1,94 @@
 ---
-import { brand } from '../config/brand';
-import { teamMembers, teamPage } from '../content/team';
+/**
+ * /team — the people behind the device, grouped when groups apply.
+ * Only `published: true` profiles render; no invented bios or photos.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
+import PageHero from '../components/PageHero.astro';
+import PageCTA from '../components/PageCTA.astro';
 import Footer from '../components/Footer.astro';
+import { brand } from '../config/brand';
+import { SITE_URL } from '../config/site.mjs';
+import { teamMembers, teamGroups, teamPage } from '../content/team';
 
 const members = teamMembers
   .filter((m) => m.published)
   .sort((a, b) => a.order - b.order);
+
+/* groups that actually have published members, in configured order;
+   ungrouped members render in a single list after them */
+const grouped = teamGroups
+  .map((g) => ({ ...g, members: members.filter((m) => m.group === g.key) }))
+  .filter((g) => g.members.length > 0);
+const ungrouped = members.filter((m) => !m.group || !teamGroups.some((g) => g.key === m.group));
+
+/* Person JSON-LD only for published profiles — never invented */
+const peopleJsonLd = members.map((m) => ({
+  '@type': 'Person',
+  name: m.name,
+  jobTitle: m.role,
+  affiliation: m.affiliation,
+  ...(m.linkedin ? { sameAs: m.linkedin } : {}),
+  worksFor: { '@id': `${SITE_URL}/#organization` },
+}));
 ---
 
-<BaseLayout locale="en" title={teamPage.metaTitle} description={teamPage.metaDescription}>
+<BaseLayout title={teamPage.metaTitle} description={teamPage.metaDescription} breadcrumb="Team" jsonLdExtra={peopleJsonLd}>
   <a class="skip-link" href="#main">Skip to content</a>
-  <Header locale="en" />
+  <Header />
   <main id="main">
-    <section class="sec" aria-labelledby="team-title">
+    <PageHero kicker={teamPage.kicker} title={teamPage.title} lead={teamPage.lead} />
+
+    {(grouped.length > 0 || ungrouped.length > 0) && (
+      <section class="sec hairtop" aria-label="Team profiles">
+        <div class="container">
+          {grouped.map((g) => (
+            <div class="team__group" id={g.key}>
+              <h2 class="team__group-title">{g.title}</h2>
+              <div class="team__grid">
+                {g.members.map((m) => (
+                  <article class="panel team__card reveal">
+                    {m.image && <img class="team__photo" src={m.image} alt={`${m.name} — ${m.role}`} loading="lazy" width="400" height="400" />}
+                    <h3>{m.name}</h3>
+                    <p class="team__role">{m.role}</p>
+                    <p class="team__affiliation">{m.affiliation}</p>
+                    {m.bio && <p class="team__bio">{m.bio}</p>}
+                    <div class="team__links">
+                      {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a>}
+                      {m.website && <a href={m.website} target="_blank" rel="noopener">Website</a>}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {ungrouped.length > 0 && (
+            <div class="team__grid team__group">
+              {ungrouped.map((m) => (
+                <article class="panel team__card reveal">
+                  {m.image && <img class="team__photo" src={m.image} alt={`${m.name} — ${m.role}`} loading="lazy" width="400" height="400" />}
+                  <h3>{m.name}</h3>
+                  <p class="team__role">{m.role}</p>
+                  <p class="team__affiliation">{m.affiliation}</p>
+                  {m.bio && <p class="team__bio">{m.bio}</p>}
+                  <div class="team__links">
+                    {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a>}
+                    {m.website && <a href={m.website} target="_blank" rel="noopener">Website</a>}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    )}
+
+    <section class="sec hairtop" aria-labelledby="team-contact-title">
       <div class="container">
-        <p class="eyebrow">{teamPage.kicker}</p>
-        <h1 class="h2 page__title" id="team-title">{teamPage.title}</h1>
-        <p class="lead">{teamPage.lead}</p>
-
-        {members.length > 0 && (
-          <div class="team__grid">
-            {members.map((m) => (
-              <article class="panel team__card">
-                {m.image && <img class="team__photo" src={m.image} alt={`${m.name} — ${m.role}`} loading="lazy" />}
-                <h2>{m.name}</h2>
-                <p class="team__role">{m.role}</p>
-                <p class="team__affiliation">{m.affiliation}</p>
-                {m.bio && <p class="team__bio">{m.bio}</p>}
-                {m.linkedin && (
-                  <a class="team__link" href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a>
-                )}
-              </article>
-            ))}
-          </div>
-        )}
-
-        <div class="panel page__contact">
-          <h2>{teamPage.contactTitle}</h2>
+        <div class="panel page__contact reveal">
+          <h2 id="team-contact-title">{teamPage.contactTitle}</h2>
           <p>
             {teamPage.contactText}
             {' '}<a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
@@ -46,20 +96,37 @@ const members = teamMembers
         </div>
       </div>
     </section>
+
+    <PageCTA
+      title={teamPage.finalCta.title}
+      text={teamPage.finalCta.text}
+      button={teamPage.finalCta.button}
+      href={teamPage.finalCta.href}
+      ctaSource="team-final"
+    />
   </main>
-  <Footer locale="en" />
+  <Footer />
 </BaseLayout>
 
 <style>
-  .page__title {
-    max-width: 26ch;
+  .team__group {
+    margin-top: 1rem;
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  .team__group + .team__group {
+    margin-top: 2.75rem;
+  }
+
+  .team__group-title {
+    font-size: 1.35rem;
   }
 
   .team__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
   }
 
   .team__card {
@@ -74,7 +141,7 @@ const members = teamMembers
     margin-bottom: 1.1rem;
   }
 
-  .team__card h2 {
+  .team__card h3 {
     font-family: var(--font-body);
     font-size: 1.19rem;
   }
@@ -98,15 +165,18 @@ const members = teamMembers
     margin-top: 0.7rem;
   }
 
-  .team__link {
-    display: inline-block;
+  .team__links {
+    display: flex;
+    gap: 1rem;
     margin-top: 0.8rem;
+  }
+
+  .team__links a {
     font-size: 0.88rem;
     font-weight: 600;
   }
 
   .page__contact {
-    margin-top: 2.5rem;
     padding: 1.75rem 2rem;
     max-width: 34rem;
   }

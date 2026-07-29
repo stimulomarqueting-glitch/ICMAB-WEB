@@ -1,0 +1,117 @@
+---
+/**
+ * /contact — the conversion page: short intro, light lead form, and a
+ * quiet "what happens next" aside. Interest preselects from URL params
+ * (see LeadForm + src/content/contact.ts).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Footer from '../components/Footer.astro';
+import { brand } from '../config/brand';
+import { contact } from '../content/contact';
+---
+
+<BaseLayout title={contact.meta.title} description={contact.meta.description} breadcrumb="Contact">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header />
+  <main id="main">
+    <section class="sec contact-sec" aria-labelledby="contact-title">
+      <div class="container contact">
+        <div>
+          <p class="eyebrow">{contact.hero.kicker}</p>
+          <h1 class="contact__title" id="contact-title">{contact.hero.title}</h1>
+          <p class="lead">{contact.hero.lead}</p>
+
+          <div class="contact__aside reveal">
+            <h2 class="contact__aside-title">{contact.aside.title}</h2>
+            <ol class="contact__steps" role="list">
+              {contact.aside.steps.map((step, i) => (
+                <li>
+                  <span class="contact__sn" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+            <h2 class="contact__aside-title contact__direct">{contact.aside.directTitle}</h2>
+            <p class="contact__direct-text">
+              {contact.aside.directText}
+              {' '}<a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
+            </p>
+          </div>
+        </div>
+
+        <LeadForm />
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* the soft tri-tint gradient marks the conversion moment */
+  .contact-sec {
+    background: var(--grad-vapor-subtle);
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .contact__title {
+    font-size: clamp(2rem, 4.2vw, 3.1rem);
+    line-height: 1.06;
+    margin-top: 0.9rem;
+  }
+
+  .contact__aside {
+    margin-top: 2.25rem;
+  }
+
+  .contact__aside-title {
+    font-family: var(--font-body);
+    font-size: 1.06rem;
+  }
+
+  .contact__steps {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+  }
+
+  .contact__steps li {
+    display: flex;
+    gap: 0.9rem;
+    padding: 0.8rem 0;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.94rem;
+  }
+
+  .contact__sn {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--coral-dark);
+    min-width: 1.5rem;
+    line-height: 1.8;
+  }
+
+  .contact__direct {
+    margin-top: 2rem;
+  }
+
+  .contact__direct-text {
+    font-size: 0.94rem;
+    margin-top: 0.4rem;
+  }
+
+  @media (max-width: 56rem) {
+    .contact {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+</style>

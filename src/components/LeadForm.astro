@@ -1,0 +1,432 @@
+---
+/**
+ * Light lead form (/contact). Same demo/production system as before —
+ * configured in src/config/leadCapture.ts, nothing is sent in demo mode.
+ *
+ * Conversion context:
+ *  - ?interest=product|application|research|partnership|distribution
+ *    preselects the interest (mapping in src/content/contact.ts)
+ *  - ?application=<slug> is captured into the payload
+ *  - ctaSource + UTM come from src/scripts/leadTracking.ts
+ *  - honeypot field ("website") silently drops bot submissions
+ */
+import { brand } from '../config/brand';
+import { leadCapture, isMisconfigured } from '../config/leadCapture';
+import { contact } from '../content/contact';
+
+const f = contact.form;
+
+// Surface misconfiguration early: visible in `astro dev` / `astro build` logs.
+if (isMisconfigured) {
+  console.warn(
+    '\n[leadCapture] ⚠ mode is "production" but formEndpoint is empty.\n' +
+      '            The form will fall back to demo behaviour (no data sent).\n' +
+      '            Set formEndpoint in src/config/leadCapture.ts to go live.\n'
+  );
+}
+---
+
+<div class="panel lf__card reveal">
+  <form
+    id="lead-form"
+    method="post"
+    novalidate
+    data-mode={leadCapture.mode}
+    data-endpoint={leadCapture.formEndpoint}
+    data-project={brand.projectName}
+  >
+    <div class="lf__grid">
+      <div class="field">
+        <label for="lf-fullname">{f.fullName.label}</label>
+        <input class="control" id="lf-fullname" name="fullName" type="text" autocomplete="name" required />
+        <p class="field__error" id="lf-fullname-error" data-error-for="lf-fullname" hidden>{f.fullName.error}</p>
+      </div>
+      <div class="field">
+        <label for="lf-email">{f.email.label}</label>
+        <input class="control" id="lf-email" name="email" type="email" autocomplete="email" required />
+        <p class="field__error" id="lf-email-error" data-error-for="lf-email" hidden>{f.email.error}</p>
+      </div>
+      <div class="field">
+        <label for="lf-org">{f.organization.label}</label>
+        <input class="control" id="lf-org" name="organization" type="text" autocomplete="organization" required />
+        <p class="field__error" id="lf-org-error" data-error-for="lf-org" hidden>{f.organization.error}</p>
+      </div>
+      <div class="field">
+        <label for="lf-role">{f.role.label} <span class="opt">{f.optionalTag}</span></label>
+        <input class="control" id="lf-role" name="role" type="text" autocomplete="organization-title" />
+      </div>
+      <div class="field field--full">
+        <label for="lf-interest">{f.interest.label}</label>
+        <select class="control" id="lf-interest" name="interest" required>
+          <option value="" selected disabled>{f.selectPlaceholder}</option>
+          {f.interest.options.map((o) => (
+            <option value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        <p class="field__error" id="lf-interest-error" data-error-for="lf-interest" hidden>{f.interest.error}</p>
+      </div>
+      <div class="field field--full">
+        <label for="lf-message">{f.message.label}</label>
+        <textarea class="control" id="lf-message" name="message" rows="5" required placeholder={f.message.placeholder}></textarea>
+        <p class="field__error" id="lf-message-error" data-error-for="lf-message" hidden>{f.message.error}</p>
+      </div>
+
+      {/* honeypot — hidden from people, tempting for bots */}
+      <div class="lf__hp" aria-hidden="true">
+        <label for="lf-website">Website</label>
+        <input id="lf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="field field--full">
+        {/* TODO(client/legal): final consent wording pending legal review. */}
+        <label class="consent">
+          <input id="lf-consent" name="consent" type="checkbox" required />
+          <span>
+            {f.consent.labelBefore}
+            {' '}<a href={leadCapture.privacyUrl} target="_blank" rel="noopener">{f.consent.privacyLabel}</a>{f.consent.labelAfter}
+          </span>
+        </label>
+        <p class="field__error" id="lf-consent-error" data-error-for="lf-consent" hidden>{f.consent.error}</p>
+      </div>
+      <div class="field field--full">
+        <button class="btn lf__submit" type="submit" data-label={f.submit} data-label-busy={f.submitting}>
+          {f.submit}
+        </button>
+      </div>
+    </div>
+
+    <p class="lf__status" data-status="error" role="alert" hidden>
+      {f.errorText}
+      {' '}<a href={`mailto:${leadCapture.contactEmail}`}>{leadCapture.contactEmail}</a>.
+    </p>
+  </form>
+
+  <div class="lf__success" data-status="success" role="status" tabindex="-1" hidden>
+    <span class="surface-line surface-line--dots lf__success-line" aria-hidden="true"></span>
+    <h2>{f.successTitle}</h2>
+    <p>{f.successText}</p>
+  </div>
+</div>
+
+<style>
+  .lf__card {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .lf__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  .field label {
+    font-size: 0.81rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .field .opt {
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  .control {
+    font-family: var(--font-body);
+    font-size: 0.94rem;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--silica);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 0.9rem;
+    width: 100%;
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+
+  .control:hover {
+    border-color: var(--text-body);
+  }
+
+  /* v3 focus: violet border + soft violet ring */
+  .control:focus-visible {
+    outline: none;
+    border-color: var(--violet);
+    box-shadow: 0 0 0 3px rgba(108, 18, 248, 0.15);
+  }
+
+  .control::placeholder {
+    color: var(--text-muted);
+  }
+
+  select.control {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2357534A' stroke-width='1.6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 2.4rem;
+  }
+
+  textarea.control {
+    resize: vertical;
+    min-height: 7rem;
+  }
+
+  .control[aria-invalid='true'] {
+    border-color: var(--valve-red-90);
+  }
+
+  .field__error {
+    font-size: 0.81rem;
+    color: var(--valve-red-90);
+    margin: 0;
+  }
+
+  /* honeypot: visually removed, still in the accessibility-hidden DOM */
+  .lf__hp {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .consent {
+    flex-direction: row;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .consent input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    accent-color: var(--coral);
+    flex: none;
+  }
+
+  .consent span {
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: var(--text-body);
+    line-height: 1.5;
+  }
+
+  .lf__submit {
+    width: 100%;
+    padding-block: 1rem;
+    font-size: 1rem;
+  }
+
+  .lf__submit[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .lf__status {
+    margin: 1rem 0 0;
+    font-size: 0.88rem;
+    color: var(--valve-red-90);
+  }
+
+  .lf__status a {
+    color: var(--valve-red-90);
+    text-decoration: underline;
+  }
+
+  .lf__success {
+    background: var(--violet-tint);
+    border: 1px solid var(--lavender);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+  }
+
+  .lf__success-line {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .lf__success h2 {
+    font-size: 1.35rem;
+  }
+
+  .lf__success p {
+    margin-top: 0.7rem;
+    font-size: 0.94rem;
+    max-width: 44ch;
+  }
+
+  @media (max-width: 40rem) {
+    .lf__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .lf__card {
+      padding: 1.5rem 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Lead form controller — see README "Lead capture setup".
+   *
+   * Modes (configured in src/config/leadCapture.ts, passed via data-mode):
+   *   demo        → validate, log payload, simulate success. Nothing sent.
+   *   production  → POST the JSON payload to data-endpoint.
+   *                 If the endpoint is missing, warns and falls back to demo.
+   */
+  import { trackEvent, getCtaSource, getUtm } from '../scripts/leadTracking';
+  import { interestParamMap } from '../content/contact';
+
+  const form = document.getElementById('lead-form') as HTMLFormElement | null;
+
+  if (form) {
+    const mode = form.dataset.mode ?? 'demo';
+    const endpoint = form.dataset.endpoint ?? '';
+    const isLive = mode === 'production' && endpoint !== '';
+
+    if (mode === 'production' && !endpoint) {
+      console.warn('[leadCapture] production mode without formEndpoint — falling back to demo behaviour.');
+    }
+
+    /* ── preselect interest + capture application from URL params ─────────── */
+    const params = new URLSearchParams(window.location.search);
+    const interestSelect = form.querySelector<HTMLSelectElement>('#lf-interest')!;
+    const rawInterest = params.get('interest') ?? '';
+    const mapped = interestParamMap[rawInterest] ?? rawInterest;
+    if (mapped && [...interestSelect.options].some((o) => o.value === mapped)) {
+      interestSelect.value = mapped;
+    }
+    const applicationSlug = params.get('application') ?? '';
+
+    const submitBtn = form.querySelector<HTMLButtonElement>('.lf__submit')!;
+    const errorBox = form.querySelector<HTMLElement>('[data-status="error"]')!;
+    const successBox = document.querySelector<HTMLElement>('[data-status="success"]')!;
+
+    const showFieldError = (input: HTMLElement, show: boolean) => {
+      const msg = form.querySelector<HTMLElement>(`[data-error-for="${input.id}"]`);
+      input.setAttribute('aria-invalid', String(show));
+      if (msg) {
+        msg.hidden = !show;
+        input.setAttribute('aria-describedby', show ? msg.id : '');
+      }
+    };
+
+    const validate = (): boolean => {
+      const invalid: HTMLElement[] = [];
+
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]').forEach((el) => {
+        let valid = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.value.trim() !== '';
+        if (valid && el.type === 'email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+        showFieldError(el, !valid);
+        if (!valid) invalid.push(el);
+      });
+
+      invalid[0]?.focus();
+      return invalid.length === 0;
+    };
+
+    /** Structured lead payload — keep in sync with README "Lead capture setup". */
+    const buildPayload = () => {
+      const data = new FormData(form);
+      const v = (name: string) => String(data.get(name) ?? '').trim();
+      return {
+        project: form.dataset.project ?? '',
+        sourcePage: window.location.pathname,
+        ctaSource: getCtaSource(),
+        interest: v('interest'),
+        application: applicationSlug,
+        fullName: v('fullName'),
+        email: v('email'),
+        organization: v('organization'),
+        role: v('role'),
+        message: v('message'),
+        consent: (form.querySelector('#lf-consent') as HTMLInputElement).checked,
+        utm: getUtm(),
+        submittedAt: new Date().toISOString(),
+      };
+    };
+
+    // form_start: first interaction with any field, once per page view.
+    let started = false;
+    form.addEventListener('focusin', () => {
+      if (started) return;
+      started = true;
+      trackEvent('form_start', {});
+    });
+
+    // Clear a field's error as soon as the user fixes it.
+    form.addEventListener('input', (e) => {
+      const el = e.target as HTMLElement;
+      if (el.getAttribute('aria-invalid') === 'true') showFieldError(el, false);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.hidden = true;
+      trackEvent('form_submit_attempt', {});
+      if (!validate()) return;
+
+      // Honeypot filled → almost certainly a bot. Pretend success, send nothing.
+      const honeypot = form.querySelector<HTMLInputElement>('#lf-website');
+      if (honeypot && honeypot.value !== '') {
+        form.hidden = true;
+        successBox.hidden = false;
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = submitBtn.dataset.labelBusy ?? '…';
+
+      const payload = buildPayload();
+      // Non-PII qualification data only — safe for analytics.
+      const eventProps = {
+        ctaSource: payload.ctaSource,
+        interest: payload.interest,
+        application: payload.application,
+        sourcePage: payload.sourcePage,
+      };
+
+      try {
+        if (isLive) {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error(`Lead endpoint responded ${res.status}`);
+        } else {
+          // DEMO MODE — nothing is sent anywhere.
+          console.info('[leadCapture] demo mode — payload NOT sent:', payload);
+          await new Promise((r) => setTimeout(r, 500));
+        }
+
+        trackEvent('form_submit_success', eventProps);
+        form.hidden = true;
+        successBox.hidden = false;
+        successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        successBox.focus({ preventScroll: true });
+      } catch (err) {
+        console.error('[leadCapture] submission failed:', err);
+        trackEvent('form_submit_error', eventProps);
+        errorBox.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.label ?? '';
+      }
+    });
+  }
+</script>

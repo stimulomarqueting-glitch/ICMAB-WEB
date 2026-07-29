@@ -32,6 +32,10 @@ export interface Publication {
   doi?: string;
   url?: string;
   description?: string;
+  /** path under /public, when a figure is available */
+  image?: string;
+  /** lower numbers render first within the same year */
+  order?: number;
   published: boolean;
 }
 
@@ -65,6 +69,26 @@ export const expertExperiences: ExpertExperience[] = [];
  */
 export const publications: Publication[] = [];
 
+/**
+ * Validation & IP block — content pending confirmation by ICMAB Technology
+ * Transfer. The section renders ONLY when at least one item has
+ * `published: true`; no "coming soon" placeholder is shown.
+ * TODO(client): flip `published` when Technology Transfer approves the copy.
+ */
+export interface ValidationItem {
+  title: string;
+  text: string;
+  published: boolean;
+}
+
+export const validationItems: ValidationItem[] = [
+  {
+    title: 'Validation & IP',
+    text: 'The technology was developed at ICMAB-CSIC (Institut de Ciència de Materials de Barcelona) and is protected by a Spanish and European patent family (EP 23711114.1). Working prototypes are at TRL 5 moving towards 6, supported by competitive research and technology-transfer programmes, with real experimental use in the lab.',
+    published: false,
+  },
+];
+
 /** Page copy (headings without trailing periods, per style guide). */
 export const researchPage = {
   metaTitle: `Research & validation — ${brand.projectName}`,
@@ -76,4 +100,10 @@ export const researchPage = {
   publicationsTitle: 'Publications',
   inviteTitle: 'Have you worked with the device?',
   inviteText: 'We would like to feature your experience or your publication here:',
+  finalCta: {
+    title: 'Explore a collaboration',
+    text: 'Validations, expert experiences and published work all grow from conversations.',
+    button: 'Explore a collaboration',
+    href: '/contact?interest=research',
+  },
 };

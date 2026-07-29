@@ -1,0 +1,84 @@
+---
+/**
+ * Final conversion band (design system v3): dark plum panel, radius 24,
+ * 8px sublimation strip on the bottom edge, gradient pill button.
+ * Every page closes with one of these, pointing at /contact with the
+ * page's interest preselected.
+ */
+interface Props {
+  title: string;
+  text?: string;
+  button: string;
+  href: string;
+  ctaSource: string;
+}
+
+const { title, text, button, href, ctaSource } = Astro.props;
+---
+
+<section class="sec pcta-sec" aria-label={title}>
+  <div class="container">
+    <div class="pcta reveal">
+      <div>
+        <h2 class="pcta__title">{title}</h2>
+        {text && <p class="pcta__text">{text}</p>}
+      </div>
+      <a class="btn btn--grad" href={href} data-cta-source={ctaSource}>{button}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcta-sec {
+    padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .pcta {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(1.75rem, 3.5vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem) calc(clamp(1.75rem, 3.5vw, 2.5rem) + 8px);
+    background: var(--bg-inverse);
+    border-radius: var(--radius-xl);
+  }
+
+  .pcta::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 8px;
+    background: var(--grad-vapor);
+  }
+
+  .pcta__title {
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    color: var(--text-on-dark);
+  }
+
+  .pcta__text {
+    margin-top: 0.5rem;
+    font-size: 0.94rem;
+    color: var(--text-on-dark-2);
+    max-width: 44ch;
+  }
+
+  .pcta .btn {
+    flex: none;
+  }
+
+  @media (max-width: 40rem) {
+    .pcta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .pcta .btn {
+      width: 100%;
+    }
+  }
+</style>

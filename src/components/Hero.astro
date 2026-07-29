@@ -1,14 +1,9 @@
 ---
 import { brand } from '../config/brand';
-import { getContent, type Locale } from '../content';
+import { home } from '../content/home';
 
-interface Props {
-  locale: Locale;
-}
-
-const { locale } = Astro.props;
-const t = getContent(locale);
-const claim = locale === 'es' ? brand.claimEs : brand.claim;
+const t = home.hero;
+const claim = brand.claim;
 
 /* v3 lockup: the last word of the claim is always emphasised ("…for ALL.") */
 const claimMatch = claim.match(/^(.*\s)(\S+?)(\.?)$/);
@@ -24,7 +19,7 @@ const claimEnd = claimMatch ? claimMatch[3] : '';
   <img
     class="hero-band__photo"
     src="/img/product-table.jpg"
-    alt={t.hero.photoAlt}
+    alt={t.photoAlt}
     width="1100"
     height="619"
     fetchpriority="high"
@@ -33,14 +28,14 @@ const claimEnd = claimMatch ? claimMatch[3] : '';
 
   <div class="container hero">
     <p class="hero__claim">{claimLead}<b>{claimEmph}</b>{claimEnd}</p>
-    <h1 class="hero__title" id="hero-title">{t.hero.headline}</h1>
-    <p class="hero__descriptor">{t.hero.descriptor}</p>
-    <p class="hero__lead">{t.hero.lead}</p>
+    <h1 class="hero__title" id="hero-title">{t.headline}</h1>
+    <p class="hero__descriptor">{t.descriptor}</p>
+    <p class="hero__lead">{t.lead}</p>
     <div class="hero__ctas">
-      <a class="btn" href="#waitlist" data-cta-source="hero">{t.hero.ctaPrimary}</a>
-      <a class="btn btn--glass" href="#technology">{t.hero.ctaSecondary}</a>
+      <a class="btn" href="/contact" data-cta-source="hero">{t.ctaPrimary}</a>
+      <a class="btn btn--glass" href="/product" data-cta-source="hero-product">{t.ctaSecondary}</a>
     </div>
-    <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
+    <p class="eyebrow hero__eyebrow">{t.eyebrow}</p>
   </div>
 
   <div class="hero-band__strip" aria-hidden="true"></div>

@@ -1,45 +1,50 @@
 ---
+/**
+ * Site header (v3 liquid glass): logo → home, five-item nav with active
+ * state, stable global CTA. Mobile: burger menu, keyboard accessible,
+ * focus returned to the toggle on Escape.
+ */
 import { brand } from '../config/brand';
-import { getContent, localePath, type Locale } from '../content';
+import { site } from '../content/site';
 import BrandMark from './BrandMark.astro';
 
-interface Props {
-  locale: Locale;
-}
+const { nav, cta, ctaHref, menuOpen, menuClose } = site.header;
 
-const { locale } = Astro.props;
-const t = getContent(locale);
-const home = `${localePath(locale)}/`;
+/* active state: exact match or a subpath of the item (e.g. /product#faq) */
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => currentPath === href || currentPath.startsWith(`${href}/`);
 ---
 
 <header class="header">
   <div class="container header__inner">
-    <a class="header__logo" href={home} aria-label={`${brand.projectName} — home`}>
+    <a class="header__logo" href="/" aria-label={`${brand.projectName} — home`}>
       <BrandMark size={30} />
       <span class="wordmark">{brand.projectName}</span>
     </a>
 
     <nav class="header__nav" aria-label="Main">
       <ul id="main-menu" class="header__menu">
-        {t.header.nav.map((item) => (
-          <li><a href={item.href}>{item.label}</a></li>
+        {nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+          </li>
         ))}
         <li class="header__menu-cta">
-          <a class="btn" href="/#waitlist" data-cta-source="header">{t.header.cta}</a>
+          <a class="btn" href={ctaHref} data-cta-source="header">{cta}</a>
         </li>
       </ul>
     </nav>
 
-    <a class="btn btn--sm header__cta" href="/#waitlist" data-cta-source="header">{t.header.cta}</a>
+    <a class="btn btn--sm header__cta" href={ctaHref} data-cta-source="header">{cta}</a>
 
     <button
       class="header__burger"
       type="button"
       aria-expanded="false"
       aria-controls="main-menu"
-      data-label-open={t.header.menuOpen}
-      data-label-close={t.header.menuClose}
-      aria-label={t.header.menuOpen}
+      data-label-open={menuOpen}
+      data-label-close={menuClose}
+      aria-label={menuOpen}
     >
       <span></span><span></span><span></span>
     </button>
@@ -71,10 +76,7 @@ const home = `${localePath(locale)}/`;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    font-family: var(--font-display);
-    font-weight: 600;
     font-size: 1.1rem;
-    letter-spacing: -0.01em;
     color: var(--ink);
     margin-right: auto;
   }
@@ -102,17 +104,16 @@ const home = `${localePath(locale)}/`;
     color: var(--ink);
   }
 
-  .header__menu-cta {
-    display: none;
+  /* current page: ink + coral underline */
+  .header__menu > li > a[aria-current='page'] {
+    color: var(--ink);
+    font-weight: 600;
+    box-shadow: 0 2px 0 var(--coral);
+    padding-bottom: 0.2rem;
   }
 
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+  .header__menu-cta {
+    display: none;
   }
 
   .header__burger {
@@ -143,7 +144,6 @@ const home = `${localePath(locale)}/`;
   .header__burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
   @media (max-width: 64rem) {
-    .header__cta { display: none; }
     .header__burger { display: flex; }
 
     .header__nav {
@@ -171,12 +171,23 @@ const home = `${localePath(locale)}/`;
       border-bottom: 1px solid var(--border-subtle);
     }
 
+    .header__menu > li > a[aria-current='page'] {
+      box-shadow: none;
+      border-left: 3px solid var(--coral);
+      padding-left: 0.75rem;
+    }
+
     .header__menu-cta {
       display: block;
       margin-top: 0.5rem;
     }
 
     .header__menu-cta .btn { width: 100%; }
+  }
+
+  /* keep the primary CTA visible on mid-size screens, hide only when tight */
+  @media (max-width: 40rem) {
+    .header__cta { display: none; }
   }
 </style>
 
@@ -202,7 +213,10 @@ const home = `${localePath(locale)}/`;
       if ((e.target as HTMLElement).closest('a')) setOpen(false);
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape' && burger.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        burger.focus();
+      }
     });
   }
 </script>
