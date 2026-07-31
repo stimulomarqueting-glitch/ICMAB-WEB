@@ -40,7 +40,7 @@ export const product = {
       { title: 'Direct deposition on the final substrate', text: 'The surface system you create is the surface system you measure.' },
       { title: 'Small-scale experimentation', text: 'Reduced-scale work on 1–3 cm² samples with small material quantities.' },
       { title: 'Compact laboratory format', text: 'A compact benchtop device, under 20 cm in size, designed for existing R&D laboratories.' },
-      { title: 'Low sample consumption', text: 'Scarce, costly or newly synthesised compounds stay viable to test.' },
+      { title: 'Low sample consumption', text: 'A few milligrams can be enough — novel, costly or very valuable materials stay viable to test.' },
       { title: 'Modular configuration', text: 'A modular setup with a straightforward, adaptable workflow.' },
       { title: 'Solvent-free process', text: 'Material reaches the substrate without solvents or intermediate steps.' },
     ],
@@ -81,7 +81,7 @@ export const product = {
     outcomes: [
       {
         title: 'Less material per answer',
-        text: 'Work with small quantities during early testing, helping preserve scarce, costly or newly synthesised materials.',
+        text: 'Thanks to the reduced size of the technology, a few milligrams can be enough — decisive for novel, costly molecules or very valuable materials, where decisions are taken on milligrams.',
       },
       {
         title: 'More conditions tested per week',
@@ -120,7 +120,7 @@ export const product = {
       },
       {
         q: 'How much material is required?',
-        a: 'Small quantities are enough for early testing — reduced-scale experiments help preserve material when working with scarce, costly or newly synthesised compounds. Specific amounts depend on the material and the configuration, and are part of the technical conversation.',
+        a: 'A small amount — thanks to the reduced size of the technology, a few milligrams can be enough. That matters for novel, costly molecules or very valuable materials, where decisions are taken on milligrams. Specific amounts depend on the material and the configuration, and are part of the technical conversation.',
       },
       {
         q: 'Can it be used in an existing R&D laboratory?',

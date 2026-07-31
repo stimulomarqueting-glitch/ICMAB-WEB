@@ -56,7 +56,7 @@ export const home = {
     kicker: 'Benefits',
     title: 'What your team gets',
     outcomes: [
-      { title: 'Less material per answer', text: 'Small quantities during early testing help preserve scarce or costly materials.' },
+      { title: 'Less material per answer', text: 'A few milligrams can be enough — costly or valuable materials stay viable to test.' },
       { title: 'More conditions tested per week', text: 'Fast, straightforward direct depositions shorten research cycles.' },
       { title: 'Autonomy for the whole group', text: 'A compact workflow the whole research team can use.' },
       { title: 'Defensible results', text: 'The surface you evaluate is the surface you prepared.' },
