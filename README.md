@@ -108,6 +108,7 @@ wrapping a CRM API (keep API keys server-side).
   "sourcePage": "/contact",
   "ctaSource": "header | hero | home-product | home-applications | home-research | home-team | home-final | product-hero | product-final | applications-<slug> | applications-final | research-final | team-final | footer | direct",
   "interest": "product-information | research-application | scientific-collaboration | validation | distribution | other",
+  "areaOfInterest": "organic-electronics | solar-cells | sensors | coatings | spm-sample-preparation | new-combinations | other | ''",
   "application": "<slug> | ''",
   "fullName": "…",
   "email": "…",
@@ -120,8 +121,9 @@ wrapping a CRM API (keep API keys server-side).
 }
 ```
 
-Required: name, work email, organisation, interest, message, consent.
-Role is optional. A hidden honeypot field ("website") silently drops bot
+Required: name, work email, organisation, role, interest, message, consent.
+Area of interest is optional (and preselected when arriving from an
+application card). A hidden honeypot field ("website") silently drops bot
 submissions.
 
 ### Conversion context in URLs
@@ -147,11 +149,26 @@ Internal links preserve intent with short params, mapped to form values in
   `form_submit_success`, `form_submit_error`) flow through `trackEvent()` in
   `src/scripts/leadTracking.ts` — connect Plausible/GA4/GTM there.
 
-## Pending on the client (marked `TODO(client)` in code)
+## Pending on the client
 
-- Form endpoint (demo mode until then) + privacy policy & legal notice pages.
-- Final consent wording (legal).
-- Validation & IP copy sign-off (Technology Transfer) → flip `published`.
-- Team profiles, expert experiences, publications (confirmed data only).
-- Final production domain (`src/config/site.mjs`, `public/robots.txt`).
-- Confirm the `matsurfer@icmab.es` inbox is live.
+All confirmation-gated content is centralised in
+**`src/config/pendingContent.ts`** — flip a flag only when the
+corresponding content is confirmed. Nothing gated renders publicly and no
+"coming soon" placeholder appears in its place.
+
+- `patentFamilyConfirmed` — patent family code (Miquel / Alfonso /
+  Technology Transfer). While false, the hero shows "ICMAB-CSIC technology"
+  and the footer omits the code; the provided code is kept internally in
+  `pendingData`.
+- `validationIpPublished` — Validation & IP copy (Technology Transfer).
+- `teamProfilesPublished` — team profiles ("en camino" from ICMAB).
+- `researchContentPublished` — expert experiences and publications
+  (still being gathered).
+- `legalContentConfirmed` — GDPR consent wording + Privacy Policy +
+  Legal notice.
+- `contactEmailConfirmed` — `matsurfer@icmab.es` (centralised in
+  `src/config/brand.ts`; do not duplicate it in components).
+- `productionDomainConfirmed` — final domain (`src/config/site.mjs`,
+  `public/robots.txt`).
+- Form endpoint: demo mode until `formEndpoint` is set in
+  `src/config/leadCapture.ts`.

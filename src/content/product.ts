@@ -2,61 +2,63 @@ import { brand } from '../config/brand';
 
 /**
  * /product copy — the main explanation page for the device and the
- * technology. Every claim here comes from copy already approved for the
- * one-page site; nothing new has been asserted.
+ * technology. Editorial line (ICMAB review): surface functionalization
+ * first, sublimation AND evaporation named only where the techniques are
+ * explained, no characterisation claims, no comparisons with facilities,
+ * no unvalidated figures.
  */
 
 const name = brand.projectName;
 
 export const product = {
   meta: {
-    title: `Product — ${name} · Compact Surface Deposition Device`,
-    description: `What ${name} is and how it works: controlled sublimation with an adjustable source–substrate distance, depositing materials directly on the final substrate at lab scale.`,
+    title: `Product — ${name} · Compact Surface Functionalization Device`,
+    description: `What ${name} is and how it works: controlled deposition with an adjustable source–substrate distance, transferring materials directly onto final substrates at lab scale.`,
   },
 
   hero: {
     kicker: 'The product',
-    title: 'A compact device for direct surface deposition',
-    lead: `${name} deposits materials on surfaces by controlled sublimation, directly on the final substrate, at lab scale — in a benchtop glass chamber that runs without a cleanroom or a large vacuum line.`,
+    title: 'A compact device for direct surface functionalization',
+    lead: `${name} deposits and functionalizes materials directly on final substrates, at lab scale — a compact benchtop glass chamber designed for surface-related R&D.`,
     cta: 'Request product information',
     ctaHref: '/contact?interest=product',
-    photoAlt: `The ${name} glass deposition device on a table, next to its documentation and a sample substrate`,
+    photoAlt: `The ${name} glass chamber on a table, next to its documentation and a sample substrate`,
   },
 
   whatItIs: {
     kicker: 'What it is',
     title: 'The technology',
-    lead: `${name} is a compact, controlled sublimation chamber. A small amount of solid material is heated in the source holder until it sublimes; the vapour travels a short, adjustable distance and condenses directly on your target substrate as a thin deposited layer. Because the geometry is close-spaced and the chamber is small, most of the material ends up where the sample is — not on the chamber walls.`,
+    lead: `${name} is a compact device for controlled deposition and functionalization of materials directly on final surfaces. A small amount of source material is transferred, under controlled temperature and pressure conditions, across an adjustable distance onto the substrate selected for the experiment — through controlled sublimation or evaporation.`,
   },
 
   /** The differentiator comes first, with more visual weight than the rest */
   differentiator: {
     kicker: 'Key differentiator',
     title: 'Controllable source–substrate distance',
-    text: 'The distance between the source and the substrate is adjustable, letting researchers tune experimental conditions directly during preparation — one more parameter under control, on the same bench.',
+    text: 'The distance between the source and the substrate is adjustable, letting researchers tune the experimental geometry directly during preparation — one more parameter under control, on the same bench.',
     features: [
-      { title: 'Direct deposition on the final substrate', text: 'The surface you grow is the surface you measure. No transfer step.' },
-      { title: 'Small-scale experimentation', text: 'Samples of 1–3 cm² with milligram loads instead of grams.' },
-      { title: 'Compact laboratory format', text: 'A device under 20 cm that runs on a standard lab bench.' },
-      { title: 'Low sample consumption', text: 'Costly or novel compounds stay viable to test.' },
-      { title: 'Modular, replaceable components', text: 'The pieces are modular and economically replaceable.' },
-      { title: 'Solvent-free process', text: 'The process needs no solvents and no transfer step.' },
+      { title: 'Direct deposition on the final substrate', text: 'The surface system you create is the surface system you measure.' },
+      { title: 'Small-scale experimentation', text: 'Reduced-scale work on 1–3 cm² samples with small material quantities.' },
+      { title: 'Compact laboratory format', text: 'A compact benchtop device, under 20 cm in size, designed for existing R&D laboratories.' },
+      { title: 'Low sample consumption', text: 'Scarce, costly or newly synthesised compounds stay viable to test.' },
+      { title: 'Modular configuration', text: 'A modular setup with a straightforward, adaptable workflow.' },
+      { title: 'Solvent-free process', text: 'Material reaches the substrate without solvents or intermediate steps.' },
     ],
   },
 
   howItWorks: {
     kicker: 'How it works',
-    title: 'From solid material to deposited layer',
+    title: 'From source material to prepared surface',
     video: {
-      caption: `${name} in operation — from solid material to deposited layer.`,
+      caption: `${name} in operation — from source material to prepared surface.`,
       placeholder: 'Device video coming soon',
       playLabel: 'Play the device video',
     },
     steps: [
-      { title: 'Place the material', text: 'Load a small amount of your solid material in the source holder.' },
-      { title: 'Position the substrate', text: 'Set your final substrate and adjust the source–substrate distance d.' },
-      { title: 'Apply controlled conditions', text: 'Temperature, pressure and time — the vapour rises a short, precise distance.' },
-      { title: 'Deposit on the final surface', text: 'The layer condenses directly on your substrate, ready for characterisation.' },
+      { title: 'Load the source material', text: 'Place a small amount of material in the source holder.' },
+      { title: 'Set the distance and parameters', text: 'Adjust the source–substrate distance first, then set temperature, pressure and time.' },
+      { title: 'Deposit directly on the final surface', text: 'The material is transferred directly onto the selected substrate through controlled sublimation or evaporation.' },
+      { title: 'Remove the prepared sample', text: 'Take out the deposited sample for subsequent analysis, or prepare the next experimental condition.' },
     ],
   },
 
@@ -79,19 +81,19 @@ export const product = {
     outcomes: [
       {
         title: 'Less material per answer',
-        text: 'Screen a candidate molecule with milligrams, not grams — costly compounds stay viable to test.',
+        text: 'Work with small quantities during early testing, helping preserve scarce, costly or newly synthesised materials.',
       },
       {
         title: 'More conditions tested per week',
-        text: 'Direct cycles on the bench replace facility queues — sweeps happen the same day.',
+        text: 'Fast and straightforward direct depositions make it easier to explore more experimental conditions in shorter research cycles.',
       },
       {
         title: 'Autonomy for the whole group',
-        text: 'The workflow is simple enough that no specialist operator is needed. No booking.',
+        text: 'A compact and straightforward workflow makes surface deposition easier to integrate into the laboratory and use across the research team.',
       },
       {
         title: 'Defensible results',
-        text: 'Films grown on the real substrate — what you measure is what you made.',
+        text: 'Material is deposited directly on the selected substrate, so the surface you evaluate is the surface you prepared.',
       },
     ],
   },
@@ -101,28 +103,32 @@ export const product = {
     title: 'In more detail',
     items: [
       {
+        q: 'How does it work?',
+        a: `${name} creates controlled conditions for transferring material from a source directly onto a selected substrate. The adjustable source–substrate distance helps researchers define the experimental geometry, while temperature, pressure and time can be adapted to the material and objective. The process produces a prepared surface that can then be removed for analysis or used in the next stage of the research workflow. The surface system you create is the surface system you measure.`,
+      },
+      {
         q: 'What can it be used for?',
-        a: 'Any experiment where a sublimable material must meet a surface: emitter and transport layers for OLEDs, absorber and interface layers for perovskite and organic solar cells, receptor layers for chemical and biosensors, molecular films for organic electronics, candidate functional coatings, and screening of new compounds such as MOFs, COFs and novel molecules across different substrates.',
+        a: `${name} supports R&D workflows that require controlled deposition or functionalization on selected surfaces. Potential fields include organic electronics, solar-cell research, chemical and biosensors, functional coatings, SPM (scanning probe microscopy) sample preparation and the exploration of new material–surface combinations.`,
+      },
+      {
+        q: 'Who is it for?',
+        a: `${name} is designed for researchers and R&D teams working with surfaces or exploring how surface-related processes can contribute to their research. This includes specialised surface-science groups, researchers from adjacent fields, corporate R&D departments, testing laboratories and potential laboratory-equipment partners.`,
+      },
+      {
+        q: 'What makes it different?',
+        a: `${name} combines direct work on the final substrate, controllable source–substrate distance and reduced-scale experimentation in a compact format. Its modular configuration and straightforward workflow are designed to make material–surface screening easier to integrate into R&D laboratories.`,
       },
       {
         q: 'How much material is required?',
-        a: 'Milligram loads instead of grams. Deposition happens at 1–3 cm² scale directly on the final substrate, so most of the loaded material ends up where the sample is.',
-      },
-      {
-        q: 'Does it require specialised infrastructure?',
-        a: 'No cleanroom and no large vacuum line. The device is under 20 cm and runs on a standard lab bench, and the workflow is simple enough that no specialist operator is needed.',
-      },
-      {
-        q: 'Who is it designed for?',
-        a: 'R&D researchers and teams exploring surface-related topics or using surfaces as part of their research, across academia and industry — from groups specialised in surface science to researchers from other fields bringing surfaces into their work.',
+        a: 'Small quantities are enough for early testing — reduced-scale experiments help preserve material when working with scarce, costly or newly synthesised compounds. Specific amounts depend on the material and the configuration, and are part of the technical conversation.',
       },
       {
         q: 'Can it be used in an existing R&D laboratory?',
-        a: 'Yes — it is designed as benchtop equipment for existing laboratories, beside the instruments you already use, without a facility build-out.',
+        a: 'Yes — it is designed as compact benchtop equipment for existing laboratories, complementing the instruments you already use with a reduced laboratory footprint.',
       },
       {
         q: 'How can I discuss a potential application?',
-        a: 'Tell us what you would deposit first and on which substrate. We review use cases and come back to discuss fit — start from the contact page.',
+        a: 'Tell us about the material, substrate or workflow you would like to explore. We review every enquiry and come back to you to discuss the next step — start from the contact page.',
       },
       // NOTE: the "Validation & IP" copy (pending Technology Transfer
       // approval) lives in src/content/research.ts as `validationItems`.
@@ -131,7 +137,7 @@ export const product = {
 
   finalCta: {
     title: 'Discuss your research',
-    text: 'Tell us what you would deposit first — it shapes the pilot programme.',
+    text: 'Tell us about the application you would like to explore with MatSurfer.',
     button: 'Discuss your research',
     href: '/contact?interest=product',
   },

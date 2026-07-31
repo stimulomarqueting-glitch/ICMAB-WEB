@@ -54,7 +54,7 @@ export const teamPage = {
   metaTitle: `Team — ${brand.projectName}`,
   metaDescription: `The team behind ${brand.projectName}: surface research, technology transfer and product development around a technology born at ICMAB-CSIC.`,
   kicker: 'The team',
-  title: 'The people behind the device',
+  title: 'The team behind MatSurfer',
   lead: `${brand.projectName} brings together surface research, technology transfer and product development around a technology born at ICMAB-CSIC in Barcelona.`,
   contactTitle: 'Want to talk to the team?',
   contactText: 'For scientific, partnership or early-access enquiries:',

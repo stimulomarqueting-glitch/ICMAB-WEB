@@ -1,19 +1,19 @@
 ---
 /**
  * Identity-system figure for the Applications section: the capsule isotype
- * with callout lines — the device stays the same, different points of the
- * interior read as application fields (from the approved brand system).
- * Gradient runs coral (top) → violet (bottom) as in the identity artwork.
+ * with callout lines to the five application fields (from the approved
+ * brand system). Gradient runs coral (top) → violet (bottom) as in the
+ * identity artwork.
  */
 interface Props {
   alt: string;
   caption: string;
-  /** order: oleds, sensors, perovskites, coatings, spm */
+  /** order: organic electronics, sensors, perovskites, coatings, spm */
   labels: [string, string, string, string, string];
 }
 
 const { alt, caption, labels } = Astro.props;
-const [oleds, sensors, perovskites, coatings, spm] = labels;
+const [organicElectronics, sensors, perovskites, coatings, spm] = labels;
 
 /* dot field inside the capsule — smaller/coral on top, larger/violet below */
 const dots: [number, number, number][] = [
@@ -43,7 +43,7 @@ function dotColor(cy: number): string {
 
 /* callouts: [target dot x, y, ring r, side, label, elbow y] */
 const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: string }[] = [
-  { x: 298, y: 58, r: 10, side: 'r', label: oleds },
+  { x: 298, y: 58, r: 10, side: 'r', label: organicElectronics },
   { x: 308, y: 152, r: 12, side: 'r', label: sensors },
   { x: 310, y: 246, r: 14, side: 'r', label: coatings },
   { x: 242, y: 150, r: 11, side: 'l', label: perovskites },
@@ -52,7 +52,7 @@ const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: strin
 ---
 
 <figure class="isotype reveal">
-  <svg viewBox="0 0 560 330" role="img" aria-label={alt} class="isotype__svg">
+  <svg viewBox="0 0 600 330" role="img" aria-label={alt} class="isotype__svg">
     <defs>
       <linearGradient id="iso-cap" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#F0532F" />

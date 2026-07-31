@@ -92,17 +92,17 @@ export const validationItems: ValidationItem[] = [
 /** Page copy (headings without trailing periods, per style guide). */
 export const researchPage = {
   metaTitle: `Research & validation — ${brand.projectName}`,
-  metaDescription: `Expert experiences and published work developed with ${brand.projectName}, the compact surface deposition device from ICMAB-CSIC.`,
+  metaDescription: `The research carried out with ${brand.projectName} by the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC.`,
   kicker: 'Research & validation',
-  title: 'Built in the lab, proven in the lab',
-  lead: `This page gathers the scientific footprint of ${brand.projectName}: experiences from researchers who have worked with the device, and the published work it contributes to. It grows as the early-access programme advances.`,
+  title: 'Built in the lab',
+  lead: `${brand.projectName} grows out of the day-to-day research of the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC. This page follows the research carried out with the device and the experiences of the researchers who work with it.`,
   experiencesTitle: 'Expert experiences',
   publicationsTitle: 'Publications',
   inviteTitle: 'Have you worked with the device?',
   inviteText: 'We would like to feature your experience or your publication here:',
   finalCta: {
     title: 'Explore a collaboration',
-    text: 'Validations, expert experiences and published work all grow from conversations.',
+    text: 'Validations, researcher experiences and published work all grow from conversations.',
     button: 'Explore a collaboration',
     href: '/contact?interest=research',
   },

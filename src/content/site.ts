@@ -1,4 +1,5 @@
 import { brand } from '../config/brand';
+import { pendingContent, pendingData } from '../config/pendingContent';
 
 /**
  * Site-wide content: navigation, header, footer and default SEO metadata.
@@ -16,15 +17,17 @@ const name = brand.projectName;
 export const site = {
   meta: {
     /** default/home title & description; interior pages override them */
-    title: `${name} — Compact Surface Deposition Device · Lab-Scale R&D`,
-    description: `${name} is a compact device for direct deposition of materials on surfaces by sublimation, at lab scale. Developed at ICMAB-CSIC. Talk to the team about your research.`,
-    ogAlt: `${name} — compact surface deposition device for lab-scale R&D`,
+    title: `${name} — Compact Surface Functionalization Device for Lab-Scale R&D`,
+    description: `${name} is a compact lab-scale device for controlled deposition and functionalization of materials directly on final surfaces. Developed at ICMAB-CSIC for surface-related R&D.`,
+    ogAlt: `${name} — compact device for direct deposition and functionalization on final surfaces`,
   },
 
   header: {
     nav: [
       { label: 'Product', href: '/product' },
       { label: 'Applications', href: '/applications' },
+      // NOTE: when confirmed success stories exist, this label can become
+      // "Research & Cases" (see the editorial review, comments #9–11).
       { label: 'Research', href: '/research' },
       { label: 'Team', href: '/team' },
       { label: 'Contact', href: '/contact' },
@@ -37,7 +40,7 @@ export const site = {
   },
 
   footer: {
-    description: `Compact surface deposition device for lab-scale R&D. ${brand.origin}, Barcelona.`,
+    description: `Compact surface functionalization device for lab-scale R&D. ${brand.origin}, Barcelona.`,
     cta: 'Talk to the team',
     ctaHref: '/contact',
     columns: [
@@ -70,6 +73,9 @@ export const site = {
       },
     ] satisfies { title: string; links: NavItem[] }[],
     copyright: `© 2026 ${name} · ICMAB-CSIC · Name and brand are provisional.`,
-    bottomMono: `EP 23711114.1 · ${brand.claim}`,
+    /* patent code renders only once the family is confirmed */
+    bottomMono: pendingContent.patentFamilyConfirmed
+      ? `${pendingData.patentFamilyCode} · ${brand.claim}`
+      : brand.claim,
   },
 } as const;

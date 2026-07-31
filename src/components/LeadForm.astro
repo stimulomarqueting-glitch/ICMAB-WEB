@@ -52,10 +52,11 @@ if (isMisconfigured) {
         <p class="field__error" id="lf-org-error" data-error-for="lf-org" hidden>{f.organization.error}</p>
       </div>
       <div class="field">
-        <label for="lf-role">{f.role.label} <span class="opt">{f.optionalTag}</span></label>
-        <input class="control" id="lf-role" name="role" type="text" autocomplete="organization-title" />
+        <label for="lf-role">{f.role.label}</label>
+        <input class="control" id="lf-role" name="role" type="text" autocomplete="organization-title" required />
+        <p class="field__error" id="lf-role-error" data-error-for="lf-role" hidden>{f.role.error}</p>
       </div>
-      <div class="field field--full">
+      <div class="field">
         <label for="lf-interest">{f.interest.label}</label>
         <select class="control" id="lf-interest" name="interest" required>
           <option value="" selected disabled>{f.selectPlaceholder}</option>
@@ -64,6 +65,15 @@ if (isMisconfigured) {
           ))}
         </select>
         <p class="field__error" id="lf-interest-error" data-error-for="lf-interest" hidden>{f.interest.error}</p>
+      </div>
+      <div class="field">
+        <label for="lf-area">{f.areaOfInterest.label} <span class="opt">{f.optionalTag}</span></label>
+        <select class="control" id="lf-area" name="areaOfInterest">
+          <option value="" selected>{f.selectPlaceholder}</option>
+          {f.areaOfInterest.options.map((o) => (
+            <option value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </div>
       <div class="field field--full">
         <label for="lf-message">{f.message.label}</label>
@@ -83,7 +93,7 @@ if (isMisconfigured) {
           <input id="lf-consent" name="consent" type="checkbox" required />
           <span>
             {f.consent.labelBefore}
-            {' '}<a href={leadCapture.privacyUrl} target="_blank" rel="noopener">{f.consent.privacyLabel}</a>{f.consent.labelAfter}
+            <a href={leadCapture.privacyUrl} target="_blank" rel="noopener">{f.consent.privacyLabel}</a>{f.consent.labelAfter}
           </span>
         </label>
         <p class="field__error" id="lf-consent-error" data-error-for="lf-consent" hidden>{f.consent.error}</p>
@@ -97,7 +107,7 @@ if (isMisconfigured) {
 
     <p class="lf__status" data-status="error" role="alert" hidden>
       {f.errorText}
-      {' '}<a href={`mailto:${leadCapture.contactEmail}`}>{leadCapture.contactEmail}</a>.
+      <a href={`mailto:${leadCapture.contactEmail}`}>{leadCapture.contactEmail}</a>.
     </p>
   </form>
 
@@ -312,6 +322,13 @@ if (isMisconfigured) {
     }
     const applicationSlug = params.get('application') ?? '';
 
+    /* coming from an application card also preselects the area of interest
+       (application slugs match the area option values) */
+    const areaSelect = form.querySelector<HTMLSelectElement>('#lf-area')!;
+    if (applicationSlug && [...areaSelect.options].some((o) => o.value === applicationSlug)) {
+      areaSelect.value = applicationSlug;
+    }
+
     const submitBtn = form.querySelector<HTMLButtonElement>('.lf__submit')!;
     const errorBox = form.querySelector<HTMLElement>('[data-status="error"]')!;
     const successBox = document.querySelector<HTMLElement>('[data-status="success"]')!;
@@ -348,6 +365,7 @@ if (isMisconfigured) {
         sourcePage: window.location.pathname,
         ctaSource: getCtaSource(),
         interest: v('interest'),
+        areaOfInterest: v('areaOfInterest'),
         application: applicationSlug,
         fullName: v('fullName'),
         email: v('email'),
@@ -396,6 +414,7 @@ if (isMisconfigured) {
       const eventProps = {
         ctaSource: payload.ctaSource,
         interest: payload.interest,
+        areaOfInterest: payload.areaOfInterest,
         application: payload.application,
         sourcePage: payload.sourcePage,
       };
