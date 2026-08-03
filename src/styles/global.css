@@ -41,8 +41,8 @@
   --bg-mist: #FCEEE7;               /* warm coral-tinted section         */
   --bg-mist-violet: #F2EAFE;        /* violet-tinted process section     */
   --bg-inverse: #231536;            /* plum-violet dark sections         */
-  --silica: #EBE2DC;                /* hairlines, disabled               */
-  --border-subtle: #EBE2DC;
+  --silica: #DAD3CF;                /* hairlines, disabled               */
+  --border-subtle: #DAD3CF;
   --border-coral-soft: #F3CBBB;
   --border-violet-soft: #DCC8F8;
 
@@ -52,23 +52,30 @@
   --text-on-dark: #FDFBF8;
   --text-on-dark-2: #ABA5B8;
 
-  /* ---- Tints ---- */
-  --coral-tint: #FCEEE7;
-  --violet-tint: #F2EAFE;
-  --magenta-tint: #FAEAEF;
+  /* ---- Tints (chips/badges — one step stronger than the soft section bgs) ---- */
+  --coral-tint: #FCE0D6;
+  --violet-tint: #E9DCFD;
+  --magenta-tint: #F7DCE4;
+  --valve-red-tint: #FBE7E6;
   --valve-red-90: #C92A22;
+
+  /* ---- Functional warning (thermal/amber — states only) ---- */
+  --amber: #E09A3E;
+  --amber-tint: #FDF2D9;
 
   /* ---- The gradient IS the sublimation (process moments only) ----
      grad-vapor: heroes, covers, process strips · grad-vapor-subtle:
      highlighted section backgrounds · grad-vapor-line: technical dividers */
   --grad-vapor: linear-gradient(120deg, #F0532F 0%, #E64E3D 26%, #CE4262 50%, #A72F9E 74%, #6C12F8 100%);
-  --grad-vapor-subtle: linear-gradient(135deg, #FCEEE7 0%, #F8ECF3 50%, #F2EAFE 100%);
+  --grad-vapor-subtle: linear-gradient(120deg, rgba(240, 83, 47, 0.12) 0%, rgba(206, 66, 98, 0.08) 50%, rgba(108, 18, 248, 0.12) 100%);
+  --grad-bg-soft: linear-gradient(135deg, #FCEEE7 0%, #F8ECF3 50%, #F2EAFE 100%);
   --grad-vapor-line: linear-gradient(90deg, #F0532F, #CE4262, #6C12F8);
   --grad-vapor-rise: linear-gradient(0deg, #F0532F 0%, #CE4262 40%, #A72F9E 65%, #6C12F8 100%);
   --glow-vapor: linear-gradient(300deg, rgba(108, 18, 248, 0.35) 0%, rgba(108, 18, 248, 0) 45%);
 
   /* ---- Liquid glass (sparingly: navbar, cards over gradient/photo) ---- */
   --glass-bg: rgba(248, 246, 243, 0.62);
+  --glass-bg-strong: rgba(248, 246, 243, 0.8);
   --glass-border: rgba(255, 255, 255, 0.45);
   --glass-shadow: 0 24px 80px rgba(38, 36, 31, 0.08);
   --glass-blur: 18px;
