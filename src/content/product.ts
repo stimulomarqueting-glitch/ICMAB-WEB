@@ -28,7 +28,7 @@ export const product = {
   whatItIs: {
     kicker: 'What it is',
     title: 'The technology',
-    lead: `${name} is a compact device for controlled deposition and functionalization of materials directly on final surfaces. A small amount of source material is transferred, under controlled temperature and pressure conditions, across an adjustable distance onto the substrate selected for the experiment — through controlled sublimation or evaporation.`,
+    lead: `${name} is a compact device for controlled deposition and functionalization of materials directly on final surfaces. A small amount of source material is transferred across an adjustable source–substrate distance, under controlled temperature and pressure conditions, onto the substrate selected for the experiment — through controlled sublimation or evaporation.`,
   },
 
   /** The differentiator comes first, with more visual weight than the rest */
