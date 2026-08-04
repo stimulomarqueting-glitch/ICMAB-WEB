@@ -26,9 +26,8 @@ export const site = {
     nav: [
       { label: 'Product', href: '/product' },
       { label: 'Applications', href: '/applications' },
-      // NOTE: when confirmed success stories exist, this label can become
-      // "Research & Cases" (see the editorial review, comments #9–11).
-      { label: 'Research', href: '/research' },
+      // Label per the ICMAB review (comments #9–11); the URL stays /research.
+      { label: 'Case Studies', href: '/research' },
       { label: 'Team', href: '/team' },
       { label: 'Contact', href: '/contact' },
     ] satisfies NavItem[],
@@ -57,7 +56,7 @@ export const site = {
         title: 'Explore',
         links: [
           { label: 'Applications', href: '/applications' },
-          { label: 'Research & validation', href: '/research' },
+          { label: 'Case studies', href: '/research' },
           { label: 'Team', href: '/team' },
           { label: 'Contact', href: '/contact' },
         ],

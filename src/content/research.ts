@@ -91,9 +91,9 @@ export const validationItems: ValidationItem[] = [
 
 /** Page copy (headings without trailing periods, per style guide). */
 export const researchPage = {
-  metaTitle: `Research & validation — ${brand.projectName}`,
+  metaTitle: `Case Studies — ${brand.projectName}`,
   metaDescription: `The research carried out with ${brand.projectName} by the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC.`,
-  kicker: 'Research & validation',
+  kicker: 'Case studies',
   title: 'Built in the lab',
   lead: `${brand.projectName} grows out of the day-to-day research of the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC. This page follows the research carried out with the device and the experiences of the researchers who work with it.`,
   experiencesTitle: 'Expert experiences',

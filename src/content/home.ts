@@ -88,9 +88,9 @@ export const home = {
   },
 
   explore: {
-    researchTitle: 'Research & validation',
+    researchTitle: 'Case studies',
     researchText: 'The research carried out with the device by the FunNanoSurf group at ICMAB-CSIC.',
-    researchCta: 'Explore the research',
+    researchCta: 'Explore the case studies',
     researchHref: '/research',
     teamTitle: 'The team',
     teamText: 'The people bringing surface research, technology transfer and product development together.',
