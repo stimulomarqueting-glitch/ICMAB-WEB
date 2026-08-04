@@ -55,19 +55,30 @@ export interface Publication {
 export const expertExperiences: ExpertExperience[] = [];
 
 /**
- * TODO(client): add confirmed publications. Example entry:
- * {
- *   title: 'Paper title',
- *   authors: 'A. Author, B. Author',
- *   journal: 'Journal Name',
- *   year: 2026,
- *   doi: '10.xxxx/xxxxx',
- *   url: 'https://doi.org/10.xxxx/xxxxx',
- *   description: 'One confirmed sentence on what was done with the device.',
- *   published: true,
- * },
+ * Confirmed open-access publications from the FunNanoSurf group linked to
+ * the device (provided by Coral). More are in preparation — add them here
+ * as they are confirmed.
  */
-export const publications: Publication[] = [];
+export const publications: Publication[] = [
+  {
+    title: 'Curcuminoid-Based Responsive Surfaces for Fluorescent BF3 Detection, a Fast and Reversible Approach',
+    authors: 'R. Gimeno-Muñoz, R. Díaz-Torres, S. Gómez-Coca, O. Roubeau, J. M. Díaz-Cruz, N. Aliaga-Alcalde, A. González-Campo',
+    journal: 'ACS Applied Materials & Interfaces',
+    year: 2025,
+    doi: '10.1021/acsami.4c19421',
+    url: 'https://doi.org/10.1021/acsami.4c19421',
+    published: true,
+  },
+  {
+    title: 'Dielectric behavior of curcuminoid polymorphs on different substrates by direct soft vacuum deposition',
+    authors: 'D. Riba-López, R. Zaffino, D. Herrera, R. Matheu, F. Silvestri, J. Ferreira da Silva, E. C. Sañudo, M. Mas-Torrent, E. Barrena, R. Pfattner, E. Ruiz, A. González-Campo, N. Aliaga-Alcalde',
+    journal: 'iScience',
+    year: 2022,
+    doi: '10.1016/j.isci.2022.105686',
+    url: 'https://doi.org/10.1016/j.isci.2022.105686',
+    published: true,
+  },
+];
 
 /**
  * Validation & IP block — content pending confirmation by ICMAB Technology
@@ -83,9 +94,10 @@ export interface ValidationItem {
 
 export const validationItems: ValidationItem[] = [
   {
-    title: 'Validation & IP',
-    text: 'The technology was developed at ICMAB-CSIC (Institut de Ciència de Materials de Barcelona) and is protected by a Spanish and European patent family (EP 23711114.1). Working prototypes are at TRL 5 moving towards 6, supported by competitive research and technology-transfer programmes, with real experimental use in the lab.',
-    published: false,
+    // Approved copy from the Technology Transfer office (via Coral, 2025-09).
+    title: 'IP & Technological Validation',
+    text: 'The technology was developed at The Institute of Materials Science of Barcelona (ICMAB-CSIC) and is protected by the following patents: European Unitary Patent EP4483979B1 and Spanish Patent ES2949292B2. Working prototypes have been externally validated in their operational environments for 8 research groups and 1 company across the following fields: organic electronics, biosensing, new surface materials, and EPR sample preparation. The technology has also been proven in actual operations over time in R&D laboratories of organic electronics and new surface materials. Further external validation in an operational environment and over time in extra fields of application is required and is being developed. Additionally, the technology has been supported by competitive research and technological-transfer programmes: ERC-PoC SmolSUB 101138186, Impulsa-T CSIC, 2025 LLAV 00099 and SUBLIMAT-COMTE.',
+    published: true,
   },
 ];
 

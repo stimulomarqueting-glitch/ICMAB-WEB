@@ -88,7 +88,7 @@ const papersJsonLd = papers.map((p) => ({
     {validation.length > 0 && (
       <section aria-labelledby="validation-title" class="sec hairtop mist--violet" id="validation">
         <div class="container">
-          <h2 class="research__head" id="validation-title">Validation & IP</h2>
+          <h2 class="research__head" id="validation-title">{validation[0].title}</h2>
           {validation.map((v) => (
             <div class="panel research__validation reveal">
               <p>{v.text}</p>

@@ -9,22 +9,21 @@
  */
 
 export const pendingContent = {
-  /** Patent family code pending confirmation by Miquel / Alfonso / Technology
-   *  Transfer. While false, the hero shows only "ICMAB-CSIC technology" and
-   *  the footer omits the code. */
-  patentFamilyConfirmed: false,
+  /** Patent code CONFIRMED by the Technology Transfer office (Coral,
+   *  2025-09): European patent EP 4483 979 B1. */
+  patentFamilyConfirmed: true,
 
-  /** Validation & IP copy pending Technology Transfer approval
+  /** Validation & IP copy APPROVED — "IP & Technological Validation"
    *  (see validationItems in src/content/research.ts). */
-  validationIpPublished: false,
+  validationIpPublished: true,
 
   /** Team profiles pending from ICMAB ("en camino") —
    *  see teamMembers in src/content/team.ts. */
   teamProfilesPublished: false,
 
-  /** Expert experiences / publications still being gathered —
-   *  see src/content/research.ts. */
-  researchContentPublished: false,
+  /** Publications LIVE (two open-access papers); expert experiences and
+   *  further publications still being gathered — src/content/research.ts. */
+  researchContentPublished: true,
 
   /** GDPR consent wording + Privacy Policy + Legal notice pending legal. */
   legalContentConfirmed: false,
@@ -38,11 +37,9 @@ export const pendingContent = {
 } as const;
 
 /**
- * Internal data kept for when the flags flip. NOT rendered while the
- * corresponding flag is false. Do not replace the code with another one —
- * confirm it first.
+ * Data referenced by the flags above.
  */
 export const pendingData = {
-  /** Patent family code AS PROVIDED EARLIER — awaiting confirmation. */
-  patentFamilyCode: 'EP 23711114.1',
+  /** European patent code confirmed by the Technology Transfer office. */
+  patentFamilyCode: 'EP 4483 979 B1',
 } as const;
