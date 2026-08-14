@@ -1,7 +1,8 @@
 ---
 /**
- * MatSurfer brand mark: the deposition capsule — vapour particles (violet)
- * condensing through magenta into the settled coral deposit at the bottom.
+ * MatSurfer brand mark — outlined deposition vessel: gradient stroke
+ * (violet vapour → coral deposit) broken mid-height, particles inside
+ * coloured by their position along the same gradient.
  * Vectorised from the official logo; `size` is the rendered height in px.
  */
 interface Props {
@@ -9,32 +10,35 @@ interface Props {
 }
 
 const { size = 26 } = Astro.props;
-const width = Math.round(size * (64 / 96));
+const width = Math.round(size * (68 / 120));
 ---
 
-<svg width={width} height={size} viewBox="0 0 64 96" fill="none" aria-hidden="true">
+<svg width={width} height={size} viewBox="0 0 68 120" fill="none" aria-hidden="true">
   <defs>
-    <linearGradient id="ms-cap" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="ms-cap" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="120">
       <stop offset="0" stop-color="#6C12F8" />
-      <stop offset="0.28" stop-color="#A72F9E"/>
+      <stop offset="0.3" stop-color="#A72F9E" />
       <stop offset="0.55" stop-color="#CE4262" />
       <stop offset="1" stop-color="#F0532F" />
     </linearGradient>
-    <clipPath id="ms-inner"><rect x="12.5" y="8.5" width="39" height="79" rx="19.5" /></clipPath>
   </defs>
-  <rect x="10" y="6" width="44" height="84" rx="22" fill="none" stroke="url(#ms-cap)" stroke-width="4" />
-  <circle cx="32" cy="19" r="2.8" fill="#6C12F8" />
-  <circle cx="24.5" cy="27" r="2.2" fill="#6C12F8" />
-  <circle cx="38.5" cy="29" r="1.8" fill="#7F1BDF" />
-  <circle cx="29" cy="36" r="2.6" fill="#8E21C9" />
-  <circle cx="41" cy="40" r="2" fill="#9A28B4" />
-  <circle cx="33.5" cy="46" r="4.6" fill="#A72F9E" />
-  <circle cx="23.5" cy="44" r="2.2" fill="#A02BA9" />
-  <circle cx="25.5" cy="55" r="2.8" fill="#CE4262" />
-  <circle cx="39.5" cy="58" r="3.2" fill="#E04A4C" />
-  <g clip-path="url(#ms-inner)">
-    <circle cx="22.5" cy="72" r="6.5" fill="#E64E3D" />
-    <circle cx="41" cy="75" r="5.5" fill="#F0532F" />
-    <path d="M12 82 C17 76 25 78 28 83 A6 6 0 0 0 36 83 C39 78 47 76 52 82 L52 92 L12 92 Z" fill="#F2601F" />
-  </g>
+  <path
+    d="M 9.64 57 L 11.55 15 Q 12 5 22 5 L 46 5 Q 56 5 56.45 15 L 58.36 57"
+    stroke="url(#ms-cap)"
+    stroke-width="7"
+    stroke-linecap="round"
+  />
+  <path
+    d="M 8.91 73 L 7.55 103 Q 7 115 19 115 L 49 115 Q 61 115 60.45 103 L 59.09 73"
+    stroke="url(#ms-cap)"
+    stroke-width="7"
+    stroke-linecap="round"
+  />
+  <circle cx="24" cy="30" r="3.2" fill="url(#ms-cap)" />
+  <circle cx="46" cy="21" r="2.6" fill="url(#ms-cap)" />
+  <circle cx="42" cy="46" r="5.5" fill="url(#ms-cap)" />
+  <circle cx="22" cy="59" r="2.8" fill="url(#ms-cap)" />
+  <circle cx="48" cy="71" r="3" fill="url(#ms-cap)" />
+  <circle cx="17" cy="84" r="5" fill="url(#ms-cap)" />
+  <circle cx="33" cy="104.5" r="6.5" fill="url(#ms-cap)" />
 </svg>
