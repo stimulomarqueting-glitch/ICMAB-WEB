@@ -40,19 +40,28 @@ export interface Publication {
 }
 
 /**
- * TODO(client): add confirmed expert experiences. Example entry:
- * {
- *   name: 'Full Name',
- *   role: 'Group Leader',
- *   institution: 'University of …',
- *   field: 'Organic electronics',
- *   quote: 'Confirmed quote, verbatim.',
- *   device: 'MatSurfer prototype',
- *   order/date/link/image optional,
- *   published: true,
- * },
+ * Expert evaluations supplied by ICMAB (Material_Web, 2026-09-16).
+ * Quotes are faithful translations of the original Spanish assessment; the
+ * device is named MatSurfer where the evaluation used the earlier project
+ * name. Two passages were left out of the published quote and are kept here
+ * so nothing is lost — TODO(client): confirm with ICMAB whether to publish
+ * either of them:
+ *   1. the numeric score — "Puntuación global: 7/10";
+ *   2. the improvement note — "Cabe incorporar mejoras enfocadas a aumentar
+ *      la reproducibilidad del posicionamiento de las muestras."
  */
-export const expertExperiences: ExpertExperience[] = [];
+export const expertExperiences: ExpertExperience[] = [
+  {
+    name: 'Dr Diego Gutiérrez Yatacue',
+    role: 'Innovation and Technology Manager',
+    institution: 'ICMAB-CSIC',
+    field: 'Technology assessment',
+    quote:
+      'The overall experience with MatSurfer has been positive. It serves its purpose as a fast, low-cost screening tool for sublimation experiments in the laboratory, especially in academic environments. It would be very useful for running experiments in parallel on different surfaces or sublimation conditions, to optimise conditions quickly — an advantage over other techniques. I was surprised by how robust it is with respect to temperature. The device has potential for scientific use rather than scale-up.',
+    date: '2026-09',
+    published: true,
+  },
+];
 
 /**
  * Confirmed open-access publications from the FunNanoSurf group linked to

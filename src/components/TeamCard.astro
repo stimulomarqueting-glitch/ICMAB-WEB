@@ -1,0 +1,119 @@
+---
+/**
+ * One team profile. Renders a portrait when the member has one and a
+ * brand monogram when the photo is still pending, so the grid stays even.
+ */
+import type { TeamMember } from '../content/team';
+
+interface Props {
+  member: TeamMember;
+}
+
+const { member } = Astro.props;
+
+const initials = member.name
+  .split(/\s+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((word) => word[0])
+  .join('');
+---
+
+<article class="panel team__card reveal">
+  {member.image ? (
+    <img
+      class="team__photo"
+      src={member.image}
+      alt={`${member.name} — ${member.role}`}
+      loading="lazy"
+      width="400"
+      height="400"
+    />
+  ) : (
+    <div class="team__photo team__mono" aria-hidden="true">{initials}</div>
+  )}
+  <h3>{member.name}</h3>
+  <p class="team__role">{member.role}</p>
+  <p class="team__affiliation">{member.affiliation}</p>
+  {member.bio && <p class="team__bio">{member.bio}</p>}
+  {(member.linkedin || member.website) && (
+    <div class="team__links">
+      {member.linkedin && (
+        <a href={member.linkedin} target="_blank" rel="noopener" aria-label={`${member.name} on LinkedIn`}>
+          LinkedIn
+        </a>
+      )}
+      {member.website && (
+        <a href={member.website} target="_blank" rel="noopener" aria-label={`${member.name} — website`}>
+          Website
+        </a>
+      )}
+    </div>
+  )}
+</article>
+
+<style>
+  .team__card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .team__photo {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.1rem;
+  }
+
+  /* stands in for a portrait that has not been supplied yet */
+  .team__mono {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(140deg, var(--violet-tint), var(--coral-tint));
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--violet-dark);
+  }
+
+  .team__card h3 {
+    font-family: var(--font-body);
+    font-size: 1.13rem;
+    line-height: 1.25;
+  }
+
+  .team__role {
+    font-size: 0.88rem;
+    color: var(--text-strong);
+    margin-top: 0.3rem;
+  }
+
+  .team__affiliation {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+  }
+
+  .team__bio {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-top: 0.7rem;
+  }
+
+  .team__links {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+  }
+
+  .team__links a {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+</style>

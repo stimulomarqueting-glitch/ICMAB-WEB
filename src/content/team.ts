@@ -35,20 +35,58 @@ export const teamGroups: { key: string; title: string }[] = [
 ];
 
 /**
- * TODO(client): add confirmed team profiles. Example entry:
- * {
- *   name: 'Full Name',
- *   role: 'Principal Investigator',
- *   affiliation: 'ICMAB-CSIC',
- *   group: 'scientific-leadership',
- *   bio: 'One or two confirmed sentences.',
- *   image: '/img/team/full-name.jpg',
- *   linkedin: 'https://www.linkedin.com/in/…',
- *   order: 1,
- *   published: true,
- * },
+ * Confirmed profiles from ICMAB (Material_Web, 2026-09-16): names, roles,
+ * affiliations, approved bios and LinkedIn links exactly as supplied.
+ * Members are left ungrouped on purpose — four profiles read better as a
+ * single row than split across `teamGroups` headings.
+ *
+ * TODO(client): confirm the photo–name mapping. Three portraits arrived
+ * unnamed and are wired in the order they were sent, which matches the
+ * order of the bios in the document; Coral's portrait is still pending.
  */
-export const teamMembers: TeamMember[] = [];
+export const teamMembers: TeamMember[] = [
+  {
+    name: 'Núria Aliaga-Alcalde',
+    role: 'ICREA Professor · Consultant & co-founder',
+    affiliation: 'ICMAB-CSIC',
+    bio: 'PhD in Chemistry, dedicated to bridging the gap between single-molecule-level cutting-edge research and practical applications in technology.',
+    image: '/img/team/nuria-aliaga-alcalde.jpg',
+    linkedin: 'https://www.linkedin.com/in/n%C3%BAria-aliaga-alcalde-97bba517/',
+    order: 1,
+    published: true,
+  },
+  {
+    // "Científica Titular" rendered with ICMAB's own English title, Tenured Scientist.
+    name: 'Arántzazu González',
+    role: 'Tenured Scientist · Consultant & co-founder',
+    affiliation: 'ICMAB-CSIC',
+    bio: 'PhD in Chemistry, surface functionalization dreamer, always ready for new material developments and socially conscious.',
+    image: '/img/team/arantzazu-gonzalez-campo.jpg',
+    linkedin: 'https://www.linkedin.com/in/arantzazu-gonzalez-campo-b500798/',
+    order: 2,
+    published: true,
+  },
+  {
+    name: 'Daniel Herrera',
+    role: 'Postdoctoral Researcher · CTO',
+    affiliation: 'ICMAB-CSIC',
+    bio: 'Chemist, PhD. Synthesis and catalysis. Organic semiconductors. Expertise in knowledge and technology transfer.',
+    image: '/img/team/daniel-herrera.jpg',
+    linkedin: 'https://www.linkedin.com/in/dherreramiranda',
+    order: 3,
+    published: true,
+  },
+  {
+    // TODO(client): portrait pending — the card renders without a photo.
+    name: 'Coral Herranz Lancho',
+    role: 'Innovation and Research Manager · CEO',
+    affiliation: 'ICMAB-CSIC',
+    bio: 'PhD in Physical Chemistry, passionate about understanding what’s underneath nature. Bridging scientific results and the market creating social value.',
+    linkedin: 'https://www.linkedin.com/in/coral-herranz-lancho-phd/',
+    order: 4,
+    published: true,
+  },
+];
 
 export const teamPage = {
   metaTitle: `Team — ${brand.projectName}`,

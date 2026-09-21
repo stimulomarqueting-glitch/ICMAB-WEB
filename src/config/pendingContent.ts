@@ -17,12 +17,14 @@ export const pendingContent = {
    *  (see validationItems in src/content/research.ts). */
   validationIpPublished: true,
 
-  /** Team profiles pending from ICMAB ("en camino") —
-   *  see teamMembers in src/content/team.ts. */
-  teamProfilesPublished: false,
+  /** Team profiles CONFIRMED by ICMAB (Material_Web, 2026-09-16): four
+   *  approved bios live. Coral's portrait and the photo–name mapping for
+   *  the other three are still to be confirmed — src/content/team.ts. */
+  teamProfilesPublished: true,
 
-  /** Publications LIVE (two open-access papers); expert experiences and
-   *  further publications still being gathered — src/content/research.ts. */
+  /** Publications LIVE (two open-access papers) and the first expert
+   *  evaluation published; further experiences and papers still being
+   *  gathered — src/content/research.ts. */
   researchContentPublished: true,
 
   /** GDPR consent wording + Privacy Policy + Legal notice pending legal. */

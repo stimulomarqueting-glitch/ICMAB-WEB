@@ -7,6 +7,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import PageHero from '../components/PageHero.astro';
 import PageCTA from '../components/PageCTA.astro';
+import TeamCard from '../components/TeamCard.astro';
 import Footer from '../components/Footer.astro';
 import { brand } from '../config/brand';
 import { SITE_URL } from '../config/site.mjs';
@@ -47,38 +48,14 @@ const peopleJsonLd = members.map((m) => ({
             <div class="team__group" id={g.key}>
               <h2 class="team__group-title">{g.title}</h2>
               <div class="team__grid">
-                {g.members.map((m) => (
-                  <article class="panel team__card reveal">
-                    {m.image && <img class="team__photo" src={m.image} alt={`${m.name} — ${m.role}`} loading="lazy" width="400" height="400" />}
-                    <h3>{m.name}</h3>
-                    <p class="team__role">{m.role}</p>
-                    <p class="team__affiliation">{m.affiliation}</p>
-                    {m.bio && <p class="team__bio">{m.bio}</p>}
-                    <div class="team__links">
-                      {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a>}
-                      {m.website && <a href={m.website} target="_blank" rel="noopener">Website</a>}
-                    </div>
-                  </article>
-                ))}
+                {g.members.map((m) => <TeamCard member={m} />)}
               </div>
             </div>
           ))}
 
           {ungrouped.length > 0 && (
             <div class="team__grid team__group">
-              {ungrouped.map((m) => (
-                <article class="panel team__card reveal">
-                  {m.image && <img class="team__photo" src={m.image} alt={`${m.name} — ${m.role}`} loading="lazy" width="400" height="400" />}
-                  <h3>{m.name}</h3>
-                  <p class="team__role">{m.role}</p>
-                  <p class="team__affiliation">{m.affiliation}</p>
-                  {m.bio && <p class="team__bio">{m.bio}</p>}
-                  <div class="team__links">
-                    {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a>}
-                    {m.website && <a href={m.website} target="_blank" rel="noopener">Website</a>}
-                  </div>
-                </article>
-              ))}
+              {ungrouped.map((m) => <TeamCard member={m} />)}
             </div>
           )}
         </div>
@@ -122,58 +99,13 @@ const peopleJsonLd = members.map((m) => ({
     font-size: 1.35rem;
   }
 
+  /* four profiles fill one row; card styling lives in TeamCard.astro */
   .team__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-top: 1.5rem;
-  }
-
-  .team__card {
-    padding: 1.75rem;
-  }
-
-  .team__photo {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    margin-bottom: 1.1rem;
-  }
-
-  .team__card h3 {
-    font-family: var(--font-body);
-    font-size: 1.19rem;
-  }
-
-  .team__role {
-    font-size: 0.94rem;
-    color: var(--text-strong);
-    margin-top: 0.25rem;
-  }
-
-  .team__affiliation {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-    margin-top: 0.35rem;
-  }
-
-  .team__bio {
-    font-size: 0.88rem;
-    margin-top: 0.7rem;
-  }
-
-  .team__links {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.8rem;
-  }
-
-  .team__links a {
-    font-size: 0.88rem;
-    font-weight: 600;
+    align-items: stretch;
   }
 
   .page__contact {
@@ -190,8 +122,13 @@ const peopleJsonLd = members.map((m) => ({
     margin-top: 0.5rem;
   }
 
-  @media (max-width: 56rem) {
-    .team__grid { grid-template-columns: 1fr 1fr; }
+  /* below four-up, keep the cards from ballooning: two centred columns */
+  @media (max-width: 72rem) {
+    .team__grid {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 40rem;
+      margin-inline: auto;
+    }
   }
 
   @media (max-width: 40rem) {
