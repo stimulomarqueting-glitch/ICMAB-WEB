@@ -40,17 +40,17 @@ export const teamGroups: { key: string; title: string }[] = [
  * Members are left ungrouped on purpose — four profiles read better as a
  * single row than split across `teamGroups` headings.
  *
- * TODO(client): confirm the photo–name mapping. Three portraits arrived
- * unnamed and are wired in the order they were sent, which matches the
- * order of the bios in the document; Coral's portrait is still pending.
+ * Photo–name mapping confirmed by the client (2026-09-22). Three portraits
+ * arrived unnamed; Núria's is still pending, so her card falls back to a
+ * monogram until it is supplied.
  */
 export const teamMembers: TeamMember[] = [
   {
+    // TODO(client): portrait pending — the card renders a monogram instead.
     name: 'Núria Aliaga-Alcalde',
     role: 'ICREA Professor · Consultant & co-founder',
     affiliation: 'ICMAB-CSIC',
     bio: 'PhD in Chemistry, dedicated to bridging the gap between single-molecule-level cutting-edge research and practical applications in technology.',
-    image: '/img/team/nuria-aliaga-alcalde.jpg',
     linkedin: 'https://www.linkedin.com/in/n%C3%BAria-aliaga-alcalde-97bba517/',
     order: 1,
     published: true,
@@ -77,11 +77,11 @@ export const teamMembers: TeamMember[] = [
     published: true,
   },
   {
-    // TODO(client): portrait pending — the card renders without a photo.
     name: 'Coral Herranz Lancho',
     role: 'Innovation and Research Manager · CEO',
     affiliation: 'ICMAB-CSIC',
     bio: 'PhD in Physical Chemistry, passionate about understanding what’s underneath nature. Bridging scientific results and the market creating social value.',
+    image: '/img/team/coral-herranz-lancho.jpg',
     linkedin: 'https://www.linkedin.com/in/coral-herranz-lancho-phd/',
     order: 4,
     published: true,
