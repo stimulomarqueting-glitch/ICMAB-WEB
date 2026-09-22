@@ -218,6 +218,20 @@ const productJsonLd = [
     background: var(--grad-vapor-rise);
     border-radius: 2px;
     position: relative;
+    animation: d-breathe 6s ease-in-out infinite alternate;
+  }
+
+  /* the adjustable distance, adjusting */
+  @keyframes d-breathe {
+    from { height: 3.6rem; }
+    to { height: 5.4rem; }
+  }
+
+  .diff__hero:hover .diff__d .mono {
+    background: var(--grad-vapor-rise);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .diff__d-line::before,
@@ -259,8 +273,25 @@ const productJsonLd = [
   }
 
   .diff__feature {
+    position: relative;
     border-top: 1px solid var(--border-violet-soft);
     padding-top: 1rem;
+  }
+
+  .diff__feature::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--grad-vapor-line);
+    transition: width 900ms var(--ease-out);
+    transition-delay: calc(var(--rd, 0s) + 200ms);
+  }
+
+  .diff__feature.is-visible::before {
+    width: 100%;
   }
 
   .diff__feature h3 {
@@ -373,12 +404,25 @@ const productJsonLd = [
   }
 
   .tech__steps {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     list-style: none;
     margin: 2.25rem 0 0;
     padding: 0;
+  }
+
+  /* the process runs through the four cards */
+  .tech__steps::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 2%;
+    right: 2%;
+    height: 2px;
+    background: var(--grad-vapor-line);
+    opacity: 0.45;
   }
 
   /* process cards (v3): white card, phase-coloured 8px bar on top */
@@ -390,6 +434,13 @@ const productJsonLd = [
     box-shadow: var(--shadow-sm);
     padding: 1.35rem 1.35rem 1.45rem;
     overflow: hidden;
+    transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+  }
+
+  .tech__step:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-violet-soft);
   }
 
   .tech__step::before {
@@ -444,12 +495,27 @@ const productJsonLd = [
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+  }
+
+  .params__card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-violet-soft);
+    box-shadow: var(--shadow-md);
   }
 
   .params__symbol {
     font-size: 1.35rem;
     font-weight: 600;
     color: var(--violet-dark);
+    transition: color var(--dur-base) var(--ease);
+  }
+
+  .params__card:hover .params__symbol {
+    background: var(--grad-vapor-line);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .params__card:first-child {

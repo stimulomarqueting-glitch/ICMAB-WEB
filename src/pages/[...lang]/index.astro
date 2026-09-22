@@ -300,6 +300,7 @@ const apps = applications
     grid-template-columns: 7fr 5fr;
     gap: clamp(2rem, 4vw, 3.5rem);
     align-items: center;
+    perspective: 1400px;
   }
 
   .pt__cta {
@@ -313,6 +314,15 @@ const apps = applications
     object-fit: cover;
     border: 1px solid var(--border-violet-soft);
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transform-origin: 40% 50%;
+    transition: transform 700ms var(--ease-out), box-shadow 700ms var(--ease-out);
+  }
+
+  /* the photo leans in a little when the visitor comes close */
+  .pt__grid:hover .pt__photo {
+    transform: rotateY(-4deg) rotateX(2deg) translateZ(14px);
+    box-shadow: 0 30px 60px rgba(108, 18, 248, 0.16);
   }
 
   /* ── applications teaser ─────────────────────────────────────────────── */
@@ -374,11 +384,41 @@ const apps = applications
   }
 
   .explore__card {
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1.5rem 1.75rem;
+    transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+  }
+
+  /* a vapour wash slides in from the left on hover */
+  .explore__card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, var(--violet-tint) 0%, transparent 55%);
+    opacity: 0;
+    transform: translateX(-12%);
+    transition: opacity 400ms var(--ease), transform 500ms var(--ease-out);
+    pointer-events: none;
+  }
+
+  .explore__card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-violet-soft);
+    box-shadow: var(--shadow-md);
+  }
+
+  .explore__card:hover::before {
+    opacity: 1;
+    transform: none;
+  }
+
+  .explore__card > * {
+    position: relative;
   }
 
   .explore__card h2 {
