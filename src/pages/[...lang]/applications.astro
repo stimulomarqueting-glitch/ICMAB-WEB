@@ -97,9 +97,45 @@ const apps = applications
   }
 
   .app {
+    position: relative;
+    overflow: hidden;
     padding: clamp(1.5rem, 3vw, 2.25rem);
     /* anchor landing: keep the header below the sticky glass navbar */
     scroll-margin-top: calc(var(--header-h) + 1rem);
+    transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+  }
+
+  /* the deposited layer stands on the card's left edge and grows in on reveal */
+  .app::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 0;
+    background: var(--grad-vapor-rise);
+    transition: height 900ms var(--ease-out);
+    transition-delay: 200ms;
+  }
+
+  .app.is-visible::before {
+    height: 100%;
+  }
+
+  .app:hover {
+    border-color: var(--border-violet-soft);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  /* landing on an anchor from the home chips: a brief violet halo */
+  .app:target {
+    animation: app-land 1800ms var(--ease-out);
+  }
+
+  @keyframes app-land {
+    0% { box-shadow: 0 0 0 0 rgba(108, 18, 248, 0.35); border-color: var(--violet); }
+    100% { box-shadow: 0 0 0 18px rgba(108, 18, 248, 0); border-color: var(--border-subtle); }
   }
 
   .app__head {

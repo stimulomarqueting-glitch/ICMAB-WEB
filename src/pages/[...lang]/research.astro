@@ -139,7 +139,32 @@ const papersJsonLd = papers.map((p) => ({
   }
 
   .research__card {
+    position: relative;
+    overflow: hidden;
     padding: 1.75rem;
+    transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+  }
+
+  /* vapour hairline along the top, drawn on reveal */
+  .research__card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: var(--grad-vapor-line);
+    transition: width 900ms var(--ease-out) 200ms;
+  }
+
+  .research__card.is-visible::before {
+    width: 100%;
+  }
+
+  .research__card:hover {
+    border-color: var(--border-violet-soft);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
   }
 
   .research__field {
@@ -186,8 +211,31 @@ const papersJsonLd = papers.map((p) => ({
   }
 
   .research__pub {
-    padding: 1.25rem 0;
+    position: relative;
+    padding: 1.25rem 0 1.25rem 0;
     border-top: 1px solid var(--border-subtle);
+    transition: padding-left var(--dur-base) var(--ease);
+  }
+
+  /* a short vapour tick slides in as the row is hovered */
+  .research__pub::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--grad-vapor-line);
+    transform: translateY(-50%);
+    transition: width var(--dur-base) var(--ease);
+  }
+
+  .research__pub:hover {
+    padding-left: 1.25rem;
+  }
+
+  .research__pub:hover::before {
+    width: 0.75rem;
   }
 
   .research__pub h3 {
