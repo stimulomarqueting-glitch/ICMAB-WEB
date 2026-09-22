@@ -4,16 +4,21 @@
  * quiet "what happens next" aside. Interest preselects from URL params
  * (see LeadForm + src/content/contact.ts).
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import LeadForm from '../components/LeadForm.astro';
-import Footer from '../components/Footer.astro';
-import { brand } from '../config/brand';
-import { contact } from '../content/contact';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import Footer from '../../components/Footer.astro';
+import { brand } from '../../config/brand';
+import { getContent } from '../../content';
+import { getLocale, localeStaticPaths } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { contact, site } = getContent(getLocale(Astro.url));
 ---
 
-<BaseLayout title={contact.meta.title} description={contact.meta.description} breadcrumb="Contact">
-  <a class="skip-link" href="#main">Skip to content</a>
+<BaseLayout title={contact.meta.title} description={contact.meta.description} breadcrumb={contact.meta.breadcrumb}>
+  <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
     <section class="sec contact-sec" aria-labelledby="contact-title">

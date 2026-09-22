@@ -5,20 +5,27 @@
  * benefit), each with an anchor and a contextual contact CTA. Grows from
  * src/content/applications.ts.
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import PageHero from '../components/PageHero.astro';
-import PageCTA from '../components/PageCTA.astro';
-import Footer from '../components/Footer.astro';
-import { applications, applicationsPage as t } from '../content/applications';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import PageHero from '../../components/PageHero.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import Footer from '../../components/Footer.astro';
+import { getContent } from '../../content';
+import { getLocale, localePath, localeStaticPaths } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = getLocale(Astro.url);
+const { applications, applicationsPage: t, site } = getContent(locale);
+const lp = (href: string) => localePath(locale, href);
 
 const apps = applications
   .filter((a) => a.published)
   .sort((a, b) => a.order - b.order);
 ---
 
-<BaseLayout title={t.meta.title} description={t.meta.description} breadcrumb="Applications">
-  <a class="skip-link" href="#main">Skip to content</a>
+<BaseLayout title={t.meta.title} description={t.meta.description} breadcrumb={t.meta.breadcrumb}>
+  <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
     <PageHero
@@ -28,7 +35,7 @@ const apps = applications
       lead={t.hero.lead}
     />
 
-    <section class="sec hairtop" aria-label="Use cases">
+    <section class="sec hairtop" aria-label={t.labels.section}>
       <div class="container apps">
         {apps.map((app) => (
           <article class="panel app reveal" id={app.slug} aria-labelledby={`app-${app.slug}`}>
@@ -52,7 +59,7 @@ const apps = applications
             </div>
             <a
               class="btn btn--ghost btn--sm app__cta"
-              href={`/contact?interest=application&application=${app.slug}`}
+              href={lp(`/contact?interest=application&application=${app.slug}`)}
               data-cta-source={`applications-${app.slug}`}
               aria-label={`${t.labels.cta} — ${app.title}`}
             >

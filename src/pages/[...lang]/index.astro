@@ -5,17 +5,23 @@
  * → who it's for → research/team strip → final CTA.
  * Full explanations live on /product, /applications, /research, /team.
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import Hero from '../components/Hero.astro';
-import Benefits from '../components/Benefits.astro';
-import Audiences from '../components/Audiences.astro';
-import AppsIsotype from '../components/AppsIsotype.astro';
-import SectionHeader from '../components/SectionHeader.astro';
-import PageCTA from '../components/PageCTA.astro';
-import Footer from '../components/Footer.astro';
-import { home } from '../content/home';
-import { applications } from '../content/applications';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Hero from '../../components/Hero.astro';
+import Benefits from '../../components/Benefits.astro';
+import Audiences from '../../components/Audiences.astro';
+import AppsIsotype from '../../components/AppsIsotype.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import Footer from '../../components/Footer.astro';
+import { getContent } from '../../content';
+import { getLocale, localePath, localeStaticPaths } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = getLocale(Astro.url);
+const { home, applications, site } = getContent(locale);
+const lp = (href: string) => localePath(locale, href);
 
 const apps = applications
   .filter((a) => a.published)
@@ -23,13 +29,13 @@ const apps = applications
 ---
 
 <BaseLayout>
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
     <Hero />
 
     {/* value strip: Problem → MatSurfer → Result, one sentence each */}
-    <section class="sec hairtop" aria-label="Value proposition">
+    <section class="sec hairtop" aria-label={home.value.label}>
       <div class="container">
         <div class="value__grid">
           {home.value.items.map((item, i) => (
@@ -54,7 +60,7 @@ const apps = applications
             id="product-teaser-title"
           />
           <div class="pt__cta reveal">
-            <a class="btn" href={home.product.ctaHref} data-cta-source="home-product">{home.product.cta}</a>
+            <a class="btn" href={lp(home.product.ctaHref)} data-cta-source="home-product">{home.product.cta}</a>
           </div>
         </div>
         <img
@@ -91,7 +97,7 @@ const apps = applications
         <ul class="apps__links reveal" role="list">
           {apps.map((app) => (
             <li>
-              <a class="apps__chip" href={`/applications#${app.slug}`}>
+              <a class="apps__chip" href={lp(`/applications#${app.slug}`)}>
                 {app.title}
                 <span aria-hidden="true">→</span>
               </a>
@@ -99,7 +105,7 @@ const apps = applications
           ))}
         </ul>
         <div class="apps__cta reveal">
-          <a class="btn" href={home.applications.ctaHref} data-cta-source="home-applications">{home.applications.cta}</a>
+          <a class="btn" href={lp(home.applications.ctaHref)} data-cta-source="home-applications">{home.applications.cta}</a>
         </div>
       </div>
     </section>
@@ -114,14 +120,14 @@ const apps = applications
             <h2>{home.explore.researchTitle}</h2>
             <p>{home.explore.researchText}</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href={home.explore.researchHref} data-cta-source="home-research">{home.explore.researchCta}</a>
+          <a class="btn btn--ghost btn--sm" href={lp(home.explore.researchHref)} data-cta-source="home-research">{home.explore.researchCta}</a>
         </div>
         <div class="panel explore__card reveal">
           <div>
             <h2>{home.explore.teamTitle}</h2>
             <p>{home.explore.teamText}</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href={home.explore.teamHref} data-cta-source="home-team">{home.explore.teamCta}</a>
+          <a class="btn btn--ghost btn--sm" href={lp(home.explore.teamHref)} data-cta-source="home-team">{home.explore.teamCta}</a>
         </div>
       </div>
     </section>

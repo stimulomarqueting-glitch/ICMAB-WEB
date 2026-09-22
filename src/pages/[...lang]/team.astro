@@ -3,15 +3,20 @@
  * /team — the people behind the device, grouped when groups apply.
  * Only `published: true` profiles render; no invented bios or photos.
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import PageHero from '../components/PageHero.astro';
-import PageCTA from '../components/PageCTA.astro';
-import TeamCard from '../components/TeamCard.astro';
-import Footer from '../components/Footer.astro';
-import { brand } from '../config/brand';
-import { SITE_URL } from '../config/site.mjs';
-import { teamMembers, teamGroups, teamPage } from '../content/team';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import PageHero from '../../components/PageHero.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import TeamCard from '../../components/TeamCard.astro';
+import Footer from '../../components/Footer.astro';
+import { brand } from '../../config/brand';
+import { SITE_URL } from '../../config/site.mjs';
+import { getContent } from '../../content';
+import { getLocale, localeStaticPaths } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { teamMembers, teamGroups, teamPage, site } = getContent(getLocale(Astro.url));
 
 const members = teamMembers
   .filter((m) => m.published)
@@ -35,14 +40,14 @@ const peopleJsonLd = members.map((m) => ({
 }));
 ---
 
-<BaseLayout title={teamPage.metaTitle} description={teamPage.metaDescription} breadcrumb="Team" jsonLdExtra={peopleJsonLd}>
-  <a class="skip-link" href="#main">Skip to content</a>
+<BaseLayout title={teamPage.metaTitle} description={teamPage.metaDescription} breadcrumb={teamPage.breadcrumb} jsonLdExtra={peopleJsonLd}>
+  <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
     <PageHero kicker={teamPage.kicker} title={teamPage.title} lead={teamPage.lead} />
 
     {(grouped.length > 0 || ungrouped.length > 0) && (
-      <section class="sec hairtop" aria-label="Team profiles">
+      <section class="sec hairtop" aria-label={teamPage.profilesLabel}>
         <div class="container">
           {grouped.map((g) => (
             <div class="team__group" id={g.key}>

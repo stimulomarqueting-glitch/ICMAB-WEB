@@ -15,7 +15,10 @@ interface Props {
   id?: string;
 }
 
+import { getLocale, localePath } from '../i18n';
+
 const { kicker, kickerNote, title, lead, cta, photo, id = 'page-title' } = Astro.props;
+const ctaHref = cta ? localePath(getLocale(Astro.url), cta.href) : undefined;
 ---
 
 <section class="sec phero" aria-labelledby={id}>
@@ -33,7 +36,7 @@ const { kicker, kickerNote, title, lead, cta, photo, id = 'page-title' } = Astro
       {lead && <p class="lead">{lead}</p>}
       {cta && (
         <div class="phero__cta">
-          <a class="btn" href={cta.href} data-cta-source={cta.ctaSource}>{cta.label}</a>
+          <a class="btn" href={ctaHref} data-cta-source={cta.ctaSource}>{cta.label}</a>
         </div>
       )}
     </div>

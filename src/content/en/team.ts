@@ -1,27 +1,11 @@
-import { brand } from '../config/brand';
+import { brand } from '../../config/brand';
+import type { TeamMember } from '../types';
 
 /**
  * /team data — add profiles here as they are confirmed by the client.
  * Only entries with `published: true` are rendered; unpublished drafts can
  * live here safely. Do NOT invent bios, roles, photos or links.
  */
-
-export interface TeamMember {
-  name: string;
-  role: string;
-  affiliation: string;
-  /** grouping key — renders under the matching heading in `teamGroups` */
-  group?: string;
-  /** short bio, when available */
-  bio?: string;
-  /** path under /public, e.g. '/img/team/jane-doe.jpg' */
-  image?: string;
-  linkedin?: string;
-  website?: string;
-  /** lower numbers render first */
-  order: number;
-  published: boolean;
-}
 
 /**
  * Profile groups, rendered in this order when they contain published members.
@@ -89,6 +73,8 @@ export const teamMembers: TeamMember[] = [
 ];
 
 export const teamPage = {
+  breadcrumb: 'Team',
+  profilesLabel: 'Team profiles',
   metaTitle: `Team — ${brand.projectName}`,
   metaDescription: `The team behind ${brand.projectName}: surface research, technology transfer and product development around a technology born at ICMAB-CSIC.`,
   kicker: 'The team',
@@ -96,10 +82,19 @@ export const teamPage = {
   lead: `${brand.projectName} brings together surface research, technology transfer and product development around a technology born at ICMAB-CSIC in Barcelona.`,
   contactTitle: 'Want to talk to the team?',
   contactText: 'For scientific, partnership or early-access enquiries:',
+  links: {
+    linkedin: 'LinkedIn',
+    website: 'Website',
+    /** appended to the person's name in the link's accessible name */
+    linkedinOf: 'on LinkedIn',
+    websiteOf: 'website',
+  },
   finalCta: {
     title: 'Talk to the team',
     text: 'Scientific, partnership or early-access enquiries all start the same way.',
     button: 'Talk to the team',
     href: '/contact?interest=partnership',
   },
-} as const;
+};
+
+export type TeamPageContent = typeof teamPage;

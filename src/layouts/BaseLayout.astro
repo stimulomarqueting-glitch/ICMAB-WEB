@@ -1,8 +1,9 @@
 ---
 /**
  * Base layout: HTML shell + full SEO head (meta, OG, Twitter, canonical,
- * JSON-LD). Defaults come from src/content/site.ts; every page overrides
- * title and description. The site ships in English only.
+ * JSON-LD). Defaults come from the locale's site content; every page
+ * overrides title and description. English at the root, Spanish under /es,
+ * cross-linked with hreflang.
  */
 import '@fontsource/sora/400.css';
 import '@fontsource/sora/600.css';
@@ -16,7 +17,8 @@ import '@fontsource/ibm-plex-mono/600.css';
 import '../styles/global.css';
 import { brand } from '../config/brand';
 import { SITE_URL } from '../config/site.mjs';
-import { site } from '../content/site';
+import { getContent } from '../content';
+import { getLocale, localeMeta, locales, localePath, stripLocale } from '../i18n';
 
 interface Props {
   title?: string;
@@ -31,11 +33,22 @@ interface Props {
 }
 
 const { title: titleOverride, description: descriptionOverride, breadcrumb, jsonLdExtra = [] } = Astro.props;
+const locale = getLocale(Astro.url);
+const { site } = getContent(locale);
+const meta = localeMeta[locale];
 const pageTitle = titleOverride ?? site.meta.title;
 const pageDescription = descriptionOverride ?? site.meta.description;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).href;
 const ogImage = new URL('/og-image.png', SITE_URL).href;
+
+/* the same page in every language, for hreflang + og:locale:alternate */
+const basePath = stripLocale(Astro.url.pathname);
+const alternates = locales.map((l) => ({
+  locale: l,
+  hreflang: localeMeta[l].lang,
+  href: new URL(localePath(l, basePath), SITE_URL).href,
+}));
 
 const graph: Record<string, unknown>[] = [
   {
@@ -43,6 +56,7 @@ const graph: Record<string, unknown>[] = [
     '@id': `${SITE_URL}/#website`,
     name: brand.projectName,
     url: SITE_URL,
+    inLanguage: locales.map((l) => localeMeta[l].lang),
   },
   {
     '@type': 'Organization',
@@ -61,7 +75,7 @@ const graph: Record<string, unknown>[] = [
         {
           '@type': 'BreadcrumbList',
           itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+            { '@type': 'ListItem', position: 1, name: site.a11y.breadcrumbHome, item: new URL(localePath(locale, '/'), SITE_URL).href },
             { '@type': 'ListItem', position: 2, name: breadcrumb, item: canonicalURL },
           ],
         },
@@ -74,13 +88,15 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={meta.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonicalURL} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#FDFBF8" />
@@ -95,7 +111,10 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={site.meta.ogAlt} />
-    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {alternates
+      .filter((alt) => alt.locale !== locale)
+      .map((alt) => <meta property="og:locale:alternate" content={localeMeta[alt.locale].ogLocale} />)}
 
     {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />

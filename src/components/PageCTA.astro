@@ -13,7 +13,10 @@ interface Props {
   ctaSource: string;
 }
 
+import { getLocale, localePath } from '../i18n';
+
 const { title, text, button, href, ctaSource } = Astro.props;
+const to = localePath(getLocale(Astro.url), href);
 ---
 
 <section class="sec pcta-sec" aria-label={title}>
@@ -23,7 +26,7 @@ const { title, text, button, href, ctaSource } = Astro.props;
         <h2 class="pcta__title">{title}</h2>
         {text && <p class="pcta__text">{text}</p>}
       </div>
-      <a class="btn btn--grad" href={href} data-cta-source={ctaSource}>{button}</a>
+      <a class="btn btn--grad" href={to} data-cta-source={ctaSource}>{button}</a>
     </div>
   </div>
 </section>

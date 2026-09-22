@@ -7,23 +7,28 @@
  */
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import PageHero from '../components/PageHero.astro';
-import SectionHeader from '../components/SectionHeader.astro';
-import Benefits from '../components/Benefits.astro';
-import Accordion from '../components/Accordion.astro';
-import BrandMark from '../components/BrandMark.astro';
-import PageCTA from '../components/PageCTA.astro';
-import Footer from '../components/Footer.astro';
-import { brand } from '../config/brand';
-import { SITE_URL } from '../config/site.mjs';
-import { product } from '../content/product';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import Benefits from '../../components/Benefits.astro';
+import Accordion from '../../components/Accordion.astro';
+import BrandMark from '../../components/BrandMark.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import Footer from '../../components/Footer.astro';
+import { brand } from '../../config/brand';
+import { SITE_URL } from '../../config/site.mjs';
+import { getContent } from '../../content';
+import { getLocale, localeStaticPaths } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { product, site } = getContent(getLocale(Astro.url));
 
 const faqItems = product.faq.items.filter((item) => item.published !== false);
 
 const VIDEO_SRC = '/video/matsurfer-device.mp4';
-const hasVideo = existsSync(fileURLToPath(new URL(`../../public${VIDEO_SRC}`, import.meta.url)));
+const hasVideo = existsSync(fileURLToPath(new URL(`../../../public${VIDEO_SRC}`, import.meta.url)));
 
 const productJsonLd = [
   {
@@ -36,8 +41,8 @@ const productJsonLd = [
 ];
 ---
 
-<BaseLayout title={product.meta.title} description={product.meta.description} breadcrumb="Product" jsonLdExtra={productJsonLd}>
-  <a class="skip-link" href="#main">Skip to content</a>
+<BaseLayout title={product.meta.title} description={product.meta.description} breadcrumb={product.meta.breadcrumb} jsonLdExtra={productJsonLd}>
+  <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
     <PageHero

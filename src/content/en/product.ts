@@ -1,4 +1,4 @@
-import { brand } from '../config/brand';
+import { brand } from '../../config/brand';
 
 /**
  * /product copy — the main explanation page for the device and the
@@ -12,6 +12,7 @@ const name = brand.projectName;
 
 export const product = {
   meta: {
+    breadcrumb: 'Product',
     title: `Product — ${name} · Compact Surface Functionalization Device`,
     description: `What ${name} is and how it works: controlled deposition with an adjustable source–substrate distance, transferring materials directly onto final substrates at lab scale.`,
   },
@@ -141,4 +142,6 @@ export const product = {
     button: 'Discuss your research',
     href: '/contact?interest=product',
   },
-} as const;
+};
+
+export type ProductContent = typeof product;

@@ -1,5 +1,5 @@
-import { brand } from '../config/brand';
-import { pendingContent, pendingData } from '../config/pendingContent';
+import { brand } from '../../config/brand';
+import { pendingContent, pendingData } from '../../config/pendingContent';
 
 /**
  * Home copy — strategic introduction, not the full dossier.
@@ -27,6 +27,7 @@ export const home = {
 
   /** Problem → MatSurfer → Result, one sentence each */
   value: {
+    label: 'Value proposition',
     items: [
       {
         tag: 'The problem',
@@ -104,4 +105,6 @@ export const home = {
     button: 'Talk to the team',
     href: '/contact',
   },
-} as const;
+};
+
+export type HomeContent = typeof home;

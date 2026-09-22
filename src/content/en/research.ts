@@ -1,4 +1,5 @@
-import { brand } from '../config/brand';
+import { brand } from '../../config/brand';
+import type { ExpertExperience, Publication, ValidationItem } from '../types';
 
 /**
  * /research data — expert experiences and publications grow from here.
@@ -6,38 +7,6 @@ import { brand } from '../config/brand';
  * testimonials, publications, DOIs or links; add them as they are
  * confirmed by the client.
  */
-
-export interface ExpertExperience {
-  name: string;
-  role: string;
-  institution: string;
-  /** scientific field, shown as a mono tag (e.g. 'Organic electronics') */
-  field: string;
-  quote: string;
-  /** device/model used, when relevant */
-  device?: string;
-  /** path under /public, e.g. '/img/research/jane-doe.jpg' */
-  image?: string;
-  link?: string;
-  /** ISO date, used for ordering (newest first) */
-  date?: string;
-  published: boolean;
-}
-
-export interface Publication {
-  title: string;
-  authors: string;
-  journal: string;
-  year: number;
-  doi?: string;
-  url?: string;
-  description?: string;
-  /** path under /public, when a figure is available */
-  image?: string;
-  /** lower numbers render first within the same year */
-  order?: number;
-  published: boolean;
-}
 
 /**
  * Expert evaluations supplied by ICMAB (Material_Web, 2026-09-16).
@@ -95,12 +64,6 @@ export const publications: Publication[] = [
  * `published: true`; no "coming soon" placeholder is shown.
  * TODO(client): flip `published` when Technology Transfer approves the copy.
  */
-export interface ValidationItem {
-  title: string;
-  text: string;
-  published: boolean;
-}
-
 export const validationItems: ValidationItem[] = [
   {
     // Approved copy from the Technology Transfer office (via Coral, 2025-09).
@@ -112,6 +75,7 @@ export const validationItems: ValidationItem[] = [
 
 /** Page copy (headings without trailing periods, per style guide). */
 export const researchPage = {
+  breadcrumb: 'Case Studies',
   metaTitle: `Case Studies — ${brand.projectName}`,
   metaDescription: `The research carried out with ${brand.projectName} by the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC.`,
   kicker: 'Case studies',
@@ -119,6 +83,7 @@ export const researchPage = {
   lead: `${brand.projectName} grows out of the day-to-day research of the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC. This page follows the research carried out with the device and the experiences of the researchers who work with it.`,
   experiencesTitle: 'Expert experiences',
   publicationsTitle: 'Publications',
+  moreLink: 'More about this experience',
   inviteTitle: 'Have you worked with the device?',
   inviteText: 'We would like to feature your experience or your publication here:',
   finalCta: {
@@ -128,3 +93,5 @@ export const researchPage = {
     href: '/contact?interest=research',
   },
 };
+
+export type ResearchPageContent = typeof researchPage;

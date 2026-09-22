@@ -4,31 +4,36 @@
  * legal line. Content comes from src/content/site.ts.
  */
 import { brand } from '../config/brand';
-import { site } from '../content/site';
+import { getContent } from '../content';
+import { getLocale, localePath } from '../i18n';
 import BrandMark from './BrandMark.astro';
 
+const locale = getLocale(Astro.url);
+const { site } = getContent(locale);
 const t = site.footer;
+const lp = (href: string) => localePath(locale, href);
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => (lp(href).replace(/\/$/, '') || '/') === currentPath;
 ---
 
 <footer class="footer">
   <div class="container">
     <div class="footer__top">
       <div class="footer__brand">
-        <a class="footer__logo" href="/">
+        <a class="footer__logo" href={lp('/')}>
           <BrandMark />
           <span class="wordmark">{brand.projectName}</span>
         </a>
         <p class="footer__desc">{t.description}</p>
-        <a class="btn btn--sm footer__cta" href={t.ctaHref} data-cta-source="footer">{t.cta}</a>
+        <a class="btn btn--sm footer__cta" href={lp(t.ctaHref)} data-cta-source="footer">{t.cta}</a>
       </div>
 
-      <nav class="footer__nav" aria-label="Footer">
+      <nav class="footer__nav" aria-label={site.a11y.footerNav}>
         {t.columns.map((col) => (
           <div>
             <span class="eyebrow">{col.title}</span>
             {col.links.map((link) => (
-              <a href={link.href} aria-current={currentPath === link.href ? 'page' : undefined}>
+              <a href={lp(link.href)} aria-current={isCurrent(link.href) ? 'page' : undefined}>
                 {link.label}
               </a>
             ))}

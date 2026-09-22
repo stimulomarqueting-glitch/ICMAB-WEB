@@ -4,9 +4,11 @@
  * line icons, one sentence each. The full audience context lives on
  * /product (FAQ) and /applications.
  */
-import { home } from '../content/home';
+import { getContent } from '../content';
+import { getLocale } from '../i18n';
 import SectionHeader from './SectionHeader.astro';
 
+const { home } = getContent(getLocale(Astro.url));
 const t = home.audiences;
 
 /* line icons per audience — single-weight technical stroke, one per profile:

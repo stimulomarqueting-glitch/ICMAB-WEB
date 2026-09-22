@@ -5,13 +5,18 @@
  * Every block renders only when it has published content — no fillers,
  * no "coming soon".
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import PageHero from '../components/PageHero.astro';
-import PageCTA from '../components/PageCTA.astro';
-import Footer from '../components/Footer.astro';
-import { brand } from '../config/brand';
-import { expertExperiences, publications, validationItems, researchPage } from '../content/research';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import PageHero from '../../components/PageHero.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import Footer from '../../components/Footer.astro';
+import { brand } from '../../config/brand';
+import { getContent } from '../../content';
+import { getLocale, localeStaticPaths } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { expertExperiences, publications, validationItems, researchPage, site } = getContent(getLocale(Astro.url));
 
 const experiences = expertExperiences
   .filter((e) => e.published)
@@ -36,10 +41,10 @@ const papersJsonLd = papers.map((p) => ({
 <BaseLayout
   title={researchPage.metaTitle}
   description={researchPage.metaDescription}
-  breadcrumb="Case Studies"
+  breadcrumb={researchPage.breadcrumb}
   jsonLdExtra={papersJsonLd}
 >
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
     <PageHero kicker={researchPage.kicker} title={researchPage.title} lead={researchPage.lead} />
@@ -57,7 +62,7 @@ const papersJsonLd = papers.map((p) => ({
                   <strong>{e.name}</strong> · {e.role}, {e.institution}
                 </p>
                 {e.device && <p class="research__device">{e.device}</p>}
-                {e.link && <a class="research__link" href={e.link} target="_blank" rel="noopener">More about this experience</a>}
+                {e.link && <a class="research__link" href={e.link} target="_blank" rel="noopener">{researchPage.moreLink}</a>}
               </article>
             ))}
           </div>

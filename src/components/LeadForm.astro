@@ -12,8 +12,11 @@
  */
 import { brand } from '../config/brand';
 import { leadCapture, isMisconfigured } from '../config/leadCapture';
-import { contact } from '../content/contact';
+import { getContent } from '../content';
+import { getLocale } from '../i18n';
 
+const locale = getLocale(Astro.url);
+const { contact } = getContent(locale);
 const f = contact.form;
 
 // Surface misconfiguration early: visible in `astro dev` / `astro build` logs.
@@ -34,6 +37,7 @@ if (isMisconfigured) {
     data-mode={leadCapture.mode}
     data-endpoint={leadCapture.formEndpoint}
     data-project={brand.projectName}
+    data-language={locale}
   >
     <div class="lf__grid">
       <div class="field">
@@ -299,7 +303,7 @@ if (isMisconfigured) {
    *                 If the endpoint is missing, warns and falls back to demo.
    */
   import { trackEvent, getCtaSource, getUtm } from '../scripts/leadTracking';
-  import { interestParamMap } from '../content/contact';
+  import { interestParamMap } from '../content/shared';
 
   const form = document.getElementById('lead-form') as HTMLFormElement | null;
 
@@ -362,6 +366,7 @@ if (isMisconfigured) {
       const v = (name: string) => String(data.get(name) ?? '').trim();
       return {
         project: form.dataset.project ?? '',
+        language: form.dataset.language ?? 'en',
         sourcePage: window.location.pathname,
         ctaSource: getCtaSource(),
         interest: v('interest'),

@@ -1,16 +1,12 @@
-import { brand } from '../config/brand';
-import { pendingContent, pendingData } from '../config/pendingContent';
+import { brand } from '../../config/brand';
+import { pendingContent, pendingData } from '../../config/pendingContent';
 
 /**
  * Site-wide content: navigation, header, footer and default SEO metadata.
  * Page-specific copy lives in its own file (home.ts, product.ts, …).
- * The site ships in English only; Spanish content was retired to git history.
+ * Hrefs are locale-neutral; components prefix them per locale.
  */
-
-export interface NavItem {
-  label: string;
-  href: string;
-}
+import type { NavItem } from '../types';
 
 const name = brand.projectName;
 
@@ -36,6 +32,16 @@ export const site = {
     ctaHref: '/contact',
     menuOpen: 'Open menu',
     menuClose: 'Close menu',
+    /** language switcher */
+    language: 'Language',
+  },
+
+  /** assistive-technology labels that never appear on screen */
+  a11y: {
+    skipToContent: 'Skip to content',
+    mainNav: 'Main',
+    footerNav: 'Footer',
+    breadcrumbHome: 'Home',
   },
 
   footer: {
@@ -77,4 +83,6 @@ export const site = {
       ? `${pendingData.patentFamilyCode} · ${brand.claim}`
       : brand.claim,
   },
-} as const;
+};
+
+export type SiteContent = typeof site;

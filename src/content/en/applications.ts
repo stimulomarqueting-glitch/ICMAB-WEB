@@ -1,4 +1,5 @@
-import { brand } from '../config/brand';
+import { brand } from '../../config/brand';
+import type { Application } from '../types';
 
 /**
  * /applications data — one entry per confirmed line of application
@@ -11,23 +12,6 @@ import { brand } from '../config/brand';
  */
 
 const name = brand.projectName;
-
-export interface Application {
-  slug: string;
-  /** short mono tag shown above the title */
-  tag: string;
-  title: string;
-  /** one-line summary used on teasers/cards */
-  shortDescription: string;
-  /** need or context the team faces */
-  challenge: string;
-  /** what MatSurfer lets them explore */
-  use: string;
-  /** benefit for the R&D team */
-  benefit: string;
-  published: boolean;
-  order: number;
-}
 
 export const applications: Application[] = [
   {
@@ -89,6 +73,7 @@ export const applications: Application[] = [
 
 export const applicationsPage = {
   meta: {
+    breadcrumb: 'Applications',
     title: `Applications — ${name} · Confirmed Lines of Application`,
     description: `Where ${name} is used: organic electronics including OLEDs, perovskite and organic solar-cell research, chemical and biosensors, functional coatings and SPM sample preparation.`,
   },
@@ -99,6 +84,7 @@ export const applicationsPage = {
     lead: 'Five confirmed lines of application — and the exploration of new material–surface combinations running through all of them. Each one links to a conversation.',
   },
   labels: {
+    section: 'Use cases',
     challenge: 'The need',
     use: `With ${name}`,
     benefit: 'For your team',
@@ -116,4 +102,6 @@ export const applicationsPage = {
     button: 'Discuss your use case',
     href: '/contact?interest=application',
   },
-} as const;
+};
+
+export type ApplicationsPageContent = typeof applicationsPage;

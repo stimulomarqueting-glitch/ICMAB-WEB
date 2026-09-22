@@ -1,9 +1,13 @@
 ---
 import { brand } from '../config/brand';
-import { home } from '../content/home';
+import { getContent } from '../content';
+import { getLocale, localePath } from '../i18n';
 
+const locale = getLocale(Astro.url);
+const { home } = getContent(locale);
 const t = home.hero;
-const claim = brand.claim;
+const claim = locale === 'es' ? brand.claimEs : brand.claim;
+const lp = (href: string) => localePath(locale, href);
 
 /* v3 lockup: the last word of the claim is always emphasised ("…for ALL.") */
 const claimMatch = claim.match(/^(.*\s)(\S+?)(\.?)$/);
@@ -32,8 +36,8 @@ const claimEnd = claimMatch ? claimMatch[3] : '';
     <p class="hero__descriptor">{t.descriptor}</p>
     <p class="hero__lead">{t.lead}</p>
     <div class="hero__ctas">
-      <a class="btn" href="/contact" data-cta-source="hero">{t.ctaPrimary}</a>
-      <a class="btn btn--glass" href="/product" data-cta-source="hero-product">{t.ctaSecondary}</a>
+      <a class="btn" href={lp('/contact')} data-cta-source="hero">{t.ctaPrimary}</a>
+      <a class="btn btn--glass" href={lp('/product')} data-cta-source="hero-product">{t.ctaSecondary}</a>
     </div>
     <p class="eyebrow hero__eyebrow">{t.eyebrow}</p>
   </div>

@@ -20,9 +20,20 @@ accordion, scroll reveal).
 | `/research` | Expert experiences, publications, Validation & IP (renders only published entries) | Explore a collaboration → `/contact?interest=research` |
 | `/team` | Confirmed profiles, grouped; published-only | Talk to the team → `/contact?interest=partnership` |
 | `/contact` | Conversion page: light lead form with interest preselection | — |
-| `/es` | Redirects to `/` (site is EN-only) | — |
+| `/es`, `/es/product`, … | The same six pages in Spanish (same slugs, `/es` prefix) | same CTAs, prefixed |
 
 Global header CTA (all pages): **Talk to the team** → `/contact`.
+
+### Languages
+
+English lives at the root and Spanish under `/es`, with identical slugs.
+One template per page — `src/pages/[...lang]/*.astro` — builds both
+versions; the locale is read from the URL (`src/i18n/index.ts`). Content
+hrefs are locale-neutral (`'/product'`); components prefix them at render
+time with `localePath`, so translated copy never has to remember `/es`.
+`<html lang>`, canonical, `hreflang` (en / es / x-default), `og:locale`, the
+JSON-LD breadcrumb and the sitemap are all per-locale; the header carries
+an EN / ES switcher that keeps you on the same page.
 
 ## Quick start
 
@@ -53,19 +64,25 @@ npm run preview   # preview the production build locally
 | **Brand name / claim / contact email** | `src/config/brand.ts` |
 | **Lead capture (demo/production, endpoint, privacy URL)** | `src/config/leadCapture.ts` — see below |
 | Final production domain | `src/config/site.mjs` + `public/robots.txt` |
-| Navigation, footer, default SEO | `src/content/site.ts` |
-| Home copy | `src/content/home.ts` |
-| Product copy (differentiator, steps, parameters, FAQ) | `src/content/product.ts` |
-| Applications data (one entry per use case) | `src/content/applications.ts` |
-| Research data (experiences, publications, validation) | `src/content/research.ts` |
-| Team data (profiles + groups) | `src/content/team.ts` |
-| Contact copy + form labels + interest URL mapping | `src/content/contact.ts` |
+| Navigation, footer, default SEO, a11y labels | `src/content/{en,es}/site.ts` |
+| Home copy | `src/content/{en,es}/home.ts` |
+| Product copy (differentiator, steps, parameters, FAQ) | `src/content/{en,es}/product.ts` |
+| Applications data (one entry per use case) | `src/content/en/applications.ts` (data) + `es/applications.ts` (texts by slug) |
+| Research data (experiences, publications, validation) | `src/content/en/research.ts` (data) + `es/research.ts` (texts) |
+| Team data (profiles + groups) | `src/content/en/team.ts` (data) + `es/team.ts` (roles + bios by name) |
+| Contact copy + form labels | `src/content/{en,es}/contact.ts` |
+| Interest URL mapping (shared by both languages) | `src/content/shared.ts` |
+| Shared content types | `src/content/types.ts` |
 | Design tokens | `src/styles/global.css` (`:root` block) |
 | SEO head (meta, OG, JSON-LD, breadcrumbs) | `src/layouts/BaseLayout.astro` |
 
-The site ships **English only** (`lang="en"`, no hreflang, `/es` → `/`).
-The old Spanish content lives in git history (`src/content/es.ts`, removed
-in the multi-page restructure).
+**Editing copy in two languages.** The English files define each page's
+shape and export its type (`HomeContent`, `ProductContent`, …); the Spanish
+files are typed against them, so adding a key to English without its
+Spanish counterpart fails `astro check`. Lists with non-translatable data
+(slugs, DOIs, photos, LinkedIn URLs, order, `published`) live once in
+`en/` — the Spanish file imports them and overrides only the texts, and
+throws at build time if an entry has no translation.
 
 ### Publish-gated content (no fillers, no "coming soon")
 
@@ -105,7 +122,8 @@ wrapping a CRM API (keep API keys server-side).
 ```json
 {
   "project": "MatSurfer",
-  "sourcePage": "/contact",
+  "language": "en | es",
+  "sourcePage": "/contact | /es/contact",
   "ctaSource": "header | hero | home-product | home-applications | home-research | home-team | home-final | product-hero | product-final | applications-<slug> | applications-final | research-final | team-final | footer | direct",
   "interest": "product-information | research-application | scientific-collaboration | validation | distribution | other",
   "areaOfInterest": "organic-electronics | solar-cells | sensors | coatings | spm-sample-preparation | new-combinations | other | ''",

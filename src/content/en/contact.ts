@@ -1,4 +1,4 @@
-import { brand } from '../config/brand';
+import { brand } from '../../config/brand';
 
 /**
  * /contact copy + lead form definition.
@@ -13,6 +13,7 @@ const name = brand.projectName;
 
 export const contact = {
   meta: {
+    breadcrumb: 'Contact',
     title: `Contact — ${name} · Talk to the Team`,
     description: `Talk to the ${name} team: explore an application, request technical information, discuss a scientific collaboration, join a validation or talk about distribution.`,
   },
@@ -84,22 +85,6 @@ export const contact = {
     directTitle: 'Prefer email?',
     directText: 'You can also write directly to',
   },
-} as const;
-
-/**
- * Map short URL values (used in internal links) to form option values.
- *   /contact?interest=product      → Product information
- *   /contact?interest=application  → Research application
- *   /contact?interest=research     → Scientific collaboration
- *   /contact?interest=partnership  → Scientific collaboration
- *   /contact?interest=distribution → Distribution
- * A full option value (e.g. ?interest=validation) is also accepted as-is.
- */
-export const interestParamMap: Record<string, string> = {
-  product: 'product-information',
-  application: 'research-application',
-  research: 'scientific-collaboration',
-  partnership: 'scientific-collaboration',
-  distribution: 'distribution',
-  validation: 'validation',
 };
+
+export type ContactContent = typeof contact;
