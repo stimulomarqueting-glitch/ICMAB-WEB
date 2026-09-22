@@ -1,14 +1,14 @@
 ---
 /**
- * Home hero, "sublimation field" variant. The visual is the process itself,
- * drawn live on a canvas: particles leave a heated source at the bottom
- * (coral), cool as they rise (magenta → violet) and condense into a thin
- * layer on the substrate above — while the source–substrate distance `d`
- * slowly breathes. The pointer disturbs the vapour. Copy, CTAs and the
- * claim lockup are the same as the photo hero (home.hero).
+ * Home hero, "floating device" variant. The product photo sits on a plate
+ * that tilts in 3D with the pointer (perspective + layers at different
+ * depths: halo and shadow behind, photo, a sheen sweeping the glass, and
+ * the vapour in front). Particles rise out of the chamber in the photo,
+ * cooling from coral to violet as they climb — the process, live, on the
+ * real device. A slow marquee of application fields runs along the bottom.
  *
- * Motion is progressive enhancement: no JS → the plum backdrop and copy;
- * prefers-reduced-motion → one still frame, no marquee, no text rise.
+ * Motion is progressive enhancement: no JS → static plate and copy;
+ * prefers-reduced-motion → no tilt, no float, one still frame of vapour.
  * The loop pauses off-screen and when the tab is hidden.
  */
 import { brand } from '../config/brand';
@@ -26,42 +26,49 @@ const claimLead = claimMatch ? claimMatch[1] : '';
 const claimEmph = claimMatch ? claimMatch[2] : claim;
 const claimEnd = claimMatch ? claimMatch[3] : '';
 
-/* the headline rises word by word */
 const words = t.headline.split(' ');
 const marquee = [...t.field.marquee, ...t.field.marquee];
 ---
 
 <section class="field" aria-labelledby="hero-title" data-field>
   <div class="field__mesh" aria-hidden="true"></div>
-  <img class="field__photo" src="/img/tech-detail.jpg" alt="" width="1000" height="750" decoding="async" aria-hidden="true" />
-  <canvas class="field__canvas" aria-hidden="true"></canvas>
 
-  {/* the two lines of the process, labelled; the substrate follows `d` */}
-  <div class="field__labels" aria-hidden="true">
-    <span class="field__label field__label--substrate" data-substrate-label>{t.field.substrate}</span>
-    <span class="field__label field__label--d" data-d-label>{t.field.distance}</span>
-    <span class="field__label field__label--source" data-source-label>{t.field.source}</span>
-  </div>
-
-  <div class="container field__content">
-    <p class="field__claim rise" style="--i: 0">{claimLead}<b>{claimEmph}</b>{claimEnd}</p>
-    <h1 class="field__title" id="hero-title">
-      {words.map((w, i) => (
-        <>
-          <span class="field__word"><span class="rise" style={`--i: ${i + 1}`}>{w}</span></span>{' '}
-        </>
-      ))}
-    </h1>
-    <p class="field__descriptor rise" style={`--i: ${words.length + 1}`}>{t.descriptor}</p>
-    <p class="field__lead rise" style={`--i: ${words.length + 2}`}>{t.lead}</p>
-    <div class="field__ctas rise" style={`--i: ${words.length + 3}`}>
-      <a class="btn" href={lp('/contact')} data-cta-source="hero">{t.ctaPrimary}</a>
-      <a class="btn btn--glass" href={lp('/product')} data-cta-source="hero-product">{t.ctaSecondary}</a>
+  <div class="container field__grid">
+    <div class="field__content">
+      <p class="field__claim rise" style="--i: 0">{claimLead}<b>{claimEmph}</b>{claimEnd}</p>
+      <h1 class="field__title" id="hero-title">
+        {words.map((w, i) => (
+          <>
+            <span class="field__word"><span class="rise" style={`--i: ${i + 1}`}>{w}</span></span>{' '}
+          </>
+        ))}
+      </h1>
+      <p class="field__descriptor rise" style={`--i: ${words.length + 1}`}>{t.descriptor}</p>
+      <p class="field__lead rise" style={`--i: ${words.length + 2}`}>{t.lead}</p>
+      <div class="field__ctas rise" style={`--i: ${words.length + 3}`}>
+        <a class="btn" href={lp('/contact')} data-cta-source="hero">{t.ctaPrimary}</a>
+        <a class="btn btn--glass" href={lp('/product')} data-cta-source="hero-product">{t.ctaSecondary}</a>
+      </div>
+      <p class="eyebrow field__eyebrow rise" style={`--i: ${words.length + 4}`}>{t.eyebrow}</p>
     </div>
-    <p class="eyebrow field__eyebrow rise" style={`--i: ${words.length + 4}`}>{t.eyebrow}</p>
+
+    {/* the device: a plate in perspective, layers at different depths */}
+    <div class="field__stage" aria-hidden="true">
+      <div class="plate" data-plate>
+        <div class="plate__float">
+          <div class="plate__halo"></div>
+          <div class="plate__shadow"></div>
+          <div class="plate__card">
+            <img class="plate__img" src="/img/product-table.jpg" alt="" width="1100" height="619" decoding="async" fetchpriority="high" />
+            <div class="plate__tint"></div>
+            <div class="plate__sheen"></div>
+          </div>
+          <canvas class="plate__vapour" data-vapour></canvas>
+        </div>
+      </div>
+    </div>
   </div>
 
-  {/* application fields drift along the bottom edge */}
   <div class="field__marquee" aria-hidden="true">
     <ul class="field__track">
       {marquee.map((item) => (
@@ -82,21 +89,22 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     background: var(--bg-inverse);
     color: var(--text-on-dark);
     isolation: isolate;
-    --px: 0.7; /* pointer position, 0–1, steers the mesh a little */
-    --py: 0.4;
+    --px: 0.5; /* pointer, 0–1 */
+    --py: 0.5;
+    --rx: 0deg; /* plate tilt */
+    --ry: 0deg;
   }
 
-  /* slow gradient mesh: heat bottom-left, vacuum top-right */
+  /* slow gradient mesh: heat low-left, vacuum high-right; the pointer steers it a little */
   .field__mesh {
     position: absolute;
     inset: -20%;
     background:
-      radial-gradient(40% 40% at calc(20% + var(--px) * 10%) 95%, rgba(240, 83, 47, 0.28), transparent 70%),
-      radial-gradient(45% 55% at calc(70% + var(--px) * 8%) calc(20% + var(--py) * 10%), rgba(108, 18, 248, 0.42), transparent 70%),
-      radial-gradient(30% 35% at 55% 60%, rgba(206, 66, 98, 0.18), transparent 70%),
+      radial-gradient(40% 40% at calc(15% + var(--px) * 10%) 95%, rgba(240, 83, 47, 0.26), transparent 70%),
+      radial-gradient(45% 55% at calc(72% + var(--px) * 6%) calc(25% + var(--py) * 10%), rgba(108, 18, 248, 0.4), transparent 70%),
+      radial-gradient(30% 35% at 50% 60%, rgba(206, 66, 98, 0.16), transparent 70%),
       linear-gradient(180deg, #2a1845 0%, #231536 50%, #1a0f2c 100%);
     animation: field-drift 22s ease-in-out infinite alternate;
-    transition: background-position 600ms var(--ease);
   }
 
   @keyframes field-drift {
@@ -104,65 +112,17 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     to { transform: translate3d(1.5%, 1.5%, 0) scale(1.04); }
   }
 
-  /* a whisper of the real glass, so the field is not pure abstraction */
-  .field__photo {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 70% 50%;
-    opacity: 0.14;
-    mix-blend-mode: luminosity;
-    -webkit-mask-image: linear-gradient(90deg, transparent 30%, #000 75%);
-    mask-image: linear-gradient(90deg, transparent 30%, #000 75%);
-  }
-
-  .field__canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* mono labels pinned to the two process lines (JS keeps them in place) */
-  .field__labels {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  .field__label {
-    position: absolute;
-    right: 4%;
-    transform: translateY(-50%);
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 800ms ease;
-  }
-
-  .field__label--substrate { top: var(--sub-y, 32%); margin-top: -0.9rem; }
-  .field__label--source { top: var(--src-y, 84%); margin-top: 1rem; }
-  .field__label--d {
-    top: calc((var(--sub-y, 32%) + var(--src-y, 84%)) / 2);
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .field[data-ready] .field__label {
-    opacity: 1;
-  }
-
-  .field__content {
+  .field__grid {
     position: relative;
     z-index: 1;
-    padding-block: clamp(3rem, 7vh, 5rem) clamp(4rem, 9vh, 6rem);
+    display: grid;
+    grid-template-columns: minmax(0, 11fr) minmax(0, 10fr);
+    align-items: center;
+    gap: clamp(2rem, 4vw, 4rem);
+    padding-block: clamp(3rem, 7vh, 5rem) clamp(4.5rem, 9vh, 6.5rem);
   }
 
+  /* ── copy ─────────────────────────────────────────────────────────── */
   .field__claim {
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -180,13 +140,12 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
   .field__title {
     max-width: 14ch;
     margin-top: 1rem;
-    font-size: clamp(2.5rem, 5.6vw, 4.6rem);
+    font-size: clamp(2.5rem, 4.6vw, 4.2rem);
     line-height: 1.02;
     letter-spacing: -0.02em;
     color: #fff;
   }
 
-  /* each word rises from behind a clip line */
   .field__word {
     display: inline-block;
     overflow: hidden;
@@ -206,7 +165,7 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
   .field__lead {
     font-size: 1.125rem;
     line-height: 1.55;
-    max-width: 34rem;
+    max-width: 32rem;
     margin-top: 1rem;
     color: rgba(255, 255, 255, 0.86);
   }
@@ -223,7 +182,6 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     margin-top: 2.25rem;
   }
 
-  /* entrance: staggered rise, 60ms per step */
   .rise {
     display: inline-block;
     opacity: 0;
@@ -232,10 +190,9 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     animation-delay: calc(120ms + var(--i, 0) * 60ms);
   }
 
-  .field__ctas.rise,
-  .field__lead.rise,
-  .field__descriptor.rise,
   .field__claim.rise,
+  .field__descriptor.rise,
+  .field__lead.rise,
   .field__eyebrow.rise {
     display: block;
   }
@@ -248,7 +205,111 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* marquee of application fields, just above the strip */
+  /* ── the plate ────────────────────────────────────────────────────── */
+  .field__stage {
+    perspective: 1400px;
+    perspective-origin: 50% 40%;
+  }
+
+  .plate {
+    position: relative;
+    width: 108%; /* bleeds a little past the container edge */
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transition: transform 220ms ease-out;
+    will-change: transform;
+  }
+
+  .plate__float {
+    position: relative;
+    transform-style: preserve-3d;
+    animation: plate-float 7s ease-in-out infinite;
+  }
+
+  @keyframes plate-float {
+    50% { transform: translateY(-10px); }
+  }
+
+  .plate__card {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 40px 90px rgba(10, 4, 24, 0.55);
+    transform: translateZ(0);
+  }
+
+  .plate__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 50%;
+  }
+
+  /* warm-to-cool duotone, light enough to keep the glass legible */
+  .plate__tint {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(120deg, rgba(240, 83, 47, 0.55) 0%, rgba(206, 66, 98, 0.45) 45%, rgba(108, 18, 248, 0.6) 100%);
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+  }
+
+  /* a specular band that follows the pointer across the glass */
+  .plate__sheen {
+    position: absolute;
+    inset: -20%;
+    background: linear-gradient(
+      115deg,
+      transparent calc(var(--px) * 100% - 22%),
+      rgba(255, 255, 255, 0.18) calc(var(--px) * 100% - 4%),
+      rgba(255, 255, 255, 0.05) calc(var(--px) * 100% + 4%),
+      transparent calc(var(--px) * 100% + 20%)
+    );
+    mix-blend-mode: screen;
+    transform: translateZ(20px);
+    pointer-events: none;
+  }
+
+  /* depth behind: a violet halo and a soft drop shadow that slides against the tilt */
+  .plate__halo {
+    position: absolute;
+    inset: -12% -8%;
+    background: radial-gradient(50% 50% at 60% 55%, rgba(108, 18, 248, 0.55), transparent 70%);
+    filter: blur(24px);
+    transform: translateZ(-140px) scale(1.1);
+  }
+
+  .plate__shadow {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -8%;
+    height: 24%;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(8, 3, 20, 0.7), transparent 70%);
+    filter: blur(18px);
+    transform: translateZ(-90px) translateX(calc(var(--ry) * -1.4)) translateY(calc(var(--rx) * 1.2));
+  }
+
+  /* the vapour lives in front of the glass and overflows the card */
+  .plate__vapour {
+    position: absolute;
+    left: -25%;
+    right: -25%;
+    top: -70%;
+    bottom: -10%;
+    width: 150%;
+    height: 180%;
+    transform: translateZ(70px);
+    pointer-events: none;
+  }
+
+  /* ── marquee + strip ──────────────────────────────────────────────── */
   .field__marquee {
     position: absolute;
     left: 0;
@@ -308,15 +369,31 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     z-index: 2;
   }
 
-  @media (max-width: 56rem) {
-    .field__photo {
-      opacity: 0.1;
-      -webkit-mask-image: linear-gradient(180deg, transparent 35%, #000 80%);
-      mask-image: linear-gradient(180deg, transparent 35%, #000 80%);
+  /* ── responsive ───────────────────────────────────────────────────── */
+  @media (max-width: 64rem) {
+    .field__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
 
-    .field__labels {
-      font-size: 0.6rem;
+    .plate {
+      width: 104%;
+    }
+  }
+
+  /* stacked: the plate sits under the copy, capped so the band stays compact */
+  @media (max-width: 56rem) {
+    .field__grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .plate {
+      width: min(100%, 34rem);
+      margin-inline: auto;
+    }
+
+    .plate__card {
+      aspect-ratio: 16 / 10;
     }
 
     .field__eyebrow {
@@ -329,20 +406,20 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
       width: 100%;
     }
 
-    .field__labels {
-      display: none;
-    }
-
-    /* leave the field its own band under the copy */
-    .field__content {
-      padding-bottom: 11rem;
+    .field__grid {
+      padding-bottom: 5.5rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .field__mesh,
-    .field__track {
+    .field__track,
+    .plate__float {
       animation: none;
+    }
+
+    .plate {
+      transition: none;
     }
 
     .rise {
@@ -355,162 +432,119 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
 
 <script>
   /**
-   * Sublimation field. A cheap 2D-canvas particle system:
-   *  - particles spawn along the source line, rise with a little lateral
-   *    drift, and change colour with height (coral → magenta → violet);
-   *  - reaching the substrate they either settle into a thin deposited layer
-   *    (per-column buckets, capped) or respawn;
-   *  - the pointer pushes nearby vapour aside;
-   *  - `d` breathes: the substrate line eases up and down over ~14s.
+   * Plate tilt + vapour.
+   *  - pointer over the section → tilt (±7° / ±10°), sheen and mesh follow;
+   *    leaving eases the plate back;
+   *  - vapour: particles spawn in an ellipse over the chamber in the photo,
+   *    rise with a light drift, cool from coral to violet, fade out high up;
+   *    the pointer pushes them aside.
    */
   const root = document.querySelector<HTMLElement>('[data-field]');
-  const canvas = root?.querySelector<HTMLCanvasElement>('.field__canvas');
+  const plate = root?.querySelector<HTMLElement>('[data-plate]');
+  const canvas = root?.querySelector<HTMLCanvasElement>('[data-vapour]');
 
-  if (root && canvas) {
-    const ctx = canvas.getContext('2d')!;
+  if (root && plate && canvas) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ctx = canvas.getContext('2d')!;
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
+    /* ── tilt ─────────────────────────────────────────────────────── */
+    let px = -1e4, py = -1e4; // pointer in canvas space
+    if (!reduce) {
+      root.addEventListener('pointermove', (e) => {
+        const r = root.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width - 0.5;
+        const ny = (e.clientY - r.top) / r.height - 0.5;
+        root.style.setProperty('--px', String(nx + 0.5));
+        root.style.setProperty('--py', String(ny + 0.5));
+        root.style.setProperty('--ry', (nx * 10).toFixed(2) + 'deg');
+        root.style.setProperty('--rx', (-ny * 7).toFixed(2) + 'deg');
+        const c = canvas.getBoundingClientRect();
+        px = e.clientX - c.left; py = e.clientY - c.top;
+      });
+      root.addEventListener('pointerleave', () => {
+        root.style.setProperty('--rx', '0deg');
+        root.style.setProperty('--ry', '0deg');
+        px = py = -1e4;
+      });
+    }
+
+    /* ── vapour ───────────────────────────────────────────────────── */
     const CORAL = [240, 83, 47], MAGENTA = [206, 66, 98], VIOLET = [108, 18, 248];
     const mix = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
     const colour = (t: number) => (t < 0.5 ? mix(CORAL, MAGENTA, t / 0.5) : mix(MAGENTA, VIOLET, (t - 0.5) / 0.5));
 
-    let W = 0, H = 0, narrow = false;
-    let glow: HTMLCanvasElement | null = null;
-    /* geometry in CSS px: source span, substrate span, line heights */
-    let srcY = 0, subY = 0, subBase = 0, x0 = 0, x1 = 0;
+    let W = 0, H = 0;
+    /* emitter: the chamber sits at ~73% / 56% of the card; the canvas is
+       150% × 180% of the card, offset 25% left and 70% up */
+    let ex = 0, ey = 0, erx = 0, ery = 0, travel = 0;
     const layout = () => {
-      const r = root.getBoundingClientRect();
+      const r = canvas.getBoundingClientRect();
       W = Math.round(r.width); H = Math.round(r.height);
       canvas.width = W * DPR; canvas.height = H * DPR;
-      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      narrow = W < 640;
-      /* phones: the copy fills the band, so the process sits low and right */
-      x0 = narrow ? W * 0.3 : W < 900 ? W * 0.5 : W * 0.56;
-      x1 = narrow ? W * 0.97 : W * 0.94;
-      srcY = narrow ? H * 0.965 : H * 0.84;
-      subBase = narrow ? H * 0.8 : H * 0.32;
-      glow = null;
-      buckets.length = 0;
-      for (let i = 0; i < Math.ceil((x1 - x0) / BUCKET) + 1; i++) buckets.push(0);
-      root.style.setProperty('--src-y', (srcY / H) * 100 + '%');
+      const cardW = W / 1.5, cardH = H / 1.8;
+      const cardX = cardW * 0.25, cardY = cardH * 0.7;
+      ex = cardX + cardW * 0.73; ey = cardY + cardH * 0.56;
+      erx = cardW * 0.07; ery = cardH * 0.1;
+      travel = ey - cardY * 0.15; // how far up the vapour lives
     };
 
-    /* deposited layer: height per column bucket */
-    const BUCKET = 6, CAP = 9;
-    const buckets: number[] = [];
-
-    /* the glowing source line, rendered once per layout */
-    const sourceGlow = () => {
-      if (glow) return glow;
-      const c = document.createElement('canvas');
-      c.width = Math.ceil((x1 - x0 + 80) * DPR); c.height = Math.ceil(80 * DPR);
-      const g2 = c.getContext('2d')!;
-      g2.setTransform(DPR, 0, 0, DPR, 0, 0);
-      const g = g2.createLinearGradient(40, 0, x1 - x0 + 40, 0);
-      g.addColorStop(0, 'rgba(240,83,47,0)'); g.addColorStop(0.15, 'rgba(240,83,47,0.9)');
-      g.addColorStop(0.85, 'rgba(230,78,61,0.9)'); g.addColorStop(1, 'rgba(240,83,47,0)');
-      g2.shadowColor = 'rgba(240,83,47,0.9)'; g2.shadowBlur = 24;
-      g2.strokeStyle = g; g2.lineWidth = 2; g2.lineCap = 'round';
-      g2.beginPath(); g2.moveTo(40, 40); g2.lineTo(x1 - x0 + 40, 40); g2.stroke();
-      glow = c;
-      return c;
-    };
-
-    type P = { x: number; y: number; vx: number; vy: number; s: number; age: number; life: number; ph: number };
+    type P = { x: number; y: number; vx: number; vy: number; s: number; age: number; ph: number; span: number };
     const ps: P[] = [];
     const spawn = (p: P) => {
-      p.x = x0 + Math.random() * (x1 - x0);
-      p.y = srcY + (Math.random() - 0.5) * 6;
-      p.vx = (Math.random() - 0.5) * 0.15;
-      p.vy = -(0.35 + Math.random() * 0.55) * (H / 900);
-      p.s = 0.9 + Math.random() * 1.7;
+      const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random());
+      p.x = ex + Math.cos(a) * erx * rr;
+      p.y = ey + Math.sin(a) * ery * rr;
+      p.vx = (Math.random() - 0.5) * 0.12;
+      p.vy = -(0.3 + Math.random() * 0.5) * (H / 800);
+      p.s = 1.1 + Math.random() * 1.9;
       p.age = 0;
-      p.life = 1;
       p.ph = Math.random() * Math.PI * 2;
+      p.span = 0.6 + Math.random() * 0.4; // fraction of travel before it fades
       return p;
     };
-    const N = Math.max(120, Math.min(520, Math.round((W || 1200) * (H || 800) / (W < 640 ? 6500 : 3800))));
-
-    let px = -1e4, py = -1e4; // pointer, CSS px in canvas space
-    root.addEventListener('pointermove', (e) => {
-      const r = canvas.getBoundingClientRect();
-      px = e.clientX - r.left; py = e.clientY - r.top;
-      root.style.setProperty('--px', String(px / W));
-      root.style.setProperty('--py', String(py / H));
-    });
-    root.addEventListener('pointerleave', () => { px = py = -1e4; });
+    const N = window.innerWidth < 640 ? 140 : 320;
 
     let t0 = performance.now();
     const step = (now: number) => {
       const dt = Math.min(2, (now - t0) / 16.67); t0 = now;
-      /* d breathes: substrate drifts ±5% of height over ~14s */
-      subY = subBase + Math.sin(now / 2200) * H * (narrow ? 0.02 : 0.05);
-      root.style.setProperty('--sub-y', (subY / H) * 100 + '%');
-
       for (const p of ps) {
         p.age += dt;
-        /* lateral drift: two slow sines, phase per particle */
-        const rise = (srcY - p.y) / (srcY - subY);
         p.vx += (Math.sin(now / 900 + p.ph + p.y / 60) * 0.02 + Math.sin(now / 1700 - p.ph) * 0.012) * dt;
         p.vx *= 0.96;
-        /* pointer pushes the vapour aside */
         const dx = p.x - px, dy = p.y - py, d2 = dx * dx + dy * dy;
-        if (d2 < 140 * 140) {
-          const f = (1 - Math.sqrt(d2) / 140) * 0.9;
-          p.vx += (dx / (Math.sqrt(d2) + 1)) * f * dt;
-          p.vy += (dy / (Math.sqrt(d2) + 1)) * f * 0.35 * dt;
+        if (d2 < 120 * 120) {
+          const d = Math.sqrt(d2) + 1, f = (1 - d / 120) * 0.9;
+          p.vx += (dx / d) * f * dt;
+          p.vy += (dy / d) * f * 0.35 * dt;
         }
         p.x += p.vx * dt * 1.6;
         p.y += p.vy * dt;
-        /* condense on the substrate, or leave the frame */
-        if (rise >= 1) {
-          const b = Math.floor((p.x - x0) / BUCKET);
-          if (b >= 0 && b < buckets.length && buckets[b] < CAP && Math.random() < 0.35) buckets[b] += 0.6;
-          spawn(p);
-        } else if (p.x < -10 || p.x > W + 10 || p.y < -10) {
-          spawn(p);
-        }
+        const rise = (ey - p.y) / travel;
+        if (rise > p.span || p.x < -10 || p.x > W + 10 || p.y < -10) spawn(p);
       }
-      /* the layer slowly re-evaporates so it never saturates */
-      for (let i = 0; i < buckets.length; i++) buckets[i] = Math.max(0, buckets[i] - 0.004 * dt);
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
-      /* source: a warm glowing line (cached) */
-      const sg = sourceGlow();
-      ctx.drawImage(sg, x0 - 40, srcY - 40, sg.width / DPR, sg.height / DPR);
-      /* substrate: a cool thin line with the deposited layer beneath it */
-      ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x0, subY); ctx.lineTo(x1, subY); ctx.stroke();
-      ctx.save();
       ctx.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < buckets.length; i++) {
-        const h = buckets[i];
-        if (h <= 0.05) continue;
-        const lg = ctx.createLinearGradient(0, subY, 0, subY + h);
-        lg.addColorStop(0, 'rgba(233,220,253,0.9)'); lg.addColorStop(1, 'rgba(108,18,248,0.15)');
-        ctx.fillStyle = lg;
-        ctx.fillRect(x0 + i * BUCKET, subY + 0.5, BUCKET - 0.5, h);
-      }
-      /* vapour */
       for (const p of ps) {
-        const rise = Math.max(0, Math.min(1, (srcY - p.y) / (srcY - subY)));
-        const [r, gg, b] = colour(rise);
-        const fadeIn = Math.min(1, p.age / 30);
-        const a = (0.25 + 0.55 * (1 - Math.abs(rise - 0.45) * 1.2)) * fadeIn;
-        ctx.fillStyle = `rgba(${r},${gg},${b},${Math.max(0.05, a)})`;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.s * (0.8 + rise * 0.5), 0, Math.PI * 2); ctx.fill();
+        const rise = Math.max(0, Math.min(1, (ey - p.y) / travel));
+        const [r, g, b] = colour(Math.min(1, rise / 0.8));
+        const fadeIn = Math.min(1, p.age / 25);
+        const fadeOut = 1 - Math.max(0, (rise - p.span * 0.7) / (p.span * 0.3));
+        const a = (0.4 + 0.55 * (1 - rise)) * fadeIn * Math.max(0, fadeOut);
+        ctx.fillStyle = `rgba(${r},${g},${b},${Math.max(0.03, a).toFixed(3)})`;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.s * (0.8 + rise * 0.6), 0, Math.PI * 2); ctx.fill();
       }
-      ctx.restore();
+      ctx.globalCompositeOperation = 'source-over';
     };
 
     layout();
     for (let i = 0; i < N; i++) {
-      const p = spawn({ x: 0, y: 0, vx: 0, vy: 0, s: 1, age: 0, life: 1, ph: 0 });
-      p.y = srcY - Math.random() * (srcY - subBase); // pre-fill the column
+      const p = spawn({ x: 0, y: 0, vx: 0, vy: 0, s: 1, age: 0, ph: 0, span: 1 });
+      p.y = ey - Math.random() * travel * p.span; // pre-fill the plume
       p.age = 40;
       ps.push(p);
     }
@@ -521,9 +555,8 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     const stop = () => { running = false; cancelAnimationFrame(raf); };
 
     if (reduce) {
-      /* one settled still: advance the simulation without drawing */
       const now = performance.now();
-      for (let i = 0; i < 420; i++) step(now + i * 16.67);
+      for (let i = 0; i < 300; i++) step(now + i * 16.67);
       draw();
     } else {
       new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }, { threshold: 0.05 }).observe(root);
@@ -535,7 +568,5 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
       window.clearTimeout(rt);
       rt = window.setTimeout(() => { layout(); ps.forEach(spawn); if (reduce) draw(); }, 150);
     });
-
-    root.setAttribute('data-ready', '');
   }
 </script>

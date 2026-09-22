@@ -22,9 +22,6 @@ export const home: HomeContent = {
     ctaSecondary: 'Explora el producto',
     photoAlt: `La cámara de vidrio de ${name} sobre una mesa, junto a su documentación y un sustrato de muestra`,
     field: {
-      source: 'fuente',
-      substrate: 'sustrato',
-      distance: 'd · distancia fuente–sustrato',
       marquee: ['Electrónica orgánica', 'Sensores', 'Perovskitas', 'Recubrimientos', 'Preparación de muestras para SPM', 'Nuevas combinaciones material–superficie'],
     },
   },

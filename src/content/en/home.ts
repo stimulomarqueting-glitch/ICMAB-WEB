@@ -23,12 +23,8 @@ export const home = {
     ctaPrimary: 'Talk to the team',
     ctaSecondary: 'Explore the product',
     photoAlt: `The ${name} glass chamber on a table, next to its documentation and a sample substrate`,
-    /** labels of the animated sublimation field (HeroField variant) */
+    /** HeroField variant: slow marquee along the bottom edge */
     field: {
-      source: 'source',
-      substrate: 'substrate',
-      distance: 'd · source–substrate distance',
-      /** slow marquee along the bottom edge */
       marquee: ['Organic electronics', 'Sensors', 'Perovskites', 'Coatings', 'SPM sample preparation', 'New material–surface combinations'],
     },
   },

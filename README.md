@@ -88,15 +88,16 @@ throws at build time if an entry has no translation.
 
 ### Home hero variants
 
-`src/config/hero.ts` picks the home hero. `HeroField.astro` (default) draws the
-sublimation process live on a canvas — particles leave the heated source,
-cool as they rise and condense on the substrate while the distance `d`
-breathes; the pointer disturbs the vapour, a marquee of application fields
-runs along the bottom and the headline rises word by word. It pauses
-off-screen and when the tab is hidden, renders a single still under
-`prefers-reduced-motion`, and needs no JS for the copy to show. `Hero.astro`
-is the previous full-bleed duotone photo. Both read `home.hero`; the field
-labels live in `home.hero.field`.
+`src/config/hero.ts` picks the home hero. `HeroField.astro` (default) puts the
+product photo on a plate that tilts in 3D with the pointer — layers at
+different depths (violet halo and shadow behind, the photo, a sheen sweeping
+the glass, the vapour in front) — while particles rise out of the chamber
+in the photo, cooling from coral to violet. The headline rises word by word
+and a marquee of application fields runs along the bottom edge. It pauses
+off-screen and when the tab is hidden, renders a single still (no tilt, no
+float) under `prefers-reduced-motion`, and needs no JS for the copy to
+show. `Hero.astro` is the previous full-bleed duotone photo. Both read
+`home.hero`; the marquee items live in `home.hero.field.marquee`.
 
 ### Team showcase (top of `/team`)
 
