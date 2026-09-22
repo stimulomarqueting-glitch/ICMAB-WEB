@@ -1,8 +1,12 @@
 ---
 /**
- * Compact "who it's for" block (home): four profiles with the approved
- * line icons, one sentence each. The full audience context lives on
- * /product (FAQ) and /applications.
+ * "Who it's for" (home): four audiences as expanding panels. On desktop
+ * one panel is active at a time — it grows, turns plum, shows its
+ * description and carries a vapour spotlight that follows the pointer —
+ * while the others rest as white tiles with icon and title. The active
+ * panel cycles slowly until the visitor hovers, focuses or taps one.
+ * Below 64rem every panel is open in a plain grid. Motion-safe: reduced
+ * motion gets the open grid with no cycling.
  */
 import { getContent } from '../content';
 import { getLocale } from '../i18n';
@@ -28,18 +32,26 @@ const icons: Record<string, string> = {
   <div class="container">
     <SectionHeader kicker={t.kicker} title={t.title} id="audiences-title" />
 
-    <div class="aud__grid">
-      {t.groups.map((g) => (
-        <article class="panel aud__card reveal">
+    <div class="aud reveal" data-audiences data-interval="3800">
+      {t.groups.map((g, i) => (
+        <article
+          class="aud__panel"
+          data-index={i}
+          data-active={i === 0 ? '' : undefined}
+          tabindex="0"
+          aria-labelledby={`aud-${i}`}
+        >
+          <span class="aud__spot" aria-hidden="true"></span>
           <span class="aud__icon" aria-hidden="true">
             <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d={icons[g.icon] ?? icons.lab}></path>
             </svg>
           </span>
-          <div>
-            <h3>{g.title}</h3>
+          <h3 class="aud__title" id={`aud-${i}`}>{g.title}</h3>
+          <div class="aud__more">
             <p>{g.text}</p>
           </div>
+          <span class="aud__layer" aria-hidden="true"></span>
         </article>
       ))}
     </div>
@@ -47,43 +59,243 @@ const icons: Record<string, string> = {
 </section>
 
 <style>
-  .aud__grid {
+  .aud {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-top: 2.25rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
   }
 
-  .aud__card {
-    padding: 1.5rem;
+  .aud__panel {
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
-    align-items: flex-start;
+    padding: 1.6rem 1.6rem 1.9rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    color: var(--ink);
+    cursor: default;
+    --mx: 50%;
+    --my: 40%;
+    transition:
+      background-color 500ms var(--ease),
+      border-color 500ms var(--ease),
+      color 500ms var(--ease),
+      box-shadow 500ms var(--ease),
+      flex-grow 650ms var(--ease-out);
+  }
+
+  .aud__panel:focus-visible {
+    outline: 2px solid var(--violet);
+    outline-offset: 3px;
+  }
+
+  /* vapour spotlight, driven by the pointer position */
+  .aud__spot {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background:
+      radial-gradient(38% 45% at var(--mx) var(--my), rgba(108, 18, 248, 0.55), transparent 70%),
+      radial-gradient(26% 30% at calc(var(--mx) - 12%) calc(var(--my) + 18%), rgba(240, 83, 47, 0.32), transparent 70%);
+    transition: opacity 500ms var(--ease);
   }
 
   .aud__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: var(--coral-tint);
     color: var(--coral-dark);
-    flex: none;
-    width: 1.75rem;
-    height: 1.75rem;
+    transition: background-color 500ms var(--ease), color 500ms var(--ease);
   }
 
-  .aud__card h3 {
+  .aud__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .aud__title {
+    position: relative;
     font-family: var(--font-body);
-    font-size: 1.06rem;
+    font-size: 1.19rem;
+    line-height: 1.25;
+    max-width: 14ch;
+    color: var(--ink);
+    transition: color 500ms var(--ease);
   }
 
-  .aud__card p {
-    font-size: 0.88rem;
-    margin-top: 0.4rem;
+  .aud__more {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 550ms var(--ease-out), opacity 450ms var(--ease);
   }
 
-  @media (max-width: 56rem) {
-    .aud__grid { grid-template-columns: 1fr 1fr; }
+  .aud__more p {
+    overflow: hidden;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--text-body);
+    transition: color 500ms var(--ease);
+  }
+
+  /* the deposited layer draws along the base of the active panel */
+  .aud__layer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: var(--grad-vapor-line);
+    transition: width 900ms var(--ease-out);
+  }
+
+  /* active / hovered: plum tile with the spotlight on */
+  .aud__panel[data-active],
+  .aud__panel:hover {
+    background: var(--bg-inverse);
+    border-color: transparent;
+    color: var(--text-on-dark);
+    box-shadow: var(--shadow-md);
+  }
+
+  .aud__panel[data-active] .aud__spot,
+  .aud__panel:hover .aud__spot {
+    opacity: 1;
+  }
+
+  .aud__panel[data-active] .aud__icon,
+  .aud__panel:hover .aud__icon {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  .aud__panel[data-active] .aud__title,
+  .aud__panel:hover .aud__title {
+    color: #fff;
+  }
+
+  .aud__panel[data-active] .aud__more p,
+  .aud__panel:hover .aud__more p {
+    color: var(--text-on-dark-2);
+  }
+
+  .aud__panel[data-active] .aud__layer {
+    width: 100%;
+  }
+
+  /* desktop: a row of panels, the active one wide with its text open */
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .aud {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .aud__panel {
+      flex: 1 1 0;
+      min-height: 19rem;
+      justify-content: flex-end;
+    }
+
+    .aud__panel[data-active] {
+      flex-grow: 2.3;
+    }
+
+    .aud__icon {
+      margin-bottom: auto;
+    }
+
+    .aud__more {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+
+    .aud__panel[data-active] .aud__more {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    .aud__panel[data-active] .aud__title {
+      max-width: 24ch;
+    }
   }
 
   @media (max-width: 40rem) {
-    .aud__grid { grid-template-columns: 1fr; }
+    .aud {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aud__panel,
+    .aud__spot,
+    .aud__icon,
+    .aud__more,
+    .aud__layer {
+      transition: none;
+    }
+
+    .aud__layer {
+      width: 100%;
+    }
   }
 </style>
+
+<script>
+  /**
+   * Audiences: hover/focus/tap makes a panel active; the spotlight tracks
+   * the pointer inside the hovered panel. Until the visitor interacts the
+   * active panel cycles every few seconds (desktop, motion-safe only),
+   * pausing while hovered and when the row is off-screen.
+   */
+  const root = document.querySelector<HTMLElement>('[data-audiences]');
+
+  if (root) {
+    const panels = [...root.querySelectorAll<HTMLElement>('.aud__panel')];
+    const interval = Number(root.dataset.interval) || 3800;
+    const desktop = window.matchMedia('(min-width: 64rem)');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let active = 0;
+    let engaged = false; // set once the visitor picks a panel; stops the cycling
+    let timer: number | undefined;
+
+    const activate = (i: number) => {
+      active = i;
+      panels.forEach((p, k) => p.toggleAttribute('data-active', k === i));
+    };
+
+    const stop = () => { if (timer !== undefined) window.clearInterval(timer); timer = undefined; };
+    const start = () => {
+      stop();
+      if (reduce || engaged || !desktop.matches || document.hidden) return;
+      timer = window.setInterval(() => activate((active + 1) % panels.length), interval);
+    };
+
+    panels.forEach((p, i) => {
+      p.addEventListener('pointerenter', () => { engaged = true; stop(); activate(i); });
+      p.addEventListener('focus', () => { engaged = true; stop(); activate(i); });
+      p.addEventListener('click', () => { engaged = true; stop(); activate(i); });
+      p.addEventListener('pointermove', (e) => {
+        const r = p.getBoundingClientRect();
+        p.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
+        p.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
+      });
+    });
+
+    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+    desktop.addEventListener('change', start);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.4 }).observe(root);
+    } else {
+      start();
+    }
+  }
+</script>
