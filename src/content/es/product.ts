@@ -78,19 +78,19 @@ export const product: ProductContent = {
     title: 'Lo que el dispositivo cambia para tu equipo',
     outcomes: [
       {
-        title: 'Menos material por respuesta',
+        icon: 'material', title: 'Menos material por respuesta',
         text: 'Gracias al tamaño reducido de la tecnología, unos pocos miligramos pueden ser suficientes: algo decisivo para moléculas novedosas y costosas o materiales muy valiosos, donde las decisiones se toman con miligramos.',
       },
       {
-        title: 'Más condiciones ensayadas por semana',
+        icon: 'conditions', title: 'Más condiciones ensayadas por semana',
         text: 'Deposiciones directas, rápidas y sencillas que facilitan explorar más condiciones experimentales en ciclos de investigación más cortos.',
       },
       {
-        title: 'Autonomía para todo el grupo',
+        icon: 'group', title: 'Autonomía para todo el grupo',
         text: 'Un flujo de trabajo compacto y sencillo facilita integrar la deposición sobre superficies en el laboratorio y utilizarla en todo el equipo de investigación.',
       },
       {
-        title: 'Resultados defendibles',
+        icon: 'defensible', title: 'Resultados defendibles',
         text: 'El material se deposita directamente sobre el sustrato seleccionado, de modo que la superficie que evalúas es la superficie que preparaste.',
       },
     ],

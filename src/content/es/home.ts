@@ -58,10 +58,10 @@ export const home: HomeContent = {
     kicker: 'Beneficios',
     title: 'Lo que gana tu equipo',
     outcomes: [
-      { title: 'Menos material por respuesta', text: 'Unos pocos miligramos pueden ser suficientes: los materiales costosos o valiosos siguen siendo viables para ensayar.' },
-      { title: 'Más condiciones ensayadas por semana', text: 'Deposiciones directas, rápidas y sencillas que acortan los ciclos de investigación.' },
-      { title: 'Autonomía para todo el grupo', text: 'Un flujo de trabajo compacto que puede utilizar todo el equipo de investigación.' },
-      { title: 'Resultados defendibles', text: 'La superficie que evalúas es la superficie que preparaste.' },
+      { icon: 'material', title: 'Menos material por respuesta', text: 'Unos pocos miligramos pueden ser suficientes: los materiales costosos o valiosos siguen siendo viables para ensayar.' },
+      { icon: 'conditions', title: 'Más condiciones ensayadas por semana', text: 'Deposiciones directas, rápidas y sencillas que acortan los ciclos de investigación.' },
+      { icon: 'group', title: 'Autonomía para todo el grupo', text: 'Un flujo de trabajo compacto que puede utilizar todo el equipo de investigación.' },
+      { icon: 'defensible', title: 'Resultados defendibles', text: 'La superficie que evalúas es la superficie que preparaste.' },
     ],
   },
 

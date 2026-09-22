@@ -1,39 +1,63 @@
 ---
 /**
- * Outcome band — the dark beat of a page (plum-violet, v3).
- * Props-driven so home and /product can show different depths of copy.
+ * Outcome band — the dark beat of a page (plum-violet, v3): four glass
+ * cards on the plum backdrop, each with a single-weight line icon, a mono
+ * index and, along its base, the deposited layer — a vapour line that
+ * draws itself when the card enters the viewport. Props-driven so home
+ * and /product can show different depths of copy.
  */
 import SectionHeader from './SectionHeader.astro';
 
 interface Props {
   kicker: string;
   title: string;
-  outcomes: readonly { title: string; text: string }[];
+  outcomes: readonly { icon?: string; title: string; text: string }[];
   id?: string;
 }
 
 const { kicker, title, outcomes, id = 'benefits-title' } = Astro.props;
+
+/* line icons, one per benefit: vial (little material) · dot matrix (many
+   conditions) · people (the whole group) · shield-check (defensible) */
+const icons: Record<string, string> = {
+  material: 'M10.5 4h7M12 4v7.5M16 4v7.5M12 11.5 8.8 20.2A2 2 0 0 0 10.7 23h6.6a2 2 0 0 0 1.9-2.8L16 11.5M10.2 17h7.6',
+  conditions: 'M8 8h.01M14 8h.01M20 8h.01M8 14h.01M14 14h.01M20 14h.01M8 20h.01M14 20h.01M20 20h.01',
+  group: 'M10.5 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM18.5 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM4.5 22a6 6 0 0 1 12 0M16.5 22a4.5 4.5 0 0 1 7-3.7',
+  defensible: 'M14 4.5l7.5 2.8v5.4c0 4.8-3.2 8.3-7.5 10-4.3-1.7-7.5-5.2-7.5-10V7.3L14 4.5ZM10.6 14.2l2.4 2.4 4.6-4.8',
+};
 ---
 
 <section class="sec bene--dark" id="benefits" aria-labelledby={id}>
+  <div class="bene__glow" aria-hidden="true"></div>
   <div class="container">
     <SectionHeader kicker={kicker} title={title} id={id} />
 
-    <div class="bene__grid">
-      {outcomes.map((o) => (
-        <div class="bene__outcome reveal">
+    <ol class="bene__grid" role="list">
+      {outcomes.map((o, i) => (
+        <li class="bene__outcome reveal" style={`--i: ${i}`}>
+          <div class="bene__head">
+            <span class="bene__icon" aria-hidden="true">
+              <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d={icons[o.icon ?? ''] ?? icons.conditions} stroke-width={o.icon === 'conditions' ? 2.6 : 1.5}></path>
+              </svg>
+            </span>
+            <span class="bene__index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          </div>
           <h3>{o.title}</h3>
           <p>{o.text}</p>
-        </div>
+          <span class="bene__layer" aria-hidden="true"></span>
+        </li>
       ))}
-    </div>
+    </ol>
   </div>
 </section>
 
 <style>
   .bene--dark {
     position: relative;
+    overflow: hidden;
     background: var(--bg-inverse);
+    isolation: isolate;
   }
 
   /* deposition dots resting on the section's top edge */
@@ -51,6 +75,16 @@ const { kicker, title, outcomes, id = 'benefits-title' } = Astro.props;
     opacity: 0.6;
   }
 
+  /* the vapour glow of the hero, much quieter */
+  .bene__glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(45% 60% at 85% 20%, rgba(108, 18, 248, 0.28), transparent 70%),
+      radial-gradient(35% 45% at 8% 100%, rgba(240, 83, 47, 0.14), transparent 70%);
+  }
+
   .bene--dark :global(.eyebrow) {
     color: var(--lavender);
   }
@@ -62,13 +96,67 @@ const { kicker, title, outcomes, id = 'benefits-title' } = Astro.props;
   .bene__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0 4rem;
-    margin-top: 2rem;
+    gap: 1.25rem;
+    margin: 2.25rem 0 0;
+    padding: 0;
+    list-style: none;
   }
 
+  /* glass card on plum */
   .bene__outcome {
-    padding: 1.25rem 0;
-    border-top: 1px solid rgba(248, 246, 243, 0.16);
+    position: relative;
+    overflow: hidden;
+    padding: 1.6rem 1.75rem 1.9rem;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: border-color var(--dur-base) var(--ease), background-color var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+    transition-delay: calc(var(--i) * 80ms);
+  }
+
+  .bene__outcome:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(167, 47, 158, 0.55);
+    transform: translateY(-2px);
+    transition-delay: 0ms;
+  }
+
+  .bene__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.1rem;
+  }
+
+  .bene__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: rgba(233, 220, 253, 0.08);
+    border: 1px solid rgba(233, 220, 253, 0.16);
+    color: var(--lavender, #cdb8f6);
+    transition: color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+  }
+
+  .bene__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .bene__outcome:hover .bene__icon {
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(108, 18, 248, 0.18), 0 0 28px rgba(108, 18, 248, 0.35);
+  }
+
+  .bene__index {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--text-on-dark-2);
   }
 
   .bene__outcome h3 {
@@ -83,10 +171,38 @@ const { kicker, title, outcomes, id = 'benefits-title' } = Astro.props;
     color: var(--text-on-dark-2);
   }
 
+  /* the deposited layer draws along the base once the card is in view */
+  .bene__layer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: var(--grad-vapor-line);
+    box-shadow: 0 0 14px rgba(206, 66, 98, 0.55);
+    transition: width 1100ms var(--ease-out);
+    transition-delay: calc(240ms + var(--i) * 140ms);
+  }
+
+  .bene__outcome.is-visible .bene__layer {
+    width: 100%;
+  }
+
   @media (max-width: 56rem) {
     .bene__grid {
       grid-template-columns: 1fr;
-      gap: 0;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bene__layer {
+      transition: none;
+      width: 100%;
+    }
+
+    .bene__outcome {
+      transition: none;
     }
   }
 </style>

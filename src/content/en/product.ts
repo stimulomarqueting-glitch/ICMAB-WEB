@@ -81,19 +81,19 @@ export const product = {
     title: 'What the device changes for your team',
     outcomes: [
       {
-        title: 'Less material per answer',
+        icon: 'material', title: 'Less material per answer',
         text: 'Thanks to the reduced size of the technology, a few milligrams can be enough — decisive for novel, costly molecules or very valuable materials, where decisions are taken on milligrams.',
       },
       {
-        title: 'More conditions tested per week',
+        icon: 'conditions', title: 'More conditions tested per week',
         text: 'Fast and straightforward direct depositions make it easier to explore more experimental conditions in shorter research cycles.',
       },
       {
-        title: 'Autonomy for the whole group',
+        icon: 'group', title: 'Autonomy for the whole group',
         text: 'A compact and straightforward workflow makes surface deposition easier to integrate into the laboratory and use across the research team.',
       },
       {
-        title: 'Defensible results',
+        icon: 'defensible', title: 'Defensible results',
         text: 'Material is deposited directly on the selected substrate, so the surface you evaluate is the surface you prepared.',
       },
     ],
