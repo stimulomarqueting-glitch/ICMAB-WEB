@@ -18,7 +18,7 @@ accordion, scroll reveal).
 | `/product` | Full product/technology explanation: differentiator (controllable source–substrate distance), how it works, parameters, benefits, FAQ | Discuss your research → `/contact?interest=product` |
 | `/applications` | Six confirmed use cases (need → with MatSurfer → benefit), each with an anchor and contextual CTA | Discuss this application → `/contact?interest=application&application=<slug>` |
 | `/research` | Expert experiences, publications, Validation & IP (renders only published entries) | Explore a collaboration → `/contact?interest=research` |
-| `/team` | Confirmed profiles, grouped; published-only | Talk to the team → `/contact?interest=partnership` |
+| `/team` | Full-viewport team showcase (published profiles only) + "from the lab to the bench" | Talk to the team → `/contact?interest=partnership` |
 | `/contact` | Conversion page: light lead form with interest preselection | — |
 | `/es`, `/es/product`, … | The same six pages in Spanish (same slugs, `/es` prefix) | same CTAs, prefixed |
 
@@ -91,13 +91,20 @@ throws at build time if an entry has no translation.
 studio backdrop, with the page headline on the left, the active bio on the
 right and an avatar picker along the bottom. It uses two images per person:
 
-- `image` — the square 800×800 portrait (avatar thumbnail and the card grid);
+- `image` — the square 800×800 portrait (avatar thumbnail);
 - `showcaseImage` — the same person cut out from the background, as a WebP
   with alpha, up to 1600px tall, anchored to the bottom edge. Produce it
   with any portrait matting tool (the current ones were made locally with
   `rembg` and the BiRefNet portrait model, then trimmed to the opaque
   bounding box). A profile without `showcaseImage` renders a monogram
   stand-in, and the showcase opens on the first profile that has one.
+
+The showcase rotates every 5.5 s (`data-interval` on the section), pauses
+while hovered or focused, when scrolled out of view or the tab is hidden,
+restarts after a manual pick, and does not autoplay under
+`prefers-reduced-motion`. Under it, `TeamJourney.astro` renders the
+"from the lab to the bench" section from `teamPage.journey` — draft copy,
+marked as such in the content file, to be rewritten by the client.
 
 ### Publish-gated content (no fillers, no "coming soon")
 

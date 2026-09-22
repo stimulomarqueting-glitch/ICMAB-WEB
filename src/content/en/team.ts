@@ -8,21 +8,8 @@ import type { TeamMember } from '../types';
  */
 
 /**
- * Profile groups, rendered in this order when they contain published members.
- * TODO(client): confirm which groups apply once profiles are approved.
- */
-export const teamGroups: { key: string; title: string }[] = [
-  { key: 'scientific-leadership', title: 'Scientific leadership' },
-  { key: 'technology-product', title: 'Technology and product' },
-  { key: 'technology-transfer', title: 'Technology transfer' },
-  { key: 'advisory', title: 'Business and advisory support' },
-];
-
-/**
  * Confirmed profiles from ICMAB (Material_Web, 2026-09-16): names, roles,
  * affiliations, approved bios and LinkedIn links exactly as supplied.
- * Members are left ungrouped on purpose — four profiles read better as a
- * single row than split across `teamGroups` headings.
  *
  * Photo–name mapping confirmed by the client (2026-09-22). Three portraits
  * arrived unnamed; Núria's is still pending, so her card falls back to a
@@ -100,6 +87,40 @@ export const teamPage = {
     show: 'Show',
     /** shown instead of a bio when a profile has none yet */
     noBio: 'Profile coming soon.',
+  },
+  /**
+   * "From the lab to the bench" — the section under the showcase.
+   * TODO(client): DRAFT copy. The facts repeat figures already published in
+   * the approved IP & validation text and the publications list; the step
+   * texts are placeholders for Stimulo/ICMAB to rewrite.
+   */
+  journey: {
+    kicker: 'From the lab to the bench',
+    title: 'One technology, three kinds of work',
+    lead: 'MatSurfer exists because surface research, technology transfer and product development happen in the same place.',
+    steps: [
+      {
+        title: 'Research',
+        text: 'The device grows out of the day-to-day work of the FunNanoSurf group at ICMAB-CSIC, where direct surface functionalization is a research tool before it is a product.',
+      },
+      {
+        title: 'Protection and validation',
+        text: 'The technology is protected by European and Spanish patents and has been validated externally by research groups and a company, in their own laboratories.',
+      },
+      {
+        title: 'Product',
+        text: 'MatSurfer turns that experience into a compact benchtop device for lab-scale R&D, with early-access opportunities opening up.',
+      },
+    ],
+    facts: [
+      { value: '2', label: 'patents' },
+      { value: '8', label: 'research groups' },
+      { value: '1', label: 'company' },
+      { value: '2', label: 'open-access publications' },
+    ],
+    factsNote: 'External validations and publications as listed on the Case Studies page.',
+    factsLink: 'See the case studies',
+    factsHref: '/research',
   },
   finalCta: {
     title: 'Talk to the team',

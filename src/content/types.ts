@@ -67,8 +67,6 @@ export interface TeamMember {
   name: string;
   role: string;
   affiliation: string;
-  /** grouping key — renders under the matching heading in `teamGroups` */
-  group?: string;
   /** short bio, when available */
   bio?: string;
   /** path under /public, e.g. '/img/team/jane-doe.jpg' */

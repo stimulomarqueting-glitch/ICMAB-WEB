@@ -34,13 +34,6 @@ export const teamMembers: TeamMember[] = en.map((m) => {
   return { ...m, ...t };
 });
 
-export const teamGroups: { key: string; title: string }[] = [
-  { key: 'scientific-leadership', title: 'Dirección científica' },
-  { key: 'technology-product', title: 'Tecnología y producto' },
-  { key: 'technology-transfer', title: 'Transferencia de tecnología' },
-  { key: 'advisory', title: 'Apoyo empresarial y asesoramiento' },
-];
-
 export const teamPage: TeamPageContent = {
   breadcrumb: 'Equipo',
   profilesLabel: 'Perfiles del equipo',
@@ -61,6 +54,35 @@ export const teamPage: TeamPageContent = {
     pickerLabel: 'Miembros del equipo',
     show: 'Mostrar a',
     noBio: 'Perfil disponible próximamente.',
+  },
+  // TODO(client): texto PROVISIONAL, pendiente de reescritura (ver en/team.ts).
+  journey: {
+    kicker: 'Del laboratorio a la mesa de trabajo',
+    title: 'Una tecnología, tres tipos de trabajo',
+    lead: 'MatSurfer existe porque la investigación en superficies, la transferencia de tecnología y el desarrollo de producto ocurren en el mismo lugar.',
+    steps: [
+      {
+        title: 'Investigación',
+        text: 'El dispositivo nace del trabajo diario del grupo FunNanoSurf del ICMAB-CSIC, donde la funcionalización directa de superficies es una herramienta de investigación antes que un producto.',
+      },
+      {
+        title: 'Protección y validación',
+        text: 'La tecnología está protegida por una patente europea y otra española, y se ha validado externamente con grupos de investigación y una empresa, en sus propios laboratorios.',
+      },
+      {
+        title: 'Producto',
+        text: 'MatSurfer convierte esa experiencia en un dispositivo compacto de sobremesa para I+D a escala de laboratorio, con oportunidades de acceso anticipado que empiezan a abrirse.',
+      },
+    ],
+    facts: [
+      { value: '2', label: 'patentes' },
+      { value: '8', label: 'grupos de investigación' },
+      { value: '1', label: 'empresa' },
+      { value: '2', label: 'publicaciones en acceso abierto' },
+    ],
+    factsNote: 'Validaciones externas y publicaciones tal como se recogen en la página de Casos de estudio.',
+    factsLink: 'Ver los casos de estudio',
+    factsHref: '/research',
   },
   finalCta: {
     title: 'Habla con el equipo',

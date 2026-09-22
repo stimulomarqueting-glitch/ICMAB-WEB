@@ -1,14 +1,15 @@
 ---
 /**
- * /team — the people behind the device, grouped when groups apply.
+ * /team — the people behind the device: full-viewport showcase, then the
+ * "from the lab to the bench" section, contact panel and final CTA.
  * Only `published: true` profiles render; no invented bios or photos.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import PageHero from '../../components/PageHero.astro';
 import PageCTA from '../../components/PageCTA.astro';
-import TeamCard from '../../components/TeamCard.astro';
 import TeamShowcase from '../../components/TeamShowcase.astro';
+import TeamJourney from '../../components/TeamJourney.astro';
 import Footer from '../../components/Footer.astro';
 import { brand } from '../../config/brand';
 import { SITE_URL } from '../../config/site.mjs';
@@ -17,18 +18,11 @@ import { getLocale, localeStaticPaths } from '../../i18n';
 
 export const getStaticPaths = localeStaticPaths;
 
-const { teamMembers, teamGroups, teamPage, site } = getContent(getLocale(Astro.url));
+const { teamMembers, teamPage, site } = getContent(getLocale(Astro.url));
 
 const members = teamMembers
   .filter((m) => m.published)
   .sort((a, b) => a.order - b.order);
-
-/* groups that actually have published members, in configured order;
-   ungrouped members render in a single list after them */
-const grouped = teamGroups
-  .map((g) => ({ ...g, members: members.filter((m) => m.group === g.key) }))
-  .filter((g) => g.members.length > 0);
-const ungrouped = members.filter((m) => !m.group || !teamGroups.some((g) => g.key === m.group));
 
 /* Person JSON-LD only for published profiles — never invented */
 const peopleJsonLd = members.map((m) => ({
@@ -52,26 +46,7 @@ const peopleJsonLd = members.map((m) => ({
       <PageHero kicker={teamPage.kicker} title={teamPage.title} lead={teamPage.lead} />
     )}
 
-    {(grouped.length > 0 || ungrouped.length > 0) && (
-      <section class="sec hairtop" aria-label={teamPage.profilesLabel}>
-        <div class="container">
-          {grouped.map((g) => (
-            <div class="team__group" id={g.key}>
-              <h2 class="team__group-title">{g.title}</h2>
-              <div class="team__grid">
-                {g.members.map((m) => <TeamCard member={m} />)}
-              </div>
-            </div>
-          ))}
-
-          {ungrouped.length > 0 && (
-            <div class="team__grid team__group">
-              {ungrouped.map((m) => <TeamCard member={m} />)}
-            </div>
-          )}
-        </div>
-      </section>
-    )}
+    <TeamJourney />
 
     <section class="sec hairtop" aria-labelledby="team-contact-title">
       <div class="container">
@@ -97,28 +72,6 @@ const peopleJsonLd = members.map((m) => ({
 </BaseLayout>
 
 <style>
-  .team__group {
-    margin-top: 1rem;
-    scroll-margin-top: calc(var(--header-h) + 1rem);
-  }
-
-  .team__group + .team__group {
-    margin-top: 2.75rem;
-  }
-
-  .team__group-title {
-    font-size: 1.35rem;
-  }
-
-  /* four profiles fill one row; card styling lives in TeamCard.astro */
-  .team__grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-    align-items: stretch;
-  }
-
   .page__contact {
     padding: 1.75rem 2rem;
     max-width: 34rem;
@@ -133,16 +86,4 @@ const peopleJsonLd = members.map((m) => ({
     margin-top: 0.5rem;
   }
 
-  /* below four-up, keep the cards from ballooning: two centred columns */
-  @media (max-width: 72rem) {
-    .team__grid {
-      grid-template-columns: repeat(2, 1fr);
-      max-width: 40rem;
-      margin-inline: auto;
-    }
-  }
-
-  @media (max-width: 40rem) {
-    .team__grid { grid-template-columns: 1fr; }
-  }
 </style>

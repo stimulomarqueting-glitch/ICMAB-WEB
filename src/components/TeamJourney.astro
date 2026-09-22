@@ -1,0 +1,207 @@
+---
+/**
+ * "From the lab to the bench" — the section under the team showcase.
+ * Three stages joined by a vapour line, each with a big gradient numeral,
+ * then a row of figures that are already published elsewhere on the site
+ * (IP & validation text, publications). Copy lives in teamPage.journey and
+ * is marked as a draft there.
+ */
+import SectionHeader from './SectionHeader.astro';
+import { getContent } from '../content';
+import { getLocale, localePath } from '../i18n';
+
+const locale = getLocale(Astro.url);
+const { teamPage } = getContent(locale);
+const t = teamPage.journey;
+---
+
+<section class="sec hairtop mist--violet" aria-labelledby="journey-title">
+  <div class="container">
+    <SectionHeader kicker={t.kicker} title={t.title} lead={t.lead} id="journey-title" />
+
+    <ol class="journey" role="list">
+      {t.steps.map((step, i) => (
+        <li class="journey__step reveal" style={`--i: ${i}`}>
+          <span class="journey__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="journey__node" aria-hidden="true"></span>
+          <h3 class="journey__title">{step.title}</h3>
+          <p class="journey__text">{step.text}</p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="panel journey__facts reveal">
+      <dl class="journey__grid">
+        {t.facts.map((f) => (
+          <div class="journey__fact">
+            <dd class="journey__value">{f.value}</dd>
+            <dt class="journey__label">{f.label}</dt>
+          </div>
+        ))}
+      </dl>
+      <p class="journey__note">
+        {t.factsNote}
+        <a href={localePath(locale, t.factsHref)}>{t.factsLink}</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .journey {
+    --line: 1.1rem; /* vertical position of the connecting line */
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    list-style: none;
+    margin: 3rem 0 0;
+    padding: 0;
+  }
+
+  /* one vapour line runs behind the three nodes */
+  .journey::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--line) + 3.2rem);
+    left: 0.6rem;
+    right: 0.6rem;
+    height: 2px;
+    background: var(--grad-vapor-line, var(--grad-vapor));
+    opacity: 0.55;
+  }
+
+  .journey__step {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    /* stagger the reveal a touch per step */
+    transition-delay: calc(var(--i) * 90ms);
+  }
+
+  .journey__num {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 4vw, 3.6rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    background: var(--grad-vapor);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .journey__node {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0.5rem 0 0.9rem;
+    border-radius: 50%;
+    background: var(--bg-page);
+    border: 2px solid var(--violet);
+    box-shadow: 0 0 0 6px var(--bg-mist-violet, #f2eafe);
+  }
+
+  .journey__step:nth-child(2) .journey__node { border-color: var(--magenta, #ce4262); }
+  .journey__step:nth-child(3) .journey__node { border-color: var(--coral); }
+
+  .journey__title {
+    font-family: var(--font-body);
+    font-size: 1.19rem;
+  }
+
+  .journey__text {
+    font-size: 0.94rem;
+    line-height: 1.6;
+    max-width: 34ch;
+  }
+
+  .journey__facts {
+    margin-top: 3rem;
+    padding: 1.75rem 2rem;
+    border-color: var(--border-violet-soft);
+  }
+
+  .journey__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin: 0;
+  }
+
+  .journey__fact {
+    display: grid;
+    gap: 0.25rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--border-subtle);
+  }
+
+  .journey__fact:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .journey__value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.4vw, 2.8rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+
+  .journey__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .journey__note {
+    margin-top: 1.5rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .journey__note a {
+    margin-left: 0.35rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 56rem) {
+    .journey {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding-left: 2.1rem;
+    }
+
+    /* the line turns vertical, running through the nodes */
+    .journey::before {
+      top: 0.5rem;
+      bottom: 0.5rem;
+      left: 0.5rem;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+
+    .journey__node {
+      position: absolute;
+      left: -2.1rem;
+      top: calc(var(--line) + 2.2rem);
+      margin: 0;
+    }
+
+    .journey__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .journey__fact:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+</style>
