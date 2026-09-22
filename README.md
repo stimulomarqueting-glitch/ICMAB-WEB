@@ -70,6 +70,7 @@ npm run preview   # preview the production build locally
 | Applications data (one entry per use case) | `src/content/en/applications.ts` (data) + `es/applications.ts` (texts by slug) |
 | Research data (experiences, publications, validation) | `src/content/en/research.ts` (data) + `es/research.ts` (texts) |
 | Team data (profiles + groups) | `src/content/en/team.ts` (data) + `es/team.ts` (roles + bios by name) |
+| Team showcase portraits (cut-outs with transparent background) | `public/img/team/showcase/<slug>.webp`, referenced by `showcaseImage` in `en/team.ts` — see below |
 | Contact copy + form labels | `src/content/{en,es}/contact.ts` |
 | Interest URL mapping (shared by both languages) | `src/content/shared.ts` |
 | Shared content types | `src/content/types.ts` |
@@ -83,6 +84,20 @@ Spanish counterpart fails `astro check`. Lists with non-translatable data
 (slugs, DOIs, photos, LinkedIn URLs, order, `published`) live once in
 `en/` — the Spanish file imports them and overrides only the texts, and
 throws at build time if an entry has no translation.
+
+### Team showcase (top of `/team`)
+
+`src/components/TeamShowcase.astro` shows one profile at a time over a plum
+studio backdrop, with the page headline on the left, the active bio on the
+right and an avatar picker along the bottom. It uses two images per person:
+
+- `image` — the square 800×800 portrait (avatar thumbnail and the card grid);
+- `showcaseImage` — the same person cut out from the background, as a WebP
+  with alpha, up to 1600px tall, anchored to the bottom edge. Produce it
+  with any portrait matting tool (the current ones were made locally with
+  `rembg` and the BiRefNet portrait model, then trimmed to the opaque
+  bounding box). A profile without `showcaseImage` renders a monogram
+  stand-in, and the showcase opens on the first profile that has one.
 
 ### Publish-gated content (no fillers, no "coming soon")
 

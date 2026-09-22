@@ -8,6 +8,7 @@ import Header from '../../components/Header.astro';
 import PageHero from '../../components/PageHero.astro';
 import PageCTA from '../../components/PageCTA.astro';
 import TeamCard from '../../components/TeamCard.astro';
+import TeamShowcase from '../../components/TeamShowcase.astro';
 import Footer from '../../components/Footer.astro';
 import { brand } from '../../config/brand';
 import { SITE_URL } from '../../config/site.mjs';
@@ -44,7 +45,12 @@ const peopleJsonLd = members.map((m) => ({
   <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
-    <PageHero kicker={teamPage.kicker} title={teamPage.title} lead={teamPage.lead} />
+    {/* full-viewport showcase carries the h1; the plain hero is the no-profile fallback */}
+    {members.length > 0 ? (
+      <TeamShowcase members={members} />
+    ) : (
+      <PageHero kicker={teamPage.kicker} title={teamPage.title} lead={teamPage.lead} />
+    )}
 
     {(grouped.length > 0 || ungrouped.length > 0) && (
       <section class="sec hairtop" aria-label={teamPage.profilesLabel}>

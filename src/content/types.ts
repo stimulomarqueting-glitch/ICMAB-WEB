@@ -73,6 +73,11 @@ export interface TeamMember {
   bio?: string;
   /** path under /public, e.g. '/img/team/jane-doe.jpg' */
   image?: string;
+  /**
+   * Cut-out portrait with a transparent background for the full-viewport
+   * showcase (WebP with alpha). Falls back to a monogram when missing.
+   */
+  showcaseImage?: string;
   linkedin?: string;
   website?: string;
   /** lower numbers render first */

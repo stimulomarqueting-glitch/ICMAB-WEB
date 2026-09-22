@@ -46,6 +46,7 @@ export const teamMembers: TeamMember[] = [
     affiliation: 'ICMAB-CSIC',
     bio: 'PhD in Chemistry, surface functionalization dreamer, always ready for new material developments and socially conscious.',
     image: '/img/team/arantzazu-gonzalez-campo.jpg',
+    showcaseImage: '/img/team/showcase/arantzazu-gonzalez-campo.webp',
     linkedin: 'https://www.linkedin.com/in/arantzazu-gonzalez-campo-b500798/',
     order: 2,
     published: true,
@@ -56,6 +57,7 @@ export const teamMembers: TeamMember[] = [
     affiliation: 'ICMAB-CSIC',
     bio: 'Chemist, PhD. Synthesis and catalysis. Organic semiconductors. Expertise in knowledge and technology transfer.',
     image: '/img/team/daniel-herrera.jpg',
+    showcaseImage: '/img/team/showcase/daniel-herrera.webp',
     linkedin: 'https://www.linkedin.com/in/dherreramiranda',
     order: 3,
     published: true,
@@ -66,6 +68,7 @@ export const teamMembers: TeamMember[] = [
     affiliation: 'ICMAB-CSIC',
     bio: 'PhD in Physical Chemistry, passionate about understanding what’s underneath nature. Bridging scientific results and the market creating social value.',
     image: '/img/team/coral-herranz-lancho.jpg',
+    showcaseImage: '/img/team/showcase/coral-herranz-lancho.webp',
     linkedin: 'https://www.linkedin.com/in/coral-herranz-lancho-phd/',
     order: 4,
     published: true,
@@ -88,6 +91,15 @@ export const teamPage = {
     /** appended to the person's name in the link's accessible name */
     linkedinOf: 'on LinkedIn',
     websiteOf: 'website',
+  },
+  /** full-viewport showcase at the top of the page */
+  showcase: {
+    /** accessible name of the avatar picker */
+    pickerLabel: 'Team members',
+    /** prefixed to the person's name on each avatar button */
+    show: 'Show',
+    /** shown instead of a bio when a profile has none yet */
+    noBio: 'Profile coming soon.',
   },
   finalCta: {
     title: 'Talk to the team',

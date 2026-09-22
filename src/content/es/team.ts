@@ -57,6 +57,11 @@ export const teamPage: TeamPageContent = {
     linkedinOf: 'en LinkedIn',
     websiteOf: 'sitio web',
   },
+  showcase: {
+    pickerLabel: 'Miembros del equipo',
+    show: 'Mostrar a',
+    noBio: 'Perfil disponible próximamente.',
+  },
   finalCta: {
     title: 'Habla con el equipo',
     text: 'Las consultas científicas, de colaboración o de acceso anticipado empiezan todas de la misma manera.',
