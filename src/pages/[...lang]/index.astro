@@ -112,10 +112,10 @@ const apps = applications
           caption={home.applications.isotype.caption}
           labels={home.applications.isotype.labels}
         />
-        <ul class="apps__links reveal" role="list">
-          {apps.map((app) => (
-            <li>
-              <a class="apps__chip" href={lp(`/applications#${app.slug}`)}>
+        <ul class="apps__links" role="list" data-apps-links>
+          {apps.map((app, i) => (
+            <li class="reveal" style={`--rd: ${i * 70}ms`}>
+              <a class="apps__chip" href={lp(`/applications#${app.slug}`)} data-field={app.slug}>
                 {app.title}
                 <span aria-hidden="true">→</span>
               </a>
@@ -160,6 +160,24 @@ const apps = applications
   </main>
   <Footer />
 </BaseLayout>
+
+<script>
+  /* a chip under the isotype lights up its field in the figure */
+  const chips = document.querySelectorAll<HTMLAnchorElement>('[data-apps-links] [data-field]');
+  const callouts = document.querySelectorAll<SVGGElement>('[data-isotype] .iso__callout[data-field]');
+  const setHot = (field: string | undefined, on: boolean) => {
+    callouts.forEach((c) => {
+      if (c.dataset.field === field) c.toggleAttribute('data-hot', on);
+    });
+  };
+  chips.forEach((chip) => {
+    const field = chip.dataset.field;
+    chip.addEventListener('pointerenter', () => setHot(field, true));
+    chip.addEventListener('pointerleave', () => setHot(field, false));
+    chip.addEventListener('focus', () => setHot(field, true));
+    chip.addEventListener('blur', () => setHot(field, false));
+  });
+</script>
 
 <style>
   /* ── value flow ──────────────────────────────────────────────────── */
@@ -319,7 +337,7 @@ const apps = applications
     font-weight: 600;
     font-size: 0.94rem;
     color: var(--ink);
-    transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+    transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur-base) var(--ease);
   }
 
   .apps__chip span {
@@ -327,9 +345,13 @@ const apps = applications
     transition: transform var(--dur-fast) var(--ease);
   }
 
-  .apps__chip:hover {
+  .apps__chip:hover,
+  .apps__chip:focus-visible {
     color: var(--coral-dark);
     border-color: var(--border-coral-soft);
+    background: linear-gradient(120deg, var(--coral-tint) 0%, var(--bg-panel) 60%);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
   }
 
   .apps__chip:hover span {

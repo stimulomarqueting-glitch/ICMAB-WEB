@@ -4,6 +4,12 @@
  * with callout lines to the five application fields (from the approved
  * brand system). Gradient runs coral (top) → violet (bottom) as in the
  * identity artwork.
+ *
+ * Animated: when the figure enters the viewport the capsule and the
+ * callout lines draw themselves and the labels settle in; the dots drift
+ * like vapour and the five highlighted ones pulse in turn. Each callout
+ * carries `data-field=<application slug>` so the chips below can light
+ * their field up on hover (see index.astro). Motion-safe only.
  */
 interface Props {
   alt: string;
@@ -41,17 +47,24 @@ function dotColor(cy: number): string {
   return `rgb(${mix(c1[0], c2[0], k)},${mix(c1[1], c2[1], k)},${mix(c1[2], c2[2], k)})`;
 }
 
-/* callouts: [target dot x, y, ring r, side, label, elbow y] */
-const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: string }[] = [
-  { x: 298, y: 58, r: 10, side: 'r', label: organicElectronics },
-  { x: 308, y: 152, r: 12, side: 'r', label: sensors },
-  { x: 310, y: 246, r: 14, side: 'r', label: coatings },
-  { x: 242, y: 150, r: 11, side: 'l', label: perovskites },
-  { x: 264, y: 272, r: 15, side: 'l', label: spm },
+/* callouts: target dot, ring radius, side, label, application slug */
+const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: string; field: string }[] = [
+  { x: 298, y: 58, r: 10, side: 'r', label: organicElectronics, field: 'organic-electronics' },
+  { x: 308, y: 152, r: 12, side: 'r', label: sensors, field: 'sensors' },
+  { x: 310, y: 246, r: 14, side: 'r', label: coatings, field: 'coatings' },
+  { x: 242, y: 150, r: 11, side: 'l', label: perovskites, field: 'solar-cells' },
+  { x: 264, y: 272, r: 15, side: 'l', label: spm, field: 'spm-sample-preparation' },
 ];
+
+/* a deterministic per-dot drift so the field breathes without looking random */
+const drift = (i: number) => ({
+  delay: `${((i * 37) % 23) / 10}s`,
+  dur: `${4.5 + ((i * 13) % 9) / 3}s`,
+  amp: `${1.5 + ((i * 7) % 5) * 0.5}px`,
+});
 ---
 
-<figure class="isotype reveal">
+<figure class="isotype reveal" data-isotype>
   <svg viewBox="0 0 600 330" role="img" aria-label={alt} class="isotype__svg">
     <defs>
       <linearGradient id="iso-cap" x1="0" y1="0" x2="0" y2="1">
@@ -62,25 +75,28 @@ const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: strin
       </linearGradient>
     </defs>
 
-    <!-- capsule -->
-    <rect x="215" y="12" width="130" height="306" rx="65" fill="none" stroke="url(#iso-cap)" stroke-width="6" />
+    <!-- capsule: draws itself on reveal -->
+    <rect class="iso__capsule" x="215" y="12" width="130" height="306" rx="65" fill="none" stroke="url(#iso-cap)" stroke-width="6" pathLength="1" />
 
-    <!-- dot field -->
-    {dots.map(([cx, cy, r]) => (
-      <circle cx={cx} cy={cy} r={r} fill={dotColor(cy)} />
-    ))}
+    <!-- dot field: each dot drifts on its own rhythm -->
+    {dots.map(([cx, cy, r], i) => {
+      const d = drift(i);
+      return <circle class="iso__dot" cx={cx} cy={cy} r={r} fill={dotColor(cy)} style={`--delay: ${d.delay}; --dur: ${d.dur}; --amp: ${d.amp}`} />;
+    })}
 
-    <!-- callouts -->
-    {callouts.map((c) => {
+    <!-- callouts: line draws, ring scales in, label settles; pulses in turn -->
+    {callouts.map((c, i) => {
       const edgeX = c.side === 'r' ? c.x + c.r : c.x - c.r;
       const endX = c.side === 'r' ? 420 : 140;
       const textX = c.side === 'r' ? 428 : 132;
       return (
-        <>
-          <circle cx={c.x} cy={c.y} r={c.r} fill="none" stroke="#26241F" stroke-width="1.5" />
-          <line x1={edgeX} y1={c.y} x2={endX} y2={c.y} stroke="#57534A" stroke-width="1.2" />
-          <circle cx={endX} cy={c.y} r="2" fill="#26241F" />
+        <g class="iso__callout" data-field={c.field} style={`--i: ${i}`}>
+          <circle class="iso__pulse" cx={c.x} cy={c.y} r={c.r} fill="none" stroke="#CE4262" stroke-width="1.5" />
+          <circle class="iso__ring" cx={c.x} cy={c.y} r={c.r} fill="none" stroke="#26241F" stroke-width="1.5" />
+          <line class="iso__line" x1={edgeX} y1={c.y} x2={endX} y2={c.y} stroke="#57534A" stroke-width="1.2" pathLength="1" />
+          <circle class="iso__end" cx={endX} cy={c.y} r="2" fill="#26241F" />
           <text
+            class="iso__label"
             x={textX}
             y={c.y + 4.5}
             font-family="Manrope, sans-serif"
@@ -91,7 +107,7 @@ const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: strin
           >
             {c.label}
           </text>
-        </>
+        </g>
       );
     })}
   </svg>
@@ -107,6 +123,7 @@ const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: strin
   .isotype__svg {
     width: 100%;
     height: auto;
+    overflow: visible;
   }
 
   .isotype__caption {
@@ -116,5 +133,99 @@ const callouts: { x: number; y: number; r: number; side: 'l' | 'r'; label: strin
     letter-spacing: 0.04em;
     color: var(--text-muted);
     text-align: center;
+  }
+
+  /* hover link from the chips: the field lights up */
+  .iso__callout[data-hot] .iso__label { fill: var(--coral-dark); }
+  .iso__callout[data-hot] .iso__ring { stroke: var(--coral); stroke-width: 2.5; }
+  .iso__callout[data-hot] .iso__line { stroke: var(--coral); }
+  .iso__callout[data-hot] .iso__end { fill: var(--coral); }
+
+  .iso__label,
+  .iso__ring,
+  .iso__line,
+  .iso__end {
+    transition: fill var(--dur-base) var(--ease), stroke var(--dur-base) var(--ease), stroke-width var(--dur-base) var(--ease);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* draw-in: capsule first, then each callout in turn */
+    .iso__capsule {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 1600ms var(--ease-out);
+    }
+
+    .iso__line {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 700ms var(--ease-out);
+      transition-delay: calc(700ms + var(--i) * 140ms);
+    }
+
+    .iso__ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      transform: scale(0);
+      transition: transform 500ms var(--ease-out), stroke var(--dur-base) var(--ease), stroke-width var(--dur-base) var(--ease);
+      transition-delay: calc(600ms + var(--i) * 140ms);
+    }
+
+    .iso__end,
+    .iso__label {
+      opacity: 0;
+      transition: opacity 500ms var(--ease-out), fill var(--dur-base) var(--ease);
+      transition-delay: calc(1250ms + var(--i) * 140ms);
+    }
+
+    .iso__label {
+      transform: translateX(var(--nudge, 6px));
+      transition: opacity 500ms var(--ease-out), transform 600ms var(--ease-out), fill var(--dur-base) var(--ease);
+      transition-delay: calc(1250ms + var(--i) * 140ms);
+    }
+
+    .isotype.is-visible .iso__capsule,
+    .isotype.is-visible .iso__line {
+      stroke-dashoffset: 0;
+    }
+
+    .isotype.is-visible .iso__ring {
+      transform: scale(1);
+    }
+
+    .isotype.is-visible .iso__end,
+    .isotype.is-visible .iso__label {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* the dot field breathes */
+    .iso__dot {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: iso-drift var(--dur, 6s) ease-in-out var(--delay, 0s) infinite alternate;
+    }
+
+    @keyframes iso-drift {
+      from { transform: translateY(var(--amp, 2px)) scale(0.96); }
+      to { transform: translateY(calc(var(--amp, 2px) * -1)) scale(1.04); }
+    }
+
+    /* the five fields pulse one after another */
+    .isotype.is-visible .iso__pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: iso-pulse 4.5s ease-out calc(2s + var(--i) * 0.9s) infinite;
+    }
+
+    .iso__pulse {
+      opacity: 0;
+    }
+
+    @keyframes iso-pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      18% { transform: scale(1.9); opacity: 0; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
   }
 </style>

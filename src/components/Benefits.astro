@@ -1,8 +1,8 @@
 ---
 /**
  * Outcome band — the dark beat of a page (plum-violet, v3): four glass
- * cards on the plum backdrop, each with a single-weight line icon, a mono
- * index and, along its base, the deposited layer — a vapour line that
+ * cards on the plum backdrop, each with a single-weight line icon and,
+ * along its base, the deposited layer — a vapour line that
  * draws itself when the card enters the viewport. Props-driven so home
  * and /product can show different depths of copy.
  */
@@ -41,7 +41,6 @@ const icons: Record<string, string> = {
                 <path d={icons[o.icon ?? ''] ?? icons.conditions} stroke-width={o.icon === 'conditions' ? 2.6 : 1.5}></path>
               </svg>
             </span>
-            <span class="bene__index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           </div>
           <h3>{o.title}</h3>
           <p>{o.text}</p>
@@ -126,7 +125,6 @@ const icons: Record<string, string> = {
   .bene__head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     margin-bottom: 1.1rem;
   }
 
@@ -150,13 +148,6 @@ const icons: Record<string, string> = {
   .bene__outcome:hover .bene__icon {
     color: #fff;
     box-shadow: 0 0 0 4px rgba(108, 18, 248, 0.18), 0 0 28px rgba(108, 18, 248, 0.35);
-  }
-
-  .bene__index {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    color: var(--text-on-dark-2);
   }
 
   .bene__outcome h3 {
