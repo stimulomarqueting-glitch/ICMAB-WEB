@@ -24,9 +24,15 @@ const { contact, site } = getContent(getLocale(Astro.url));
     <section class="sec contact-sec" aria-labelledby="contact-title">
       <div class="container contact">
         <div>
-          <p class="eyebrow">{contact.hero.kicker}</p>
-          <h1 class="contact__title" id="contact-title">{contact.hero.title}</h1>
-          <p class="lead">{contact.hero.lead}</p>
+          <p class="eyebrow rise-in" style="--i: 0">{contact.hero.kicker}</p>
+          <h1 class="contact__title" id="contact-title">
+            {contact.hero.title.split(' ').map((w, i) => (
+              <>
+                <span class="contact__word"><span class="rise-in" style={`--i: ${i + 1}`}>{w}</span></span>{' '}
+              </>
+            ))}
+          </h1>
+          <p class="lead rise-in" style="--i: 5">{contact.hero.lead}</p>
 
           <div class="contact__aside reveal">
             <h2 class="contact__aside-title">{contact.aside.title}</h2>
@@ -72,6 +78,23 @@ const { contact, site } = getContent(getLocale(Astro.url));
     margin-top: 0.9rem;
   }
 
+  .contact__word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .contact__word .rise-in {
+    display: inline-block;
+  }
+
+  .eyebrow.rise-in,
+  .lead.rise-in {
+    display: block;
+  }
+
   .contact__aside {
     margin-top: 2.25rem;
   }
@@ -81,28 +104,51 @@ const { contact, site } = getContent(getLocale(Astro.url));
     font-size: 1.06rem;
   }
 
+  /* the three steps as a short timeline on a vapour line */
   .contact__steps {
+    position: relative;
     list-style: none;
-    margin: 0.75rem 0 0;
-    padding: 0;
+    margin: 1rem 0 0;
+    padding: 0 0 0 2.6rem;
+  }
+
+  .contact__steps::before {
+    content: '';
+    position: absolute;
+    top: 0.9rem;
+    bottom: 0.9rem;
+    left: 0.95rem;
+    width: 2px;
+    background: var(--grad-vapor-rise);
+    opacity: 0.5;
   }
 
   .contact__steps li {
-    display: flex;
-    gap: 0.9rem;
-    padding: 0.8rem 0;
-    border-top: 1px solid var(--border-subtle);
+    position: relative;
+    display: block;
+    padding: 0.75rem 0;
     font-size: 0.94rem;
   }
 
   .contact__sn {
+    position: absolute;
+    left: -2.6rem;
+    top: 0.55rem;
+    display: grid;
+    place-items: center;
+    width: 1.95rem;
+    height: 1.95rem;
+    border-radius: 50%;
+    background: var(--bg-page);
+    border: 1px solid var(--border-violet-soft);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.69rem;
     font-weight: 600;
-    color: var(--coral-dark);
-    min-width: 1.5rem;
-    line-height: 1.8;
+    color: var(--violet-dark);
   }
+
+  .contact__steps li:first-child .contact__sn { color: var(--coral-dark); border-color: var(--border-coral-soft); }
+  .contact__steps li:last-child .contact__sn { color: var(--violet-dark); }
 
   .contact__direct {
     margin-top: 2rem;
@@ -111,6 +157,22 @@ const { contact, site } = getContent(getLocale(Astro.url));
   .contact__direct-text {
     font-size: 0.94rem;
     margin-top: 0.4rem;
+  }
+
+  .contact :global(.lf__card) {
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .contact :global(.lf__card)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--grad-vapor-line);
   }
 
   @media (max-width: 56rem) {

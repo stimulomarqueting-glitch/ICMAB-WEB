@@ -99,6 +99,16 @@ float) under `prefers-reduced-motion`, and needs no JS for the copy to
 show. `Hero.astro` is the previous full-bleed duotone photo. Both read
 `home.hero`; the marquee items live in `home.hero.field.marquee`.
 
+### Motion language on interior pages
+
+Interior pages share the home's vocabulary without touching copy:
+`PageHero` rises word by word and puts a photo on a tilting plate;
+`/applications` has a sticky scroll-spy bar of the five applications and
+closes on a plum glass band; `/research` shows the IP & validation copy on
+a plum credibility band; `/contact` draws its three steps as a timeline;
+the FAQ accordion animates its height. Reveal edges, hover lifts and the
+"deposited layer" line recur everywhere. Every effect is motion-safe.
+
 ### Team showcase (top of `/team`)
 
 `src/components/TeamShowcase.astro` shows one profile at a time over a plum

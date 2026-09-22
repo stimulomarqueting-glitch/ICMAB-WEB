@@ -91,12 +91,14 @@ const papersJsonLd = papers.map((p) => ({
     )}
 
     {validation.length > 0 && (
-      <section aria-labelledby="validation-title" class="sec hairtop mist--violet" id="validation">
+      <section aria-labelledby="validation-title" class="sec validation--dark" id="validation">
+        <div class="validation__glow" aria-hidden="true"></div>
         <div class="container">
-          <h2 class="research__head" id="validation-title">{validation[0].title}</h2>
+          <h2 class="research__head research__head--dark" id="validation-title">{validation[0].title}</h2>
           {validation.map((v) => (
-            <div class="panel research__validation reveal">
+            <div class="research__validation reveal">
               <p>{v.text}</p>
+              <span class="research__layer" aria-hidden="true"></span>
             </div>
           ))}
         </div>
@@ -177,6 +179,24 @@ const papersJsonLd = papers.map((p) => ({
 
   .research__quote {
     margin: 0.9rem 0 0;
+  }
+
+  /* a large vapour quote mark sits in the card's corner */
+  .research__card::after {
+    content: '\201C';
+    position: absolute;
+    top: 0.3rem;
+    right: 1.1rem;
+    font-family: var(--font-display);
+    font-size: 6rem;
+    line-height: 1;
+    font-weight: 600;
+    background: var(--grad-vapor);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.18;
+    pointer-events: none;
   }
 
   .research__quote p {
@@ -260,17 +280,60 @@ const papersJsonLd = papers.map((p) => ({
   }
 
   /* the panel tracks the measure of its text instead of the full container */
+  /* ── IP & validation: plum credibility band ─────────────────────── */
+  .validation--dark {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-inverse);
+    isolation: isolate;
+  }
+
+  .validation__glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(45% 60% at 85% 15%, rgba(108, 18, 248, 0.28), transparent 70%),
+      radial-gradient(35% 45% at 8% 100%, rgba(240, 83, 47, 0.14), transparent 70%);
+  }
+
+  .research__head--dark {
+    color: var(--text-on-dark);
+  }
+
   .research__validation {
+    position: relative;
+    overflow: hidden;
     margin-top: 1.5rem;
-    padding: 1.75rem 2rem;
-    border-color: var(--border-violet-soft);
     max-width: 52rem;
+    padding: clamp(1.75rem, 3.5vw, 2.5rem);
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .research__validation p {
     font-size: 0.94rem;
-    line-height: 1.65;
+    line-height: 1.7;
     max-width: 70ch;
+    color: var(--text-on-dark-2);
+  }
+
+  .research__layer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: var(--grad-vapor-line);
+    box-shadow: 0 0 14px rgba(206, 66, 98, 0.55);
+    transition: width 1100ms var(--ease-out) 250ms;
+  }
+
+  .research__validation.is-visible .research__layer {
+    width: 100%;
   }
 
   .page__contact {

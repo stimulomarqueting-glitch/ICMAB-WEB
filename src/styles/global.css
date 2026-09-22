@@ -420,3 +420,17 @@ a:hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Entrance rise for hero copy: staggered by --i (60ms steps). Motion-safe. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise-in {
+    opacity: 0;
+    transform: translateY(0.6em);
+    animation: rise-in 900ms var(--ease-out) forwards;
+    animation-delay: calc(120ms + var(--i, 0) * 60ms);
+  }
+
+  @keyframes rise-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+}

@@ -42,7 +42,9 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
           aria-labelledby={`${idPrefix}-t-${i}`}
           hidden
         >
-          <p>{item.a}</p>
+          <div class="acc__inner">
+            <p>{item.a}</p>
+          </div>
         </div>
       </li>
     ))}
@@ -62,7 +64,24 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
   }
 
   .acc__item {
+    position: relative;
     border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* the open item grows a vapour hairline over its top edge */
+  .acc__item::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--grad-vapor-line);
+    transition: width 600ms var(--ease-out);
+  }
+
+  .acc__item[data-open]::before {
+    width: 100%;
   }
 
   .acc__heading {
@@ -91,6 +110,10 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
     color: var(--coral-dark);
   }
 
+  .acc__trigger[aria-expanded='true'] {
+    color: var(--violet-dark);
+  }
+
   /* plus → minus, drawn with borders (no icon font) */
   .acc__icon {
     position: relative;
@@ -106,7 +129,12 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
     inset: 0;
     margin: auto;
     background: var(--coral);
-    transition: transform var(--dur-base) var(--ease);
+    transition: transform var(--dur-base) var(--ease), background-color var(--dur-base) var(--ease);
+  }
+
+  .acc__trigger[aria-expanded='true'] .acc__icon::before,
+  .acc__trigger[aria-expanded='true'] .acc__icon::after {
+    background: var(--violet);
   }
 
   .acc__icon::before {
@@ -123,8 +151,33 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
     transform: scaleY(0);
   }
 
+  /* the panel opens by growing its grid row, so the height animates */
   .acc__panel {
-    padding: 0 0.25rem 1.35rem;
+    display: grid;
+    grid-template-rows: 0fr;
+    padding: 0 0.25rem;
+    transition: grid-template-rows 360ms var(--ease-out), padding 360ms var(--ease-out);
+  }
+
+  .acc__panel[hidden] {
+    display: none;
+  }
+
+  .acc__item[data-open] .acc__panel {
+    grid-template-rows: 1fr;
+    padding-bottom: 1.35rem;
+  }
+
+  .acc__inner {
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 300ms var(--ease-out) 80ms, transform 300ms var(--ease-out) 80ms;
+  }
+
+  .acc__item[data-open] .acc__inner {
+    opacity: 1;
+    transform: none;
   }
 
   .acc__panel p {
@@ -133,25 +186,33 @@ const { title, items, idPrefix = 'acc' } = Astro.props;
     line-height: 1.65;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .acc__panel:not([hidden]) {
-      animation: acc-open var(--dur-base) var(--ease-out);
-    }
-
-    @keyframes acc-open {
-      from { opacity: 0; transform: translateY(-4px); }
-      to { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .acc__panel,
+    .acc__inner,
+    .acc__item::before {
+      transition: none;
     }
   }
 </style>
 
 <script>
+  /* open: unhide, then grow on the next frame; close: shrink, then hide */
   document.querySelectorAll<HTMLButtonElement>('.acc__trigger').forEach((btn) => {
     btn.addEventListener('click', () => {
       const expanded = btn.getAttribute('aria-expanded') === 'true';
       const panel = document.getElementById(btn.getAttribute('aria-controls') ?? '');
+      const item = btn.closest<HTMLElement>('.acc__item');
       btn.setAttribute('aria-expanded', String(!expanded));
-      if (panel) panel.hidden = expanded;
+      if (!panel || !item) return;
+      if (expanded) {
+        item.removeAttribute('data-open');
+        const hide = () => { panel.hidden = true; panel.removeEventListener('transitionend', hide); };
+        panel.addEventListener('transitionend', hide);
+        window.setTimeout(hide, 420); // safety net if no transition fires
+      } else {
+        panel.hidden = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => item.setAttribute('data-open', '')));
+      }
     });
   });
 </script>

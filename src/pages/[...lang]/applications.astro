@@ -35,6 +35,15 @@ const apps = applications
       lead={t.hero.lead}
     />
 
+    {/* sticky in-page nav: the five applications, the one in view highlighted */}
+    <nav class="apps-nav" aria-label={t.labels.section} data-apps-nav>
+      <div class="container apps-nav__inner">
+        {apps.map((app) => (
+          <a class="apps-nav__pill" href={`#${app.slug}`} data-target={app.slug}>{app.title}</a>
+        ))}
+      </div>
+    </nav>
+
     <section class="sec hairtop" aria-label={t.labels.section}>
       <div class="container apps">
         {apps.map((app) => (
@@ -71,11 +80,15 @@ const apps = applications
     </section>
 
     {/* for R&D people who don't identify as surface scientists */}
-    <section class="sec hairtop mist--violet" aria-labelledby="broader-title">
+    <section class="sec broader--dark" aria-labelledby="broader-title">
+      <div class="broader__glow" aria-hidden="true"></div>
       <div class="container broader">
-        <p class="eyebrow reveal">{t.broader.kicker}</p>
-        <h2 class="h2 reveal" id="broader-title">{t.broader.title}</h2>
-        <p class="broader__text reveal">{t.broader.text}</p>
+        <div class="broader__panel reveal">
+          <p class="eyebrow">{t.broader.kicker}</p>
+          <h2 class="h2" id="broader-title">{t.broader.title}</h2>
+          <p class="broader__text">{t.broader.text}</p>
+          <span class="broader__layer" aria-hidden="true"></span>
+        </div>
       </div>
     </section>
 
@@ -90,7 +103,71 @@ const apps = applications
   <Footer />
 </BaseLayout>
 
+<script>
+  /* scroll-spy: the pill of the application in view is current */
+  const pills = [...document.querySelectorAll<HTMLAnchorElement>('[data-apps-nav] [data-target]')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.app[id]')];
+  if (pills.length && cards.length && 'IntersectionObserver' in window) {
+    const setCurrent = (id: string) => pills.forEach((p) => p.toggleAttribute('aria-current', p.dataset.target === id));
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (hit) setCurrent(hit.target.id);
+      },
+      { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+    cards.forEach((c) => io.observe(c));
+    pills.forEach((p) => p.addEventListener('click', () => setCurrent(p.dataset.target ?? '')));
+  }
+</script>
+
 <style>
+  /* ── sticky application nav ─────────────────────────────────────── */
+  .apps-nav {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 30;
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .apps-nav__inner {
+    display: flex;
+    gap: 0.5rem;
+    padding-block: 0.6rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .apps-nav__inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .apps-nav__pill {
+    flex: none;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    font-size: 0.81rem;
+    font-weight: 600;
+    color: var(--text-body);
+    background: var(--bg-panel);
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+  }
+
+  .apps-nav__pill:hover {
+    color: var(--ink);
+    border-color: var(--border-violet-soft);
+  }
+
+  .apps-nav__pill[aria-current] {
+    color: #fff;
+    background: var(--bg-inverse);
+    border-color: var(--bg-inverse);
+  }
+
   .apps {
     display: grid;
     gap: 1.5rem;
@@ -101,7 +178,7 @@ const apps = applications
     overflow: hidden;
     padding: clamp(1.5rem, 3vw, 2.25rem);
     /* anchor landing: keep the header below the sticky glass navbar */
-    scroll-margin-top: calc(var(--header-h) + 1rem);
+    scroll-margin-top: calc(var(--header-h) + 4.5rem);
     transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
   }
 
@@ -185,11 +262,64 @@ const apps = applications
     margin-top: 1.5rem;
   }
 
+  /* ── beyond surface science: plum band, glass panel ────────────── */
+  .broader--dark {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-inverse);
+    isolation: isolate;
+  }
+
+  .broader__glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(45% 60% at 85% 20%, rgba(108, 18, 248, 0.28), transparent 70%),
+      radial-gradient(35% 45% at 8% 100%, rgba(240, 83, 47, 0.14), transparent 70%);
+  }
+
+  .broader__panel {
+    position: relative;
+    overflow: hidden;
+    max-width: 52rem;
+    padding: clamp(1.75rem, 3.5vw, 2.5rem);
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .broader--dark :global(.eyebrow) {
+    color: var(--lavender);
+  }
+
+  .broader--dark :global(.h2) {
+    color: var(--text-on-dark);
+  }
+
   .broader__text {
     margin-top: 1rem;
-    max-width: 62ch;
+    max-width: 58ch;
     font-size: 1.06rem;
     line-height: 1.6;
+    color: var(--text-on-dark-2);
+  }
+
+  .broader__layer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: var(--grad-vapor-line);
+    box-shadow: 0 0 14px rgba(206, 66, 98, 0.55);
+    transition: width 1100ms var(--ease-out) 250ms;
+  }
+
+  .broader__panel.is-visible .broader__layer {
+    width: 100%;
   }
 
   @media (max-width: 56rem) {
