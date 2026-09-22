@@ -18,8 +18,7 @@ export const pendingContent = {
   validationIpPublished: true,
 
   /** Team profiles CONFIRMED by ICMAB (Material_Web, 2026-09-16): four
-   *  approved bios live, three portraits mapped and confirmed. Núria's
-   *  portrait is still to be supplied — src/content/team.ts. */
+   *  approved bios and four portraits live — src/content/en/team.ts. */
   teamProfilesPublished: true,
 
   /** Publications LIVE (two open-access papers) and the first expert

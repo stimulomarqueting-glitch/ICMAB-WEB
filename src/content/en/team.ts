@@ -11,17 +11,17 @@ import type { TeamMember } from '../types';
  * Confirmed profiles from ICMAB (Material_Web, 2026-09-16): names, roles,
  * affiliations, approved bios and LinkedIn links exactly as supplied.
  *
- * Photo–name mapping confirmed by the client (2026-09-22). Three portraits
- * arrived unnamed; Núria's is still pending, so her card falls back to a
- * monogram until it is supplied.
+ * Photo–name mapping confirmed by the client (2026-09-22); all four
+ * portraits are in place.
  */
 export const teamMembers: TeamMember[] = [
   {
-    // TODO(client): portrait pending — the card renders a monogram instead.
     name: 'Núria Aliaga-Alcalde',
     role: 'ICREA Professor · Consultant & co-founder',
     affiliation: 'ICMAB-CSIC',
     bio: 'PhD in Chemistry, dedicated to bridging the gap between single-molecule-level cutting-edge research and practical applications in technology.',
+    image: '/img/team/nuria-aliaga-alcalde.jpg',
+    showcaseImage: '/img/team/showcase/nuria-aliaga-alcalde.webp',
     linkedin: 'https://www.linkedin.com/in/n%C3%BAria-aliaga-alcalde-97bba517/',
     order: 1,
     published: true,
