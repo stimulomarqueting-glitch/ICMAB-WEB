@@ -126,6 +126,32 @@ const drift = (i: number) => ({
     overflow: visible;
   }
 
+  @media (max-width: 40rem) {
+    /* the chips underneath name the fields, so the callouts go and the
+       capsule is scaled up to fill the column */
+    .isotype {
+      margin-top: 1.5rem;
+      overflow: hidden;
+      padding-top: 3rem;
+    }
+
+    .isotype__svg {
+      transform: scale(1.5);
+      transform-origin: 50% 50%;
+    }
+
+    /* the scaled figure overflows its box by ~45px top and bottom */
+    .isotype .isotype__caption {
+      margin-top: 3.75rem;
+    }
+
+    .iso__label,
+    .iso__line,
+    .iso__end {
+      display: none;
+    }
+  }
+
   .isotype__caption {
     margin-top: 0.6rem;
     font-family: var(--font-mono);

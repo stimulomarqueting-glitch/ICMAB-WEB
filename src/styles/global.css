@@ -434,3 +434,57 @@ a:hover {
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+/* ── Phone layout rules (≤ 40rem): symmetric blocks, centred calls to action ── */
+@media (max-width: 40rem) {
+  /* every button inside the page content spans the column, capped and centred */
+  main .btn {
+    width: 100%;
+    max-width: 24rem;
+    margin-inline: auto;
+    justify-content: center;
+  }
+
+  /* hero copy and closing bands read centred on a narrow screen */
+  .phero .container > div:first-child,
+  .field__content,
+  .pcta {
+    text-align: center;
+  }
+
+  .phero__title,
+  .phero .lead,
+  .phero__row,
+  .field__title,
+  .field__lead,
+  .field__descriptor,
+  .field__claim,
+  .field__eyebrow,
+  .pcta__text {
+    margin-inline: auto;
+  }
+
+  .phero__row {
+    justify-content: center;
+  }
+
+  .field__ctas,
+  .phero__cta {
+    justify-content: center;
+  }
+
+  .pcta {
+    align-items: center;
+  }
+
+  .pcta__actions {
+    align-items: center;
+  }
+
+  /* the institutional line stays legible */
+  .field__eyebrow,
+  .hero__eyebrow {
+    font-size: 0.69rem;
+    line-height: 1.6;
+  }
+}

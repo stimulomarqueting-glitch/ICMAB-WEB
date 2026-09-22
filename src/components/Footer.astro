@@ -132,4 +132,59 @@ const isCurrent = (href: string) => (lp(href).replace(/\/$/, '') || '/') === cur
   .footer__bottom .mono {
     font-size: 0.75rem;
   }
+
+  @media (max-width: 40rem) {
+    .footer__top {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2.25rem;
+    }
+
+    .footer__brand {
+      max-width: 26rem;
+    }
+
+    .footer__cta {
+      width: 100%;
+      max-width: 24rem;
+      justify-content: center;
+    }
+
+    .footer__nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem 2rem;
+      width: 100%;
+      text-align: left;
+    }
+
+    .footer__nav div {
+      min-width: 0;
+    }
+
+    /* the third column becomes a centred row beneath the other two */
+    .footer__nav div:nth-child(3) {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-coral-soft);
+      text-align: center;
+    }
+
+    .footer__nav div:nth-child(3) .eyebrow {
+      width: 100%;
+    }
+
+    .footer__bottom {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.75rem;
+      margin-top: 2.75rem;
+    }
+  }
 </style>

@@ -181,4 +181,17 @@ const { contact, site } = getContent(getLocale(Astro.url));
       gap: 2.5rem;
     }
   }
+
+  @media (max-width: 40rem) {
+    .contact > div:first-child > .eyebrow,
+    .contact__title,
+    .contact > div:first-child > .lead {
+      text-align: center;
+      margin-inline: auto;
+    }
+
+    .contact__aside {
+      margin-top: 2.5rem;
+    }
+  }
 </style>

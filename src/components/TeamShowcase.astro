@@ -403,6 +403,25 @@ const on = (i: number) => (i === defaultIndex ? '' : undefined);
 
   /* ── responsive ─────────────────────────────────────────────────── */
   @media (max-width: 40rem) {
+    .show__top {
+      text-align: center;
+    }
+
+    .show__title,
+    .show__bio {
+      margin-inline: auto;
+    }
+
+    .show__picker {
+      justify-content: center;
+    }
+
+    .show__meta {
+      justify-content: center;
+      text-align: center;
+      gap: 0.5rem 1rem;
+    }
+
     .show__person {
       height: 50%;
       width: 84%;
