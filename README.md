@@ -62,6 +62,7 @@ npm run preview   # preview the production build locally
 | What | Where |
 |---|---|
 | **Brand name / claim / contact email** | `src/config/brand.ts` |
+| Home hero variant (`field` animated sublimation field / `photo` duotone photo) | `src/config/hero.ts` |
 | **Lead capture (demo/production, endpoint, privacy URL)** | `src/config/leadCapture.ts` — see below |
 | Final production domain | `src/config/site.mjs` + `public/robots.txt` |
 | Navigation, footer, default SEO, a11y labels | `src/content/{en,es}/site.ts` |
@@ -84,6 +85,18 @@ Spanish counterpart fails `astro check`. Lists with non-translatable data
 (slugs, DOIs, photos, LinkedIn URLs, order, `published`) live once in
 `en/` — the Spanish file imports them and overrides only the texts, and
 throws at build time if an entry has no translation.
+
+### Home hero variants
+
+`src/config/hero.ts` picks the home hero. `HeroField.astro` (default) draws the
+sublimation process live on a canvas — particles leave the heated source,
+cool as they rise and condense on the substrate while the distance `d`
+breathes; the pointer disturbs the vapour, a marquee of application fields
+runs along the bottom and the headline rises word by word. It pauses
+off-screen and when the tab is hidden, renders a single still under
+`prefers-reduced-motion`, and needs no JS for the copy to show. `Hero.astro`
+is the previous full-bleed duotone photo. Both read `home.hero`; the field
+labels live in `home.hero.field`.
 
 ### Team showcase (top of `/team`)
 

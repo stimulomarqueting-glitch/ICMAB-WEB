@@ -8,6 +8,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Hero from '../../components/Hero.astro';
+import HeroField from '../../components/HeroField.astro';
+import { heroVariant } from '../../config/hero';
 import Benefits from '../../components/Benefits.astro';
 import Audiences from '../../components/Audiences.astro';
 import AppsIsotype from '../../components/AppsIsotype.astro';
@@ -32,7 +34,7 @@ const apps = applications
   <a class="skip-link" href="#main">{site.a11y.skipToContent}</a>
   <Header />
   <main id="main">
-    <Hero />
+    {heroVariant === 'field' ? <HeroField /> : <Hero />}
 
     {/* value strip: Problem → MatSurfer → Result, one sentence each */}
     <section class="sec hairtop" aria-label={home.value.label}>
