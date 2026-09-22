@@ -42,8 +42,6 @@ export const teamPage: TeamPageContent = {
   kicker: 'El equipo',
   title: 'El equipo detrás de MatSurfer',
   lead: `${brand.projectName} reúne investigación en superficies, transferencia de tecnología y desarrollo de producto en torno a una tecnología nacida en el ICMAB-CSIC, en Barcelona.`,
-  contactTitle: '¿Quieres hablar con el equipo?',
-  contactText: 'Para consultas científicas, de colaboración o de acceso anticipado:',
   links: {
     linkedin: 'LinkedIn',
     website: 'Sitio web',
@@ -86,8 +84,9 @@ export const teamPage: TeamPageContent = {
   },
   finalCta: {
     title: 'Habla con el equipo',
-    text: 'Las consultas científicas, de colaboración o de acceso anticipado empiezan todas de la misma manera.',
+    text: 'Las consultas científicas, de colaboración o de acceso anticipado empiezan con un mensaje.',
     button: 'Habla con el equipo',
     href: '/contact?interest=partnership',
+    emailLead: 'O escríbenos directamente a',
   },
 };

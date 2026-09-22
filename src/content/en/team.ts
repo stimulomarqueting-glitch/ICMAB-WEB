@@ -70,8 +70,6 @@ export const teamPage = {
   kicker: 'The team',
   title: 'The team behind MatSurfer',
   lead: `${brand.projectName} brings together surface research, technology transfer and product development around a technology born at ICMAB-CSIC in Barcelona.`,
-  contactTitle: 'Want to talk to the team?',
-  contactText: 'For scientific, partnership or early-access enquiries:',
   links: {
     linkedin: 'LinkedIn',
     website: 'Website',
@@ -124,9 +122,11 @@ export const teamPage = {
   },
   finalCta: {
     title: 'Talk to the team',
-    text: 'Scientific, partnership or early-access enquiries all start the same way.',
+    text: 'Scientific, partnership or early-access enquiries all start with a message.',
     button: 'Talk to the team',
     href: '/contact?interest=partnership',
+    /** precedes the direct email under the button */
+    emailLead: 'Or write to us directly at',
   },
 };
 

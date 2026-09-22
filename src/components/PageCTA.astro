@@ -11,22 +11,33 @@ interface Props {
   button: string;
   href: string;
   ctaSource: string;
+  /** quiet alternative next to the button, e.g. "or write to" + email */
+  secondary?: { lead: string; label: string; href: string };
+  /** stacked, centred layout — for pages whose CTA is the only contact block */
+  centered?: boolean;
 }
 
 import { getLocale, localePath } from '../i18n';
 
-const { title, text, button, href, ctaSource } = Astro.props;
+const { title, text, button, href, ctaSource, secondary, centered = false } = Astro.props;
 const to = localePath(getLocale(Astro.url), href);
 ---
 
 <section class="sec pcta-sec" aria-label={title}>
   <div class="container">
-    <div class="pcta reveal">
-      <div>
+    <div class:list={['pcta', 'reveal', { 'pcta--centered': centered }]}>
+      <div class="pcta__copy">
         <h2 class="pcta__title">{title}</h2>
         {text && <p class="pcta__text">{text}</p>}
       </div>
-      <a class="btn btn--grad" href={to} data-cta-source={ctaSource}>{button}</a>
+      <div class="pcta__actions">
+        <a class="btn btn--grad" href={to} data-cta-source={ctaSource}>{button}</a>
+        {secondary && (
+          <p class="pcta__alt">
+            {secondary.lead} <a href={secondary.href}>{secondary.label}</a>
+          </p>
+        )}
+      </div>
     </div>
   </div>
 </section>
@@ -70,8 +81,44 @@ const to = localePath(getLocale(Astro.url), href);
     max-width: 44ch;
   }
 
-  .pcta .btn {
+  .pcta__actions {
+    display: flex;
     flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+
+  .pcta__alt {
+    font-size: 0.85rem;
+    color: var(--text-on-dark-2);
+  }
+
+  .pcta__alt a {
+    color: var(--text-on-dark);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255, 255, 255, 0.45);
+  }
+
+  .pcta__alt a:hover {
+    color: var(--coral-tint, #fce0d6);
+  }
+
+  /* centred variant: one compact block, everything on one axis */
+  .pcta--centered {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    padding-block: clamp(2.25rem, 4.5vw, 3.25rem) calc(clamp(2.25rem, 4.5vw, 3.25rem) + 8px);
+  }
+
+  .pcta--centered .pcta__text {
+    margin-inline: auto;
+  }
+
+  .pcta--centered .pcta__actions {
+    align-items: center;
   }
 
   @media (max-width: 40rem) {
@@ -80,8 +127,21 @@ const to = localePath(getLocale(Astro.url), href);
       align-items: flex-start;
     }
 
+    .pcta__actions {
+      width: 100%;
+      align-items: stretch;
+    }
+
     .pcta .btn {
       width: 100%;
+    }
+
+    .pcta--centered {
+      align-items: center;
+    }
+
+    .pcta--centered .pcta__actions {
+      align-items: center;
     }
   }
 </style>

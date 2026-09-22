@@ -48,42 +48,18 @@ const peopleJsonLd = members.map((m) => ({
 
     <TeamJourney />
 
-    <section class="sec hairtop" aria-labelledby="team-contact-title">
-      <div class="container">
-        <div class="panel page__contact reveal">
-          <h2 id="team-contact-title">{teamPage.contactTitle}</h2>
-          <p>
-            {teamPage.contactText}
-            <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
-          </p>
-        </div>
-      </div>
-    </section>
 
+    {/* the only contact block on the page: button + direct email in one band */}
     <PageCTA
       title={teamPage.finalCta.title}
       text={teamPage.finalCta.text}
       button={teamPage.finalCta.button}
       href={teamPage.finalCta.href}
       ctaSource="team-final"
+      centered
+      secondary={{ lead: teamPage.finalCta.emailLead, label: brand.contactEmail, href: `mailto:${brand.contactEmail}` }}
     />
   </main>
   <Footer />
 </BaseLayout>
 
-<style>
-  .page__contact {
-    padding: 1.75rem 2rem;
-    max-width: 34rem;
-  }
-
-  .page__contact h2 {
-    font-size: 1.19rem;
-  }
-
-  .page__contact p {
-    font-size: 0.94rem;
-    margin-top: 0.5rem;
-  }
-
-</style>
