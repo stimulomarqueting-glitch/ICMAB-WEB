@@ -13,6 +13,7 @@ import { heroVariant } from '../../config/hero';
 import Benefits from '../../components/Benefits.astro';
 import Audiences from '../../components/Audiences.astro';
 import AppsIsotype from '../../components/AppsIsotype.astro';
+import BrandMark from '../../components/BrandMark.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import PageCTA from '../../components/PageCTA.astro';
 import Footer from '../../components/Footer.astro';
@@ -36,18 +37,33 @@ const apps = applications
   <main id="main">
     {heroVariant === 'field' ? <HeroField /> : <Hero />}
 
-    {/* value strip: Problem → MatSurfer → Result, one sentence each */}
+    {/* value flow: Problem → MatSurfer → Result, one sentence each */}
     <section class="sec hairtop" aria-label={home.value.label}>
       <div class="container">
-        <div class="value__grid">
+        <p class="eyebrow value__kicker reveal">{home.value.kicker}</p>
+        <ol class="value" role="list">
           {home.value.items.map((item, i) => (
-            <div class="value__item reveal">
-              <span class="value__tag">{item.tag}</span>
+            <li class:list={['panel', 'value__item', 'reveal', { 'value__item--core': i === 1, 'value__item--result': i === 2 }]} style={`--i: ${i}`}>
+              <div class="value__head">
+                <span class="value__step">{String(i + 1).padStart(2, '0')}</span>
+                {i === 1 ? (
+                  <span class="value__tag value__tag--brand">
+                    <BrandMark size={18} />
+                    {item.tag}
+                  </span>
+                ) : (
+                  <span class="value__tag">{item.tag}</span>
+                )}
+              </div>
               <p>{item.text}</p>
-              {i < home.value.items.length - 1 && <span class="value__arrow" aria-hidden="true">→</span>}
-            </div>
+              {i < home.value.items.length - 1 && (
+                <span class="value__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
+                </span>
+              )}
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
 
@@ -146,15 +162,41 @@ const apps = applications
 </BaseLayout>
 
 <style>
-  /* ── value strip ─────────────────────────────────────────────────────── */
-  .value__grid {
+  /* ── value flow ──────────────────────────────────────────────────── */
+  .value__kicker {
+    margin-bottom: 1.25rem;
+  }
+
+  .value {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2.5rem;
+    gap: 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   .value__item {
     position: relative;
+    padding: 1.5rem 1.6rem 1.6rem;
+    transition-delay: calc(var(--i) * 90ms);
+  }
+
+  .value__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: 0.9rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .value__step {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
   }
 
   .value__tag {
@@ -166,23 +208,72 @@ const apps = applications
     color: var(--coral-dark);
   }
 
-  .value__item:nth-child(2) .value__tag {
+  .value__tag--brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     color: var(--violet-dark);
   }
 
   .value__item p {
-    margin-top: 0.6rem;
     font-size: 0.94rem;
     line-height: 1.55;
-    max-width: 34ch;
   }
 
+  /* the device step carries the vapour tint and sits a touch forward */
+  .value__item--core {
+    background: linear-gradient(160deg, var(--violet-tint) 0%, var(--bg-panel) 70%);
+    border-color: var(--border-violet-soft);
+    box-shadow: var(--shadow-md);
+  }
+
+  .value__item--core .value__head {
+    border-bottom-color: var(--border-violet-soft);
+  }
+
+  .value__item--core .value__step {
+    color: var(--violet-dark);
+  }
+
+  /* the result ends on the deposited layer */
+  .value__item--result {
+    overflow: hidden;
+  }
+
+  .value__item--result::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: var(--grad-vapor-line);
+  }
+
+  .value__item--result .value__tag {
+    color: var(--violet-dark);
+  }
+
+  /* arrow badge bridging the gap to the next step */
   .value__arrow {
     position: absolute;
-    top: -0.15rem;
-    right: -1.65rem;
-    color: var(--silica);
-    font-size: 1.1rem;
+    top: 50%;
+    right: -0.75rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    transform: translate(50%, -50%);
+    border-radius: 50%;
+    background: var(--bg-page);
+    color: var(--violet-dark);
+    box-shadow: 0 0 0 1px var(--border-violet-soft), var(--shadow-sm, 0 2px 8px rgba(38, 36, 31, 0.08));
+  }
+
+  .value__arrow svg {
+    width: 0.8rem;
+    height: 0.8rem;
   }
 
   /* ── product teaser ──────────────────────────────────────────────────── */
@@ -284,13 +375,18 @@ const apps = applications
 
   /* ── responsive ──────────────────────────────────────────────────────── */
   @media (max-width: 56rem) {
-    .value__grid {
+    .value {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
+    /* stacked: the arrow turns to point down, centred on the gap */
     .value__arrow {
-      display: none;
+      top: auto;
+      right: auto;
+      bottom: -0.625rem;
+      left: 50%;
+      transform: translate(-50%, 50%) rotate(90deg);
     }
 
     .pt__grid {

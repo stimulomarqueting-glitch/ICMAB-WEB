@@ -28,6 +28,7 @@ export const home: HomeContent = {
 
   value: {
     label: 'Propuesta de valor',
+    kicker: 'Del problema al resultado',
     items: [
       {
         tag: 'El problema',

@@ -32,6 +32,7 @@ export const home = {
   /** Problem → MatSurfer → Result, one sentence each */
   value: {
     label: 'Value proposition',
+    kicker: 'From problem to result',
     items: [
       {
         tag: 'The problem',
