@@ -2,10 +2,10 @@
 /**
  * Home hero, "floating device" variant. The product photo sits on a plate
  * that tilts in 3D with the pointer (perspective + layers at different
- * depths: halo and shadow behind, photo, a sheen sweeping the glass, and
- * the vapour in front). Particles rise out of the chamber in the photo,
- * cooling from coral to violet as they climb — the process, live, on the
- * real device. A slow marquee of application fields runs along the bottom.
+ * depths: halo and shadow behind, then the photo, with a sheen sweeping the
+ * glass). A slow, sparse plume lives inside the flask in the photo, rising
+ * from the base of the chamber and cooling from coral to violet — the
+ * process, live, on the real device. A slow marquee of application fields runs along the bottom.
  *
  * Motion is progressive enhancement: no JS → static plate and copy;
  * prefers-reduced-motion → no tilt, no float, one still frame of vapour.
@@ -61,9 +61,9 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
           <div class="plate__card">
             <img class="plate__img" src="/img/product-table.jpg" alt="" width="1100" height="619" decoding="async" fetchpriority="high" />
             <div class="plate__tint"></div>
+            <canvas class="plate__vapour" data-vapour></canvas>
             <div class="plate__sheen"></div>
           </div>
-          <canvas class="plate__vapour" data-vapour></canvas>
         </div>
       </div>
     </div>
@@ -296,16 +296,12 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     transform: translateZ(-90px) translateX(calc(var(--ry) * -1.4)) translateY(calc(var(--rx) * 1.2));
   }
 
-  /* the vapour lives in front of the glass and overflows the card */
+  /* the vapour lives inside the glass chamber of the photo */
   .plate__vapour {
     position: absolute;
-    left: -25%;
-    right: -25%;
-    top: -70%;
-    bottom: -10%;
-    width: 150%;
-    height: 180%;
-    transform: translateZ(70px);
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
   }
 
@@ -436,21 +432,22 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
    * Plate tilt + vapour.
    *  - pointer over the section → tilt (±7° / ±10°), sheen and mesh follow;
    *    leaving eases the plate back;
-   *  - vapour: particles spawn in an ellipse over the chamber in the photo,
-   *    rise with a light drift, cool from coral to violet, fade out high up;
-   *    the pointer pushes them aside.
+   *  - vapour: a slow, sparse plume inside the flask in the photo. Particles
+   *    rise from the base of the lower chamber, cool from coral to violet,
+   *    pass behind the opaque collar and fade out under the dome. Everything
+   *    is simulated in the photo's own pixel space (1100 × 619) and clipped
+   *    to the flask outline, so it stays on the glass at any card size.
    */
   const root = document.querySelector<HTMLElement>('[data-field]');
-  const plate = root?.querySelector<HTMLElement>('[data-plate]');
   const canvas = root?.querySelector<HTMLCanvasElement>('[data-vapour]');
+  const photo = root?.querySelector<HTMLImageElement>('.plate__img');
 
-  if (root && plate && canvas) {
+  if (root && canvas && photo) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d')!;
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
     /* ── tilt ─────────────────────────────────────────────────────── */
-    let px = -1e4, py = -1e4; // pointer in canvas space
     if (!reduce) {
       root.addEventListener('pointermove', (e) => {
         const r = root.getBoundingClientRect();
@@ -460,105 +457,126 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
         root.style.setProperty('--py', String(ny + 0.5));
         root.style.setProperty('--ry', (nx * 10).toFixed(2) + 'deg');
         root.style.setProperty('--rx', (-ny * 7).toFixed(2) + 'deg');
-        const c = canvas.getBoundingClientRect();
-        px = e.clientX - c.left; py = e.clientY - c.top;
       });
       root.addEventListener('pointerleave', () => {
         root.style.setProperty('--rx', '0deg');
         root.style.setProperty('--ry', '0deg');
-        px = py = -1e4;
       });
     }
 
-    /* ── vapour ───────────────────────────────────────────────────── */
+    /* ── the flask, in photo pixels ───────────────────────────────── */
+    const IMG_W = 1100, IMG_H = 619;
+    const CHAMBER = { x: 726, y: 346, w: 98, h: 114 }; // clear lower chamber
+    const DOME = { cx: 775, cy: 300, rx: 47, ry: 64 }; // upper bell, above the O-ring
+    const SOURCE_Y = 452; // where the material sits
+    const TOP_Y = 244; // where the vapour thins out under the dome
+    const COLLAR = { top: 304, bottom: 346 }; // opaque band between the two
+
+    const flaskPath = () => {
+      ctx.beginPath();
+      ctx.roundRect(CHAMBER.x, CHAMBER.y, CHAMBER.w, CHAMBER.h, [3, 3, 24, 24]);
+      ctx.ellipse(DOME.cx, DOME.cy, DOME.rx, DOME.ry, 0, Math.PI, Math.PI * 2);
+      ctx.closePath();
+    };
+
+    /* maps photo pixels onto the card, following object-fit: cover */
+    let W = 0, H = 0;
+    const layout = () => {
+      const r = canvas.getBoundingClientRect();
+      W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+      canvas.width = W * DPR; canvas.height = H * DPR;
+      const [ox, oy] = getComputedStyle(photo).objectPosition.split(' ').map((v) => parseFloat(v) / 100);
+      const s = Math.max(W / IMG_W, H / IMG_H);
+      const offX = (W - IMG_W * s) * (isNaN(ox) ? 0.5 : ox);
+      const offY = (H - IMG_H * s) * (isNaN(oy) ? 0.5 : oy);
+      ctx.setTransform(DPR * s, 0, 0, DPR * s, DPR * offX, DPR * offY);
+    };
+
     const CORAL = [240, 83, 47], MAGENTA = [206, 66, 98], VIOLET = [108, 18, 248];
     const mix = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
     const colour = (t: number) => (t < 0.5 ? mix(CORAL, MAGENTA, t / 0.5) : mix(MAGENTA, VIOLET, (t - 0.5) / 0.5));
 
-    let W = 0, H = 0;
-    /* emitter: the chamber sits at ~73% / 56% of the card; the canvas is
-       150% × 180% of the card, offset 25% left and 70% up */
-    let ex = 0, ey = 0, erx = 0, ery = 0, travel = 0;
-    const layout = () => {
-      const r = canvas.getBoundingClientRect();
-      W = Math.round(r.width); H = Math.round(r.height);
-      canvas.width = W * DPR; canvas.height = H * DPR;
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      const cardW = W / 1.5, cardH = H / 1.8;
-      const cardX = cardW * 0.25, cardY = cardH * 0.7;
-      ex = cardX + cardW * 0.73; ey = cardY + cardH * 0.56;
-      erx = cardW * 0.07; ery = cardH * 0.1;
-      travel = ey - cardY * 0.15; // how far up the vapour lives
-    };
-
-    type P = { x: number; y: number; vx: number; vy: number; s: number; age: number; ph: number; span: number };
+    type P = { x: number; y: number; vy: number; s: number; ph: number; amp: number; age: number };
     const ps: P[] = [];
     const spawn = (p: P) => {
-      const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random());
-      p.x = ex + Math.cos(a) * erx * rr;
-      p.y = ey + Math.sin(a) * ery * rr;
-      p.vx = (Math.random() - 0.5) * 0.12;
-      p.vy = -(0.3 + Math.random() * 0.5) * (H / 800);
-      p.s = 1.1 + Math.random() * 1.9;
-      p.age = 0;
+      p.x = CHAMBER.x + 14 + Math.random() * (CHAMBER.w - 28);
+      p.y = SOURCE_Y - Math.random() * 6;
+      p.vy = -(0.16 + Math.random() * 0.2); // photo px per frame: ~12–20s to the dome
+      p.s = 1.3 + Math.random() * 1.6;
       p.ph = Math.random() * Math.PI * 2;
-      p.span = 0.6 + Math.random() * 0.4; // fraction of travel before it fades
+      p.amp = 0.08 + Math.random() * 0.1;
+      p.age = 0;
       return p;
     };
-    const N = window.innerWidth < 640 ? 140 : 320;
+    const N = 70;
 
     let t0 = performance.now();
     const step = (now: number) => {
       const dt = Math.min(2, (now - t0) / 16.67); t0 = now;
       for (const p of ps) {
         p.age += dt;
-        p.vx += (Math.sin(now / 900 + p.ph + p.y / 60) * 0.02 + Math.sin(now / 1700 - p.ph) * 0.012) * dt;
-        p.vx *= 0.96;
-        const dx = p.x - px, dy = p.y - py, d2 = dx * dx + dy * dy;
-        if (d2 < 120 * 120) {
-          const d = Math.sqrt(d2) + 1, f = (1 - d / 120) * 0.9;
-          p.vx += (dx / d) * f * dt;
-          p.vy += (dy / d) * f * 0.35 * dt;
-        }
-        p.x += p.vx * dt * 1.6;
         p.y += p.vy * dt;
-        const rise = (ey - p.y) / travel;
-        if (rise > p.span || p.x < -10 || p.x > W + 10 || p.y < -10) spawn(p);
+        p.x += Math.sin(now / 1400 + p.ph) * p.amp * dt;
+        /* the walls: narrow gently as the dome closes in */
+        const halfW = p.y < COLLAR.top
+          ? DOME.rx * Math.sqrt(Math.max(0, 1 - ((DOME.cy - p.y) / DOME.ry) ** 2)) - 6
+          : CHAMBER.w / 2 - 8;
+        const cx = CHAMBER.x + CHAMBER.w / 2;
+        if (p.x < cx - halfW) p.x = cx - halfW;
+        if (p.x > cx + halfW) p.x = cx + halfW;
+        if (p.y < TOP_Y || halfW <= 2) spawn(p);
       }
     };
 
-    const draw = () => {
-      ctx.clearRect(0, 0, W, H);
+    const draw = (now: number) => {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      ctx.save();
+      flaskPath();
+      ctx.clip();
+
+      /* a warm glow where the material heats, breathing slowly */
+      const pulse = 0.28 + 0.12 * Math.sin(now / 1800);
+      const glow = ctx.createRadialGradient(775, SOURCE_Y + 4, 2, 775, SOURCE_Y + 4, 58);
+      glow.addColorStop(0, `rgba(240,83,47,${pulse.toFixed(3)})`);
+      glow.addColorStop(1, 'rgba(240,83,47,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(CHAMBER.x, CHAMBER.y + 40, CHAMBER.w, CHAMBER.h);
+
       ctx.globalCompositeOperation = 'lighter';
+      const span = SOURCE_Y - TOP_Y;
       for (const p of ps) {
-        const rise = Math.max(0, Math.min(1, (ey - p.y) / travel));
-        const [r, g, b] = colour(Math.min(1, rise / 0.8));
-        const fadeIn = Math.min(1, p.age / 25);
-        const fadeOut = 1 - Math.max(0, (rise - p.span * 0.7) / (p.span * 0.3));
-        const a = (0.4 + 0.55 * (1 - rise)) * fadeIn * Math.max(0, fadeOut);
-        ctx.fillStyle = `rgba(${r},${g},${b},${Math.max(0.03, a).toFixed(3)})`;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.s * (0.8 + rise * 0.6), 0, Math.PI * 2); ctx.fill();
+        if (p.y > COLLAR.top && p.y < COLLAR.bottom) continue; // behind the collar
+        const rise = Math.max(0, Math.min(1, (SOURCE_Y - p.y) / span));
+        const [r, g, b] = colour(rise);
+        const fadeIn = Math.min(1, p.age / 40);
+        const fadeOut = rise > 0.75 ? Math.max(0, 1 - (rise - 0.75) / 0.25) : 1;
+        const a = (0.55 - 0.2 * rise) * fadeIn * fadeOut;
+        ctx.fillStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2); ctx.fill();
       }
-      ctx.globalCompositeOperation = 'source-over';
+      ctx.restore();
     };
 
     layout();
     for (let i = 0; i < N; i++) {
-      const p = spawn({ x: 0, y: 0, vx: 0, vy: 0, s: 1, age: 0, ph: 0, span: 1 });
-      p.y = ey - Math.random() * travel * p.span; // pre-fill the plume
-      p.age = 40;
+      const p = spawn({ x: 0, y: 0, vy: 0, s: 1, ph: 0, amp: 0, age: 0 });
+      p.y = SOURCE_Y - Math.random() * (SOURCE_Y - TOP_Y); // pre-fill the plume
+      p.age = 60;
       ps.push(p);
     }
 
     let raf = 0, running = false, visible = true;
-    const loop = (now: number) => { step(now); draw(); raf = requestAnimationFrame(loop); };
+    const loop = (now: number) => { step(now); draw(now); raf = requestAnimationFrame(loop); };
     const start = () => { if (!running && visible && !document.hidden) { running = true; t0 = performance.now(); raf = requestAnimationFrame(loop); } };
     const stop = () => { running = false; cancelAnimationFrame(raf); };
 
+    const still = () => { const now = performance.now(); draw(now); };
     if (reduce) {
-      const now = performance.now();
-      for (let i = 0; i < 300; i++) step(now + i * 16.67);
-      draw();
+      if (photo.complete) still(); else photo.addEventListener('load', still, { once: true });
     } else {
       new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }, { threshold: 0.05 }).observe(root);
       document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
@@ -567,7 +585,7 @@ const marquee = [...t.field.marquee, ...t.field.marquee];
     let rt = 0;
     window.addEventListener('resize', () => {
       window.clearTimeout(rt);
-      rt = window.setTimeout(() => { layout(); ps.forEach(spawn); if (reduce) draw(); }, 150);
+      rt = window.setTimeout(() => { layout(); if (reduce) still(); }, 150);
     });
   }
 </script>
