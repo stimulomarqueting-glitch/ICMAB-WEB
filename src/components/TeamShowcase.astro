@@ -13,6 +13,7 @@
 import type { TeamMember } from '../content/types';
 import { getContent } from '../content';
 import { getLocale } from '../i18n';
+import linkedinIcon from '../icons/brand/linkedin.svg?raw';
 
 interface Props {
   members: TeamMember[];
@@ -91,6 +92,7 @@ const on = (i: number) => (i === defaultIndex ? '' : undefined);
             <span class="show__aff">{m.affiliation}</span>
             {m.linkedin ? (
               <a class="show__link" href={m.linkedin} target="_blank" rel="noopener" aria-label={`${m.name} ${links.linkedinOf}`}>
+                <span class="show__link-icon" aria-hidden="true" set:html={linkedinIcon} />
                 {links.linkedin}
               </a>
             ) : (
@@ -370,7 +372,19 @@ const on = (i: number) => (i === defaultIndex ? '' : undefined);
     letter-spacing: 0.06em;
   }
 
+  .show__link-icon {
+    display: inline-flex;
+  }
+
+  .show__link-icon :global(svg) {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
   .show__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     color: #fff;
     text-decoration: underline;
     text-underline-offset: 4px;

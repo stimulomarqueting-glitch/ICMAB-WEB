@@ -9,6 +9,7 @@ import Header from '../../components/Header.astro';
 import LeadForm from '../../components/LeadForm.astro';
 import Footer from '../../components/Footer.astro';
 import { brand } from '../../config/brand';
+import mailIcon from '../../icons/brand/mail.svg?raw';
 import { getContent } from '../../content';
 import { getLocale, localeStaticPaths } from '../../i18n';
 
@@ -44,7 +45,10 @@ const { contact, site } = getContent(getLocale(Astro.url));
                 </li>
               ))}
             </ol>
-            <h2 class="contact__aside-title contact__direct">{contact.aside.directTitle}</h2>
+            <h2 class="contact__aside-title contact__direct">
+              <span class="contact__mail" aria-hidden="true" set:html={mailIcon} />
+              {contact.aside.directTitle}
+            </h2>
             <p class="contact__direct-text">
               {contact.aside.directText}
               <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
@@ -151,7 +155,25 @@ const { contact, site } = getContent(getLocale(Astro.url));
   .contact__steps li:last-child .contact__sn { color: var(--violet-dark); }
 
   .contact__direct {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     margin-top: 2rem;
+  }
+
+  .contact__mail {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: var(--coral-tint);
+    color: var(--coral-dark);
+  }
+
+  .contact__mail :global(svg) {
+    width: 1.6rem;
+    height: 1.6rem;
   }
 
   .contact__direct-text {

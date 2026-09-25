@@ -1,44 +1,45 @@
 ---
 /**
- * MatSurfer brand mark — outlined deposition vessel: gradient stroke
- * (violet vapour → coral deposit) broken mid-height, particles inside
- * coloured by their position along the same gradient.
- * Vectorised from the official logo; `size` is the rendered height in px.
+ * MatSurfer brand mark — the deposition vessel: a violet-to-coral outline
+ * broken at mid-height, a tab under the lid, the deposited mound on the
+ * floor and particles inside, all coloured by height along one gradient.
+ * Traced from the official logo at its true proportions (72 × 115);
+ * `size` is the rendered height in px.
  */
 interface Props {
   size?: number;
 }
 
 const { size = 26 } = Astro.props;
-const width = Math.round(size * (68 / 120));
+const width = Math.round(size * (72 / 115) * 10) / 10;
+const id = `ms-mark-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
-<svg width={width} height={size} viewBox="0 0 68 120" fill="none" aria-hidden="true">
+<svg width={width} height={size} viewBox="0 0 72 115" fill="none" aria-hidden="true">
   <defs>
-    <linearGradient id="ms-cap" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="120">
+    <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="115">
       <stop offset="0" stop-color="#6C12F8" />
-      <stop offset="0.3" stop-color="#A72F9E" />
-      <stop offset="0.55" stop-color="#CE4262" />
+      <stop offset="0.32" stop-color="#A72F9E" />
+      <stop offset="0.58" stop-color="#CE4262" />
       <stop offset="1" stop-color="#F0532F" />
     </linearGradient>
   </defs>
-  <path
-    d="M 9.64 57 L 11.55 15 Q 12 5 22 5 L 46 5 Q 56 5 56.45 15 L 58.36 57"
-    stroke="url(#ms-cap)"
-    stroke-width="7"
-    stroke-linecap="round"
-  />
-  <path
-    d="M 8.91 73 L 7.55 103 Q 7 115 19 115 L 49 115 Q 61 115 60.45 103 L 59.09 73"
-    stroke="url(#ms-cap)"
-    stroke-width="7"
-    stroke-linecap="round"
-  />
-  <circle cx="24" cy="30" r="3.2" fill="url(#ms-cap)" />
-  <circle cx="46" cy="21" r="2.6" fill="url(#ms-cap)" />
-  <circle cx="42" cy="46" r="5.5" fill="url(#ms-cap)" />
-  <circle cx="22" cy="59" r="2.8" fill="url(#ms-cap)" />
-  <circle cx="48" cy="71" r="3" fill="url(#ms-cap)" />
-  <circle cx="17" cy="84" r="5" fill="url(#ms-cap)" />
-  <circle cx="33" cy="104.5" r="6.5" fill="url(#ms-cap)" />
+  <g fill={`url(#${id})`} stroke={`url(#${id})`}>
+    <!-- lid and upper walls, cut square at mid-height -->
+    <path d="M7.3 51.3 L10.2 11 Q10.8 3.7 18 3.7 L54 3.7 Q61.5 3.7 62 11 L65.2 51.3" fill="none" stroke-width="7.4" stroke-linejoin="round" />
+    <path d="M15.5 3.7 H56.5 Q52.5 4.2 51.7 8.4 Q51.2 11.3 48.3 11.3 H23.6 Q20.7 11.3 20.2 8.4 Q19.4 4.2 15.5 3.7 Z" stroke="none" />
+    <!-- lower walls and floor -->
+    <path d="M6.1 63.3 L5.2 98 Q5 110.9 18 110.9 L54 110.9 Q67.3 110.9 67.3 98 L66.8 63.3" fill="none" stroke-width="7.6" stroke-linejoin="round" />
+    <!-- the deposited mound -->
+    <path d="M26.5 110 Q27.6 99.2 36.2 99.2 Q44.8 99.2 45.9 110 Z" stroke="none" />
+    <!-- particles -->
+    <circle cx="35.8" cy="24.2" r="3" stroke="none" />
+    <circle cx="51" cy="28.8" r="2" stroke="none" />
+    <circle cx="22.5" cy="33" r="3.3" stroke="none" />
+    <circle cx="43" cy="45.5" r="6.1" stroke="none" />
+    <circle cx="21.7" cy="50" r="4.1" stroke="none" />
+    <circle cx="33.7" cy="64.5" r="3.3" stroke="none" />
+    <circle cx="50" cy="74.3" r="5" stroke="none" />
+    <circle cx="26.3" cy="82.7" r="7.5" stroke="none" />
+  </g>
 </svg>
