@@ -26,9 +26,13 @@ export interface Application {
 }
 
 export interface ExpertExperience {
-  name: string;
-  role: string;
-  institution: string;
+  /** stable key, used to pair each entry with its translation */
+  id: string;
+  /** attribution — optional: an evaluation may be published before its
+   *  author confirms how they want to be credited */
+  name?: string;
+  role?: string;
+  institution?: string;
   /** scientific field, shown as a mono tag (e.g. 'Organic electronics') */
   field: string;
   quote: string;

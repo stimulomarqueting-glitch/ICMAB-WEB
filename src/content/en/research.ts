@@ -21,6 +21,7 @@ import type { ExpertExperience, Publication, ValidationItem } from '../types';
  */
 export const expertExperiences: ExpertExperience[] = [
   {
+    id: 'technology-assessment',
     name: 'Dr Diego Gutiérrez Yatacue',
     role: 'Innovation and Technology Manager',
     institution: 'ICMAB-CSIC',
@@ -28,6 +29,17 @@ export const expertExperiences: ExpertExperience[] = [
     quote:
       'The overall experience with MatSurfer has been positive. It serves its purpose as a fast, low-cost screening tool for sublimation experiments in the laboratory, especially in academic environments. It would be very useful for running experiments in parallel on different surfaces or sublimation conditions, to optimise conditions quickly — an advantage over other techniques. I was surprised by how robust it is with respect to temperature. The device has potential for scientific use rather than scale-up.',
     date: '2026-09',
+    published: true,
+  },
+  {
+    // Evaluation supplied by ICMAB (2026-10), lightly edited for clarity; the
+    // device is named MatSurfer where the evaluation used the earlier project
+    // name. TODO(client): confirm the author's name, role and institution.
+    id: 'mof-cof-films',
+    field: 'MOF & COF thin films',
+    quote:
+      'MatSurfer proved very versatile for crystallising MOF and COF films. Its adjustable configuration made it possible to set the height at which the films were exposed to the different crystallisation mixtures — in direct contact or further away — with good results in both cases. The device also withstands temperatures of 80–100 °C over several days.',
+    date: '2026-10',
     published: true,
   },
 ];

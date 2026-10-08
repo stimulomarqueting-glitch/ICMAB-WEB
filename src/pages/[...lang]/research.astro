@@ -58,9 +58,11 @@ const papersJsonLd = papers.map((p) => ({
               <article class="panel research__card reveal">
                 <span class="research__field">{e.field}</span>
                 <blockquote class="research__quote"><p>“{e.quote}”</p></blockquote>
+                {e.name && (
                 <p class="research__who">
-                  <strong>{e.name}</strong> · {e.role}, {e.institution}
+                  <strong>{e.name}</strong>{e.role && ` · ${e.role}`}{e.institution && `, ${e.institution}`}
                 </p>
+                )}
                 {e.device && <p class="research__device">{e.device}</p>}
                 {e.link && <a class="research__link" href={e.link} target="_blank" rel="noopener">{researchPage.moreLink}</a>}
               </article>

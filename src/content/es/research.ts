@@ -16,7 +16,7 @@ import type { ResearchPageContent } from '../en/research';
 export { publications } from '../en/research';
 
 const expertsEs: Record<string, Pick<ExpertExperience, 'name' | 'role' | 'field' | 'quote'>> = {
-  'Dr Diego Gutiérrez Yatacue': {
+  'technology-assessment': {
     name: 'Dr. Diego Gutiérrez Yatacue',
     // Cargo tal como figura en el documento de ICMAB (en inglés).
     role: 'Innovation and Technology Manager',
@@ -24,11 +24,16 @@ const expertsEs: Record<string, Pick<ExpertExperience, 'name' | 'role' | 'field'
     quote:
       'La experiencia general con MatSurfer ha sido positiva. El equipo cumple adecuadamente su propósito como herramienta de cribado rápido y de bajo coste para experimentos de sublimación en laboratorio, especialmente en entornos académicos. Creo que vendría muy bien a la hora de hacer experimentos en paralelo sobre diferentes superficies o condiciones de sublimación para optimizar condiciones de manera rápida; creo que esto presenta una ventaja en relación con otras técnicas. Me sorprendió la robustez que tiene frente a la temperatura. El equipo tiene potencial para utilidad científica más que de escalado.',
   },
+  'mof-cof-films': {
+    field: 'Películas finas de MOF y COF',
+    quote:
+      'MatSurfer resultó muy versátil para la cristalización de películas de MOF y COF. Gracias a su configuración ajustable fue posible regular la altura a la que las películas quedaban expuestas a las distintas mezclas de cristalización —en contacto directo o a mayor distancia—, con buenos resultados en ambos casos. Además, el dispositivo resiste temperaturas de entre 80 y 100 °C durante varios días.',
+  },
 };
 
 export const expertExperiences: ExpertExperience[] = expertsEn.map((e) => {
-  const t = expertsEs[e.name];
-  if (!t) throw new Error(`[content/es/research] falta la traducción de "${e.name}"`);
+  const t = expertsEs[e.id];
+  if (!t) throw new Error(`[content/es/research] falta la traducción de "${e.id}"`);
   return { ...e, ...t };
 });
 
