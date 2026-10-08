@@ -3,7 +3,7 @@
 Multi-page website for **MatSurfer**, an ICMAB-CSIC technology-transfer
 project: a compact device for direct material deposition on surfaces by
 sublimation, at lab scale. Visual identity: Design System v3 (5-phase
-sublimation gradient, Sora / Manrope / IBM Plex Mono, Obviously Variable
+sublimation gradient, Sora / Manrope / IBM Plex Mono, the original logo files in `public/brand` (never re-typeset)
 for the wordmark only).
 
 Built with [Astro](https://astro.build) — fully static output, no
@@ -62,6 +62,7 @@ npm run preview   # preview the production build locally
 | What | Where |
 |---|---|
 | **Brand name / claim / contact email** | `src/config/brand.ts` |
+| Logo (official files, used as images) | `public/brand/` — see its README |
 | Home hero variant (`field` animated sublimation field / `photo` duotone photo) | `src/config/hero.ts` |
 | **Lead capture (demo/production, endpoint, privacy URL)** | `src/config/leadCapture.ts` — see below |
 | Final production domain | `src/config/site.mjs` + `public/robots.txt` |

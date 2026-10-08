@@ -6,7 +6,6 @@
 import { brand } from '../config/brand';
 import { getContent } from '../content';
 import { getLocale, localePath } from '../i18n';
-import BrandMark from './BrandMark.astro';
 
 const locale = getLocale(Astro.url);
 const { site } = getContent(locale);
@@ -21,8 +20,7 @@ const isCurrent = (href: string) => (lp(href).replace(/\/$/, '') || '/') === cur
     <div class="footer__top">
       <div class="footer__brand">
         <a class="footer__logo" href={lp('/')}>
-          <BrandMark />
-          <span class="wordmark">{brand.projectName}</span>
+          <img class="footer__logotype" src="/brand/logotipo.svg" width="168" height="30" alt={brand.projectName} />
         </a>
         <p class="footer__desc">{t.description}</p>
         <a class="btn btn--sm footer__cta" href={lp(t.ctaHref)} data-cta-source="footer">{t.cta}</a>

@@ -4,23 +4,9 @@
    → heating (warm coral) → phase change (magenta) → vapour rise (mid violet)
    → transformation (electric violet). Tinted soft backgrounds per section,
    plum-violet dark, violet-tinted shadows, liquid glass used sparingly.
-   Sora (headings) · Manrope (body/UI) · IBM Plex Mono (params, data) ·
-   Obviously Variable (wordmark ONLY).
+   Sora (headings) · Manrope (body/UI) · IBM Plex Mono (params, data).
+   The logo is always the client's original file (public/brand), never type.
    ──────────────────────────────────────────────────────────────────────────── */
-
-@font-face {
-  font-family: 'Obviously Variable';
-  src: url('/fonts/obviously-regular.otf') format('opentype');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Obviously Variable';
-  src: url('/fonts/obviously-bold.otf') format('opentype');
-  font-weight: 700;
-  font-display: swap;
-}
 
 :root {
   /* ---- Sublimation palette (5 phases) ---- */
@@ -81,7 +67,6 @@
   --glass-blur: 18px;
 
   /* ---- Typography ---- */
-  --font-logo: 'Obviously Variable', 'Sora', sans-serif; /* wordmark ONLY */
   --font-display: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -218,13 +203,6 @@ a:hover {
 
 .mist--violet {
   background: var(--bg-mist-violet);
-}
-
-/* ---- Wordmark (Obviously Variable — the ONLY place this font is used) ---- */
-.wordmark {
-  font-family: var(--font-logo);
-  font-weight: 700;
-  letter-spacing: -0.01em;
 }
 
 /* ---- Signature motif: uppercase mono eyebrow ---- */
