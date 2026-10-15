@@ -260,10 +260,10 @@ function mats_settings_schema(): array {
 						),
 						'seo_description' => array(
 							'label' => 'Descripción',
-							'help'  => 'El texto gris debajo del título. Ideal: entre 120 y 160 caracteres.',
+							'help'  => 'El texto gris debajo del título. Ideal: entre 120 y 155 caracteres. También se usa en cualquier página o noticia que no tenga su propia descripción.',
 							'type'  => 'textarea',
 							'max'   => 320,
-							'count' => 160,
+							'count' => 155,
 						),
 						'og_alt'          => array(
 							'label' => 'Texto alternativo de la imagen para redes',

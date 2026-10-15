@@ -58,7 +58,7 @@ return array(
 				),
 				array(
 					'type' => 'warn',
-					'text' => 'Si escribes mal la contraseña **5 veces seguidas**, el acceso de ese usuario se bloquea **15 minutos** («Acceso bloqueado un rato por seguridad»). Espera los minutos que indica o usa **¿Has olvidado la contraseña?**. Al entrar bien, la cuenta vuelve a empezar de cero.',
+					'text' => 'Si escribes mal la contraseña **5 veces seguidas**, el acceso de ese usuario se bloquea **15 minutos** («Acceso bloqueado un rato por seguridad»). Espera los minutos que indica o pide una nueva con **¿Has olvidado la contraseña?**: en cuanto la cambies podrás entrar. Si se bloquea toda la conexión (muchos intentos fallidos desde la misma red), solo queda esperar. Al entrar bien, la cuenta vuelve a empezar de cero.',
 				),
 				array(
 					'type' => 'note',
@@ -324,7 +324,7 @@ return array(
 					'head'  => array( 'Casilla', 'Qué es', 'Si la dejas vacía' ),
 					'rows'  => array(
 						array( '**Título en Google**', 'El título azul de Google y el de la pestaña del navegador. Recomendado: **60 caracteres como máximo** (el contador se pone naranja si se pasa).', 'La portada usa el título general de [Ajustes de la web](#ajustes); las demás páginas y las noticias, «Título de la página — MatSurfer».' ),
-						array( '**Descripción en Google**', 'El texto gris bajo el título. También se usa al compartir en LinkedIn, X, WhatsApp… Recomendado: **entre 50 y 155 caracteres**.', 'Se usa el **extracto** de la página o la noticia; si no hay, la descripción general de la web (en las noticias, el principio del texto).' ),
+						array( '**Descripción en Google**', 'El texto gris bajo el título. También se usa al compartir en LinkedIn, X, WhatsApp… Recomendado: **entre 120 y 155 caracteres**.', 'Las noticias usan su **extracto** o, si no hay, el principio del texto. Las páginas hechas de secciones usan la descripción general de [Ajustes de la web](#ajustes).' ),
 					),
 				),
 				array(
