@@ -51,7 +51,8 @@ $_SERVER['REQUEST_URI'] = '/';
 
 /* ── child: front-end render of one URL with these language packs ─────── */
 if ( str_starts_with( $mats_child, 'front:' ) ) {
-	$_SERVER['REQUEST_URI'] = substr( $mats_child, 6 );
+	$_SERVER['REQUEST_URI']    = substr( $mats_child, 6 );
+	$_SERVER['REQUEST_METHOD'] = 'GET';
 	define( 'WP_USE_THEMES', true );
 	ob_start();
 	require '/home/user/wpsite/wp-blog-header.php';
@@ -278,10 +279,15 @@ if ( $mats_offline ) {
 	mats_qa( mats_qa_has( $mats_t2, 'ya estaba en español' ) && mats_qa_has( $mats_t2, 'Polylang ya tenía su traducción' ), 'second run reports "ya estaba"' );
 
 	echo "\n== a language chosen by somebody is respected\n";
+	/* WordPress only accepts an installed language in WPLANG: fake a Catalan pack */
+	copy( WP_LANG_DIR . '/es_ES.mo', WP_LANG_DIR . '/ca.mo' );
+	copy( WP_LANG_DIR . '/es_ES.po', WP_LANG_DIR . '/ca.po' );
 	update_option( 'WPLANG', 'ca' );
 	$mats_r3 = mats_installer_run_step( 'languages', array() );
-	mats_qa( 'ca' === get_option( 'WPLANG' ) && mats_qa_has( mats_qa_texts( $mats_r3 ), 'porque alguien lo eligió así' ), 'WPLANG=ca kept, explained' );
+	mats_qa( 'ca' === get_option( 'WPLANG' ) && mats_qa_has( mats_qa_texts( $mats_r3 ), 'porque alguien lo eligió así' ), 'WPLANG=ca (chosen by hand) kept, explained: ' . get_option( 'WPLANG' ) );
 	update_option( 'WPLANG', 'es_ES' );
+	unlink( WP_LANG_DIR . '/ca.mo' );
+	unlink( WP_LANG_DIR . '/ca.po' );
 
 	echo "\n== new PHP process: the admin speaks Spanish\n";
 	$mats_cmd   = escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( __FILE__ ) . ' --child=admin';

@@ -806,7 +806,7 @@ function mats_settings_handle_save(): void {
 				'viewlinks' => true,
 			)
 		);
-	} elseif ( ! $rejected ) {
+	} elseif ( ! array_filter( $messages, static fn( $m ) => 'error' === $m['type'] ) ) {
 		array_unshift(
 			$messages,
 			array(
