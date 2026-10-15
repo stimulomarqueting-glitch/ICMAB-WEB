@@ -62,9 +62,10 @@ body {
 }
 
 /* ── in-place editing ─────────────────────────────────────────────────── */
-[data-mats-edit] {
+/* :where() keeps specificity at zero so components keep their own shape
+   (pill buttons, rounded tags) */
+:where([data-mats-edit]) {
   cursor: text;
-  border-radius: 3px;
   transition: outline-color 120ms ease, background-color 120ms ease;
   outline: 1px dashed transparent;
   outline-offset: 3px;
@@ -84,6 +85,13 @@ body {
   outline: 2px solid #6c12f8 !important;
   outline-offset: 3px;
   background-color: rgba(108, 18, 248, 0.06);
+}
+
+/* core sets `.wp-block img:not([draggable]) { pointer-events: none }`;
+   photos marked for replacement must receive the click */
+.wp-block.mats-preview img[data-mats-image],
+.mats-preview img[data-mats-image] {
+  pointer-events: auto !important;
 }
 
 [data-mats-image] {

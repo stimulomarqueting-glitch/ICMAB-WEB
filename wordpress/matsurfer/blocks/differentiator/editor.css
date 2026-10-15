@@ -1,0 +1,9 @@
+/* Key differentiator — block editor preview only (block.json "editorStyle"),
+   never loaded on the public site. The preview wrapper is .mats-preview. */
+
+/* nothing scrolls into view in the editor: show the features' vapour
+   hairline in its final (revealed) state */
+.mats-preview .diff .diff__feature::before {
+  width: 100%;
+  transition: none;
+}

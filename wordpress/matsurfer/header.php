@@ -1,15 +1,13 @@
 <?php
 /**
- * Document head + site header (port of Header.astro): logo → home, main
- * navigation with the current page marked, EN/ES switcher, global CTA,
- * burger menu under 64rem.
+ * Document head + skip link + site header (template-parts/site-header.php,
+ * port of Header.astro). Every template opens its content with
+ * <main id="main"> — the skip link's target.
  *
  * @package matsurfer
  */
 
 defined( 'ABSPATH' ) || exit;
-
-$mats_lang = mats_lang();
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>

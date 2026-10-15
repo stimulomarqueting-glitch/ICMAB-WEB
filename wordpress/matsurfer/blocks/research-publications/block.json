@@ -15,8 +15,19 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "publications"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "publications-title"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
   "matsurfer": {
     "fields": [
       {
@@ -28,7 +39,8 @@
       {
         "key": "title",
         "type": "text",
-        "label": "Título de la sección"
+        "label": "Título de la sección",
+        "help": "Encabezado encima de la lista de artículos."
       }
     ]
   }

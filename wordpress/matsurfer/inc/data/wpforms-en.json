@@ -1,0 +1,278 @@
+[
+    {
+        "fields": {
+            "1": {
+                "id": "1",
+                "type": "name",
+                "label": "Name",
+                "description": "",
+                "required": "1",
+                "size": "large",
+                "placeholder": "",
+                "default_value": "",
+                "css": "lf-half",
+                "format": "simple",
+                "simple_placeholder": "",
+                "simple_default": "",
+                "first_placeholder": "",
+                "first_default": "",
+                "middle_placeholder": "",
+                "middle_default": "",
+                "last_placeholder": "",
+                "last_default": ""
+            },
+            "2": {
+                "id": "2",
+                "type": "email",
+                "label": "Work email",
+                "description": "",
+                "required": "1",
+                "size": "large",
+                "placeholder": "",
+                "default_value": "",
+                "css": "lf-half",
+                "confirmation_placeholder": "",
+                "filter_type": "",
+                "allowlist": "",
+                "denylist": ""
+            },
+            "3": {
+                "id": "3",
+                "type": "text",
+                "label": "Organisation",
+                "description": "",
+                "required": "1",
+                "size": "large",
+                "placeholder": "",
+                "default_value": "",
+                "css": "lf-half",
+                "limit_count": "1",
+                "limit_mode": "characters",
+                "input_mask": ""
+            },
+            "4": {
+                "id": "4",
+                "type": "text",
+                "label": "Role",
+                "description": "",
+                "required": "1",
+                "size": "large",
+                "placeholder": "",
+                "default_value": "",
+                "css": "lf-half",
+                "limit_count": "1",
+                "limit_mode": "characters",
+                "input_mask": ""
+            },
+            "5": {
+                "id": "5",
+                "type": "select",
+                "label": "I am interested in",
+                "choices": {
+                    "1": {
+                        "label": "Product information",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "2": {
+                        "label": "Research application",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "3": {
+                        "label": "Scientific collaboration",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "4": {
+                        "label": "Validation",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "5": {
+                        "label": "Distribution",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "6": {
+                        "label": "Other",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    }
+                },
+                "description": "",
+                "required": "1",
+                "style": "classic",
+                "size": "large",
+                "placeholder": "Select…",
+                "default_value": "",
+                "css": "lf-half",
+                "dynamic_choices": ""
+            },
+            "6": {
+                "id": "6",
+                "type": "select",
+                "label": "Area of interest",
+                "choices": {
+                    "1": {
+                        "label": "Organic electronics, including OLEDs",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "2": {
+                        "label": "Solar cells — perovskite and organic",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "3": {
+                        "label": "Chemical and biosensors",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "4": {
+                        "label": "Functional coatings",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "5": {
+                        "label": "SPM sample preparation",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "6": {
+                        "label": "New material–surface combinations",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    },
+                    "7": {
+                        "label": "Other",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    }
+                },
+                "description": "",
+                "required": "",
+                "style": "classic",
+                "size": "large",
+                "placeholder": "Select…",
+                "default_value": "",
+                "css": "lf-half",
+                "dynamic_choices": ""
+            },
+            "7": {
+                "id": "7",
+                "type": "textarea",
+                "label": "What would you like to explore with MatSurfer?",
+                "description": "",
+                "required": "1",
+                "size": "large",
+                "placeholder": "Tell us about your material, substrate, current workflow or research challenge",
+                "default_value": "",
+                "css": "lf-full",
+                "limit_count": "1",
+                "limit_mode": "characters"
+            },
+            "8": {
+                "id": "8",
+                "type": "checkbox",
+                "label": "Privacy Policy",
+                "choices": {
+                    "1": {
+                        "label": "I agree to be contacted about MatSurfer and accept the Privacy Policy.",
+                        "value": "",
+                        "image": "",
+                        "icon": "",
+                        "icon_style": ""
+                    }
+                },
+                "description": "",
+                "required": "1",
+                "label_hide": "1",
+                "choices_images_style": "modern",
+                "input_columns": "",
+                "choice_limit": "",
+                "dynamic_choices": "",
+                "css": "lf-full lf-consent"
+            }
+        },
+        "field_id": 9,
+        "settings": {
+            "form_title": "Contacto MatSurfer (EN)",
+            "form_desc": "Formulario de la página Contacto en inglés. Lo crea el tema MatSurfer.",
+            "submit_text": "Send message",
+            "submit_text_processing": "Sending…",
+            "form_class": "mats-lead-form",
+            "submit_class": "btn lf__submit",
+            "ajax_submit": "1",
+            "notification_enable": "1",
+            "notifications": {
+                "1": {
+                    "notification_name": "Aviso al equipo MatSurfer (EN)",
+                    "email": "matsurfer@icmab.es",
+                    "carboncopy": "",
+                    "subject": "[MatSurfer] New enquiry (EN)",
+                    "sender_name": "MatSurfer web",
+                    "sender_address": "{admin_email}",
+                    "replyto": "{field_id=\"2\"}",
+                    "message": "{all_fields}",
+                    "file_upload_attachment_enable": "",
+                    "entry_csv_attachment_enable": ""
+                }
+            },
+            "confirmations": {
+                "1": {
+                    "name": "Mensaje de gracias (EN)",
+                    "type": "message",
+                    "message": "<h2>Enquiry received</h2>\n<p>Thank you — we have received your enquiry. The MatSurfer team will review the information and contact you as the early-access programme develops.</p>",
+                    "message_scroll": "1",
+                    "page": "",
+                    "page_url_parameters": "",
+                    "redirect": "",
+                    "message_entry_preview_style": "basic"
+                }
+            },
+            "antispam_v3": "1",
+            "antispam": "1",
+            "honeypot": "1",
+            "store_spam_entries": "0",
+            "anti_spam": {
+                "time_limit": {
+                    "enable": "0",
+                    "duration": "2"
+                }
+            },
+            "dynamic_population": "",
+            "disable_entries": "",
+            "form_tags": []
+        },
+        "meta": {
+            "template": "blank"
+        }
+    }
+]

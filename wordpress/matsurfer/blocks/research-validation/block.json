@@ -15,8 +15,19 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "validation"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "validation-title"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
   "matsurfer": {
     "fields": [
       {
@@ -30,7 +41,8 @@
         "label": "Párrafos",
         "itemLabel": "Párrafo",
         "min": 1,
-        "max": 4
+        "max": 4,
+        "help": "Cada párrafo va en su propio recuadro. Si no hay ningún párrafo, la sección no se muestra."
       }
     ]
   }

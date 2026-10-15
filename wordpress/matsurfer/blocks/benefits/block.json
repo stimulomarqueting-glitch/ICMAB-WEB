@@ -3,7 +3,7 @@
   "apiVersion": 3,
   "name": "matsurfer/benefits",
   "title": "Beneficios",
-  "description": "Cuatro beneficios con icono, título y texto.",
+  "description": "Banda oscura con cuatro beneficios: icono, título y texto.",
   "category": "matsurfer",
   "icon": "awards",
   "textdomain": "matsurfer",
@@ -16,6 +16,10 @@
     "renaming": false
   },
   "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "benefits"
+    },
     "headingId": {
       "type": "string",
       "default": "benefits-title"
@@ -23,12 +27,14 @@
   },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
   "matsurfer": {
     "fields": [
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto pequeño en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -48,11 +54,11 @@
             "options": [
               {
                 "value": "material",
-                "label": "Material (gota)"
+                "label": "Material (frasco)"
               },
               {
                 "value": "conditions",
-                "label": "Condiciones (ciclo)"
+                "label": "Condiciones (cuadrícula de puntos)"
               },
               {
                 "value": "group",
@@ -60,9 +66,10 @@
               },
               {
                 "value": "defensible",
-                "label": "Resultado (diana)"
+                "label": "Resultados (escudo con marca)"
               }
-            ]
+            ],
+            "help": "Dibujo de línea que acompaña al beneficio."
           },
           {
             "key": "title",

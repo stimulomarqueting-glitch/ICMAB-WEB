@@ -1,6 +1,7 @@
 <?php
 /**
- * Site footer + closing of the document.
+ * Site footer (template-parts/site-footer.php, port of Footer.astro) and
+ * the end of the document.
  *
  * @package matsurfer
  */

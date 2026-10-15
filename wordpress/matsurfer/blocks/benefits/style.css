@@ -1,0 +1,149 @@
+/* Outcome band — port of src/components/Benefits.astro (plum-violet, v3).
+   Every selector is scoped under the section root .bene--dark; the Astro
+   :global(.eyebrow) / :global(.h2) rules (SectionHeader inside the band)
+   become .bene--dark .eyebrow / .bene--dark .h2. */
+
+.bene--dark {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-inverse);
+  isolation: isolate;
+}
+
+/* deposition dots resting on the section's top edge */
+.bene--dark::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-top: calc(-1 * clamp(2.75rem, 5.5vw, 4.25rem));
+  height: 3px;
+  background-image: radial-gradient(circle, var(--lavender) 1.2px, transparent 1.4px);
+  background-size: 12px 3px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+/* the vapour glow of the hero, much quieter */
+.bene--dark .bene__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(45% 60% at 85% 20%, rgba(108, 18, 248, 0.28), transparent 70%),
+    radial-gradient(35% 45% at 8% 100%, rgba(240, 83, 47, 0.14), transparent 70%);
+}
+
+.bene--dark .eyebrow {
+  color: var(--lavender);
+}
+
+.bene--dark .h2 {
+  color: var(--text-on-dark);
+}
+
+.bene--dark .bene__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* glass card on plum */
+.bene--dark .bene__outcome {
+  position: relative;
+  overflow: hidden;
+  padding: 1.6rem 1.75rem 1.9rem;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color var(--dur-base) var(--ease), background-color var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+  transition-delay: calc(var(--i) * 80ms);
+}
+
+.bene--dark .bene__outcome:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(167, 47, 158, 0.55);
+  transform: translateY(-2px);
+  transition-delay: 0ms;
+}
+
+.bene--dark .bene__head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.1rem;
+}
+
+.bene--dark .bene__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: rgba(233, 220, 253, 0.08);
+  border: 1px solid rgba(233, 220, 253, 0.16);
+  color: var(--lavender, #cdb8f6);
+  transition: color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+
+.bene--dark .bene__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.bene--dark .bene__outcome:hover .bene__icon {
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(108, 18, 248, 0.18), 0 0 28px rgba(108, 18, 248, 0.35);
+}
+
+.bene--dark .bene__outcome h3 {
+  font-size: 1.19rem;
+  color: var(--text-on-dark);
+}
+
+.bene--dark .bene__outcome p {
+  font-size: 0.94rem;
+  margin-top: 0.5rem;
+  max-width: 48ch;
+  color: var(--text-on-dark-2);
+}
+
+/* the deposited layer draws along the base once the card is in view */
+.bene--dark .bene__layer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background: var(--grad-vapor-line);
+  box-shadow: 0 0 14px rgba(206, 66, 98, 0.55);
+  transition: width 1100ms var(--ease-out);
+  transition-delay: calc(240ms + var(--i) * 140ms);
+}
+
+.bene--dark .bene__outcome.is-visible .bene__layer {
+  width: 100%;
+}
+
+@media (max-width: 56rem) {
+  .bene--dark .bene__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bene--dark .bene__layer {
+    transition: none;
+    width: 100%;
+  }
+
+  .bene--dark .bene__outcome {
+    transition: none;
+  }
+}

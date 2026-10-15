@@ -19,6 +19,10 @@
     "sectionId": {
       "type": "string",
       "default": ""
+    },
+    "headingId": {
+      "type": "string",
+      "default": ""
     }
   },
   "render": "file:./render.php",
@@ -28,7 +32,14 @@
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto en mayúsculas encima del título."
+      },
+      {
+        "key": "kickerNote",
+        "type": "text",
+        "label": "Nota a la derecha de la etiqueta",
+        "help": "Opcional. No se muestra en móvil."
       },
       {
         "key": "title",

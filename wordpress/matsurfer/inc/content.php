@@ -55,7 +55,7 @@ function mats_cpt_fields(): array {
 			'description' => true,
 		),
 		'mats_expert'      => array(
-			'name'        => false,
+			'name'        => true, // translatable: titles differ ('Dr' / 'Dr.')
 			'role'        => true,
 			'institution' => false,
 			'field'       => true,
@@ -80,6 +80,10 @@ function mats_field( int $post_id, string $field, string $lang = '' ) {
 		$value = get_post_meta( $post_id, mats_meta_key( $field, $lang ), true );
 		if ( '' === $value || null === $value ) {
 			$value = get_post_meta( $post_id, mats_meta_key( $field, 'en' ), true );
+		}
+		if ( '' === $value || null === $value ) {
+			/* a field that was language-neutral before keeps working */
+			$value = get_post_meta( $post_id, mats_meta_key( $field ), true );
 		}
 		return (string) $value;
 	}
@@ -306,7 +310,7 @@ function mats_get_experts( string $lang = '' ): array {
 	foreach ( mats_cpt_posts( 'mats_expert' ) as $p ) {
 		$out[] = array(
 			'id'          => $p->ID,
-			'name'        => mats_field( $p->ID, 'name' ),
+			'name'        => mats_field( $p->ID, 'name', $lang ),
 			'role'        => mats_field( $p->ID, 'role', $lang ),
 			'institution' => mats_field( $p->ID, 'institution' ),
 			'field'       => mats_field( $p->ID, 'field', $lang ),
@@ -399,7 +403,8 @@ function mats_seed_find( string $type, string $key ): int {
 	$ids = get_posts(
 		array(
 			'post_type'        => $type,
-			'post_status'      => 'any',
+			/* 'any' skips the trash: a record someone binned must not come back */
+			'post_status'      => array( 'publish', 'draft', 'pending', 'private', 'future', 'trash' ),
 			'posts_per_page'   => 1,
 			'fields'           => 'ids',
 			'meta_key'         => '_mats_seed_key', // phpcs:ignore WordPress.DB.SlowDBQuery
@@ -552,12 +557,12 @@ function mats_seed_cpts( array $content, bool $overwrite = false ): array {
 			$i,
 			! empty( $e['published'] ),
 			array(
-				'name'        => $e['name'] ?? '',
 				'institution' => $e['institution'] ?? '',
 				'link'        => $e['link'] ?? '',
 				'date'        => $e['date'] ?? '',
 			),
 			array(
+				'name'   => array( 'en' => $e['name'] ?? '', 'es' => $b['name'] ?? ( $e['name'] ?? '' ) ),
 				'role'   => array( 'en' => $e['role'] ?? '', 'es' => $b['role'] ?? ( $e['role'] ?? '' ) ),
 				'field'  => array( 'en' => $e['field'] ?? '', 'es' => $b['field'] ?? '' ),
 				'quote'  => array( 'en' => $e['quote'] ?? '', 'es' => $b['quote'] ?? '' ),

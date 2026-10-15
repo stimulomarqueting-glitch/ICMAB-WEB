@@ -15,14 +15,31 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "applications"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "apps-teaser-title"
+    },
+    "ctaSource": {
+      "type": "string",
+      "default": "home-applications"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
+  "viewScript": "file:./view.js",
   "matsurfer": {
     "fields": [
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -45,24 +62,30 @@
         "label": "Isotipo"
       },
       {
+        "key": "isotypeCaption",
+        "type": "text",
+        "label": "Pie del isotipo",
+        "help": "Frase corta debajo del dibujo."
+      },
+      {
+        "key": "isotypeAlt",
+        "type": "textarea",
+        "label": "Descripción del dibujo (accesibilidad)",
+        "rows": 2,
+        "help": "Lo que leen los lectores de pantalla en lugar del dibujo."
+      },
+      {
         "key": "isotypeLabels",
         "type": "list",
         "label": "Etiquetas del isotipo",
         "itemLabel": "Etiqueta",
         "min": 5,
         "max": 5,
-        "help": "Cinco campos, en el orden del dibujo."
+        "help": "Cinco campos, en este orden: electrónica orgánica, sensores, perovskitas, recubrimientos y SPM. En el móvil no se muestran (los accesos de debajo ya nombran cada campo)."
       },
       {
-        "key": "isotypeCaption",
-        "type": "text",
-        "label": "Pie del isotipo"
-      },
-      {
-        "key": "isotypeAlt",
-        "type": "textarea",
-        "label": "Descripción del dibujo (accesibilidad)",
-        "rows": 2
+        "type": "panel",
+        "label": "Accesos a las aplicaciones"
       },
       {
         "type": "notice",

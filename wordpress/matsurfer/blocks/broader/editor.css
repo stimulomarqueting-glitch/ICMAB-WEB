@@ -1,0 +1,8 @@
+/* Dark highlighted band — block editor preview only (block.json
+   "editorStyle"), never loaded on the public site. */
+
+/* the dashed editing outlines read on the dark band */
+.mats-preview:hover .broader--dark [data-mats-edit],
+.mats-preview.is-selected .broader--dark [data-mats-edit] {
+  outline-color: rgba(201, 188, 242, 0.45);
+}

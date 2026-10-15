@@ -1,0 +1,352 @@
+/* Home hero, "floating device" variant — port of src/components/HeroField.astro.
+   Every selector is scoped under the section root. The root itself is
+   `.field[data-field]` because `.field` alone is also a form-row class
+   (contact form); the descendant rules keep Astro's specificity (0,2,0).
+   Phone rules shared with the other heroes (centred copy, eyebrow size)
+   live in assets/css/base.css. */
+
+.field[data-field] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(38rem, calc(100svh - var(--header-h)), 56rem);
+  overflow: hidden;
+  background: var(--bg-inverse);
+  color: var(--text-on-dark);
+  isolation: isolate;
+  --px: 0.5; /* pointer, 0–1 */
+  --py: 0.5;
+  --rx: 0deg; /* plate tilt */
+  --ry: 0deg;
+}
+
+/* slow gradient mesh: heat low-left, vacuum high-right; the pointer steers it a little */
+.field .field__mesh {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(40% 40% at calc(15% + var(--px) * 10%) 95%, rgba(240, 83, 47, 0.26), transparent 70%),
+    radial-gradient(45% 55% at calc(72% + var(--px) * 6%) calc(25% + var(--py) * 10%), rgba(108, 18, 248, 0.4), transparent 70%),
+    radial-gradient(30% 35% at 50% 60%, rgba(206, 66, 98, 0.16), transparent 70%),
+    linear-gradient(180deg, #2a1845 0%, #231536 50%, #1a0f2c 100%);
+  animation: field-drift 22s ease-in-out infinite alternate;
+}
+
+@keyframes field-drift {
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+  to { transform: translate3d(1.5%, 1.5%, 0) scale(1.04); }
+}
+
+.field .field__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 11fr) minmax(0, 10fr);
+  align-items: center;
+  gap: clamp(2rem, 4vw, 4rem);
+  padding-block: clamp(3rem, 7vh, 5rem) clamp(4.5rem, 9vh, 6.5rem);
+}
+
+/* ── copy ─────────────────────────────────────────────────────────── */
+.field .field__claim {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.field .field__claim b {
+  color: #fff;
+  font-weight: 600;
+}
+
+.field .field__title {
+  max-width: 14ch;
+  margin-top: 1rem;
+  font-size: clamp(2.5rem, 4.6vw, 4.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.field .field__word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.field .field__descriptor {
+  font-family: var(--font-mono);
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+  margin-top: 1.25rem;
+}
+
+.field .field__lead {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  max-width: 32rem;
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.field .field__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.field .field__eyebrow {
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2.25rem;
+}
+
+.field .rise {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.6em);
+  animation: field-rise 900ms var(--ease-out) forwards;
+  animation-delay: calc(120ms + var(--i, 0) * 60ms);
+}
+
+.field .field__claim.rise,
+.field .field__descriptor.rise,
+.field .field__lead.rise,
+.field .field__eyebrow.rise {
+  display: block;
+}
+
+.field .field__ctas.rise {
+  display: flex;
+}
+
+@keyframes field-rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── the plate ────────────────────────────────────────────────────── */
+.field .field__stage {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+.field .plate {
+  position: relative;
+  width: 108%; /* bleeds a little past the container edge */
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 220ms ease-out;
+  will-change: transform;
+}
+
+.field .plate__float {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: plate-float 7s ease-in-out infinite;
+}
+
+@keyframes plate-float {
+  50% { transform: translateY(-10px); }
+}
+
+.field .plate__card {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 40px 90px rgba(10, 4, 24, 0.55);
+  transform: translateZ(0);
+}
+
+.field .plate__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 62% 50%;
+}
+
+/* warm-to-cool duotone, light enough to keep the glass legible */
+.field .plate__tint {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(240, 83, 47, 0.55) 0%, rgba(206, 66, 98, 0.45) 45%, rgba(108, 18, 248, 0.6) 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* a specular band that follows the pointer across the glass */
+.field .plate__sheen {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    115deg,
+    transparent calc(var(--px) * 100% - 22%),
+    rgba(255, 255, 255, 0.18) calc(var(--px) * 100% - 4%),
+    rgba(255, 255, 255, 0.05) calc(var(--px) * 100% + 4%),
+    transparent calc(var(--px) * 100% + 20%)
+  );
+  mix-blend-mode: screen;
+  transform: translateZ(20px);
+  pointer-events: none;
+}
+
+/* depth behind: a violet halo and a soft drop shadow that slides against the tilt */
+.field .plate__halo {
+  position: absolute;
+  inset: -12% -8%;
+  background: radial-gradient(50% 50% at 60% 55%, rgba(108, 18, 248, 0.55), transparent 70%);
+  filter: blur(24px);
+  transform: translateZ(-140px) scale(1.1);
+}
+
+.field .plate__shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -8%;
+  height: 24%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(8, 3, 20, 0.7), transparent 70%);
+  filter: blur(18px);
+  transform: translateZ(-90px) translateX(calc(var(--ry) * -1.4)) translateY(calc(var(--rx) * 1.2));
+}
+
+/* the vapour lives inside the glass chamber of the photo */
+.field .plate__vapour {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ── marquee + strip ──────────────────────────────────────────────── */
+.field .field__marquee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  padding-block: 0.7rem;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(28, 16, 44, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.field .field__track {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  animation: field-marquee 48s linear infinite;
+}
+
+.field .field__track li {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.field .field__track li::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--grad-vapor);
+  opacity: 0.8;
+}
+
+@keyframes field-marquee {
+  to { transform: translateX(-50%); }
+}
+
+.field .field__strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  background: var(--grad-vapor);
+  z-index: 2;
+}
+
+/* ── responsive ───────────────────────────────────────────────────── */
+@media (max-width: 64rem) {
+  .field .field__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .field .plate {
+    width: 104%;
+  }
+}
+
+/* stacked: the plate sits under the copy, capped so the band stays compact */
+@media (max-width: 56rem) {
+  .field .field__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .field .plate {
+    width: min(100%, 34rem);
+    margin-inline: auto;
+  }
+
+  .field .plate__card {
+    aspect-ratio: 16 / 10;
+  }
+
+  .field .field__eyebrow {
+    font-size: 0.69rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 40rem) {
+  .field .field__ctas .btn {
+    width: 100%;
+  }
+
+  .field .field__grid {
+    padding-bottom: 5.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field .field__mesh,
+  .field .field__track,
+  .field .plate__float {
+    animation: none;
+  }
+
+  .field .plate {
+    transition: none;
+  }
+
+  .field .rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

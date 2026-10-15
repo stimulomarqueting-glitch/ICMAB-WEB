@@ -1,0 +1,69 @@
+/* Dark highlighted band — port of the "beyond surface science" rules in the
+   <style> of src/pages/[...lang]/applications.astro (plum band, glass
+   panel). Every selector is scoped under the section root .broader--dark. */
+
+.broader--dark {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-inverse);
+  isolation: isolate;
+}
+
+.broader--dark .broader__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(45% 60% at 85% 20%, rgba(108, 18, 248, 0.28), transparent 70%),
+    radial-gradient(35% 45% at 8% 100%, rgba(240, 83, 47, 0.14), transparent 70%);
+}
+
+.broader--dark .broader__panel {
+  position: relative;
+  overflow: hidden;
+  max-width: 52rem;
+  margin-inline: auto;
+  text-align: center;
+  padding: clamp(1.75rem, 3.5vw, 2.5rem);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.broader--dark .eyebrow {
+  color: var(--lavender);
+}
+
+.broader--dark .h2 {
+  color: var(--text-on-dark);
+}
+
+.broader--dark .broader__text {
+  margin: 1rem auto 0;
+  max-width: 58ch;
+  font-size: 1.06rem;
+  line-height: 1.6;
+  color: var(--text-on-dark-2);
+}
+
+/* the section header's title cap is left-aligned by default; centre it here */
+.broader--dark .h2 {
+  margin-inline: auto;
+}
+
+.broader--dark .broader__layer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background: var(--grad-vapor-line);
+  box-shadow: 0 0 14px rgba(206, 66, 98, 0.55);
+  transition: width 1100ms var(--ease-out) 250ms;
+}
+
+.broader--dark .broader__panel.is-visible .broader__layer {
+  width: 100%;
+}

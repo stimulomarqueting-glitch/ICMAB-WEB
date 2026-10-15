@@ -1,0 +1,14 @@
+/* Applications list — block editor preview only (block.json "editorStyle"),
+   never loaded on the public site. The preview wrapper is .mats-preview. */
+
+/* there is no site header above the canvas: the nav stays in the flow */
+.mats-preview .apps-nav {
+  position: relative;
+  top: auto;
+}
+
+/* the editor-only note sits above the list */
+.mats-preview .apps-list .mats-note {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}

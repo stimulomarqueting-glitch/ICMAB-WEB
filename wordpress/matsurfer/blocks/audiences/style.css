@@ -1,0 +1,193 @@
+/* "Who it's for" — port of src/components/Audiences.astro. Every selector is
+   scoped under the section root .audiences; the Astro :global(svg) rule
+   (the inlined brand icons) becomes .audiences .aud__icon svg. */
+
+.audiences .aud {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.audiences .aud__panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.6rem 1.6rem 1.9rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+  cursor: default;
+  --mx: 50%;
+  --my: 40%;
+  transition:
+    background-color 500ms var(--ease),
+    border-color 500ms var(--ease),
+    color 500ms var(--ease),
+    box-shadow 500ms var(--ease),
+    flex-grow 650ms var(--ease-out);
+}
+
+.audiences .aud__panel:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 3px;
+}
+
+/* vapour spotlight, driven by the pointer position */
+.audiences .aud__spot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(38% 45% at var(--mx) var(--my), rgba(108, 18, 248, 0.55), transparent 70%),
+    radial-gradient(26% 30% at calc(var(--mx) - 12%) calc(var(--my) + 18%), rgba(240, 83, 47, 0.32), transparent 70%);
+  transition: opacity 500ms var(--ease);
+}
+
+.audiences .aud__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: var(--radius-md);
+  background: var(--coral-tint);
+  color: var(--coral-dark);
+  transition: background-color 500ms var(--ease), color 500ms var(--ease);
+}
+
+/* the brand icons are drawn to be read large */
+.audiences .aud__icon svg {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+.audiences .aud__title {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 1.19rem;
+  line-height: 1.25;
+  max-width: 14ch;
+  color: var(--ink);
+  transition: color 500ms var(--ease);
+}
+
+.audiences .aud__more {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 550ms var(--ease-out), opacity 450ms var(--ease);
+}
+
+.audiences .aud__more p {
+  overflow: hidden;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--text-body);
+  transition: color 500ms var(--ease);
+}
+
+/* the deposited layer draws along the base of the active panel */
+.audiences .aud__layer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background: var(--grad-vapor-line);
+  transition: width 900ms var(--ease-out);
+}
+
+/* active / hovered: plum tile with the spotlight on */
+.audiences .aud__panel[data-active],
+.audiences .aud__panel:hover {
+  background: var(--bg-inverse);
+  border-color: transparent;
+  color: var(--text-on-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.audiences .aud__panel[data-active] .aud__spot,
+.audiences .aud__panel:hover .aud__spot {
+  opacity: 1;
+}
+
+.audiences .aud__panel[data-active] .aud__icon,
+.audiences .aud__panel:hover .aud__icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.audiences .aud__panel[data-active] .aud__title,
+.audiences .aud__panel:hover .aud__title {
+  color: #fff;
+}
+
+.audiences .aud__panel[data-active] .aud__more p,
+.audiences .aud__panel:hover .aud__more p {
+  color: var(--text-on-dark-2);
+}
+
+.audiences .aud__panel[data-active] .aud__layer {
+  width: 100%;
+}
+
+/* desktop: a row of panels, the active one wide with its text open */
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  .audiences .aud {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .audiences .aud__panel {
+    flex: 1 1 0;
+    min-height: 19rem;
+    justify-content: flex-end;
+  }
+
+  .audiences .aud__panel[data-active] {
+    flex-grow: 2.3;
+  }
+
+  .audiences .aud__icon {
+    margin-bottom: auto;
+  }
+
+  .audiences .aud__more {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  .audiences .aud__panel[data-active] .aud__more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .audiences .aud__panel[data-active] .aud__title {
+    max-width: 24ch;
+  }
+}
+
+@media (max-width: 40rem) {
+  .audiences .aud {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audiences .aud__panel,
+  .audiences .aud__spot,
+  .audiences .aud__icon,
+  .audiences .aud__more,
+  .audiences .aud__layer {
+    transition: none;
+  }
+
+  .audiences .aud__layer {
+    width: 100%;
+  }
+}

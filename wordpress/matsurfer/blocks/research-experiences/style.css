@@ -1,0 +1,102 @@
+/* Expert experiences — port of the experience-card rules in the <style> of
+   src/pages/[...lang]/research.astro. Every selector is scoped under the
+   section root .research-experiences. */
+
+.research-experiences .research__head {
+  font-size: 1.35rem;
+}
+
+.research-experiences .research__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.research-experiences .research__card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.75rem;
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+}
+
+/* vapour hairline along the top, drawn on reveal */
+.research-experiences .research__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--grad-vapor-line);
+  transition: width 900ms var(--ease-out) 200ms;
+}
+
+.research-experiences .research__card.is-visible::before {
+  width: 100%;
+}
+
+.research-experiences .research__card:hover {
+  border-color: var(--border-violet-soft);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.research-experiences .research__field {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--violet-dark);
+}
+
+.research-experiences .research__quote {
+  margin: 0.9rem 0 0;
+}
+
+/* a large vapour quote mark sits in the card's corner */
+.research-experiences .research__card::after {
+  content: '\201C';
+  position: absolute;
+  top: 0.3rem;
+  right: 1.1rem;
+  font-family: var(--font-display);
+  font-size: 6rem;
+  line-height: 1;
+  font-weight: 600;
+  background: var(--grad-vapor);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.research-experiences .research__quote p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-strong);
+}
+
+.research-experiences .research__who {
+  font-size: 0.88rem;
+  margin-top: 0.9rem;
+}
+
+.research-experiences .research__device {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.research-experiences .research__link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+@media (max-width: 56rem) {
+  .research-experiences .research__grid { grid-template-columns: 1fr; }
+}

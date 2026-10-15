@@ -1,0 +1,173 @@
+/* Contact section — port of the <style> of src/pages/[...lang]/contact.astro
+   plus the form card frame of LeadForm.astro (.lf__card). The form inside
+   the card (WPForms output) is styled by assets/css/wpforms.css. */
+
+/* the subtle sublimation tint marks the conversion moment */
+.contact-sec {
+  background: var(--grad-vapor-subtle), var(--bg-page);
+}
+
+.contact {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.contact .contact__title {
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  line-height: 1.06;
+  margin-top: 0.9rem;
+}
+
+.contact .contact__word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.contact .contact__word .rise-in {
+  display: inline-block;
+}
+
+.contact .eyebrow.rise-in,
+.contact .lead.rise-in {
+  display: block;
+}
+
+.contact .contact__aside {
+  margin-top: 2.25rem;
+}
+
+.contact .contact__aside-title {
+  font-family: var(--font-body);
+  font-size: 1.06rem;
+}
+
+/* the three steps as a short timeline on a vapour line */
+.contact .contact__steps {
+  position: relative;
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0 0 0 2.6rem;
+}
+
+.contact .contact__steps::before {
+  content: '';
+  position: absolute;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  left: 0.95rem;
+  width: 2px;
+  background: var(--grad-vapor-rise);
+  opacity: 0.5;
+}
+
+.contact .contact__steps li {
+  position: relative;
+  display: block;
+  padding: 0.75rem 0;
+  font-size: 0.94rem;
+}
+
+.contact .contact__sn {
+  position: absolute;
+  left: -2.6rem;
+  top: 0.55rem;
+  display: grid;
+  place-items: center;
+  width: 1.95rem;
+  height: 1.95rem;
+  border-radius: 50%;
+  background: var(--bg-page);
+  border: 1px solid var(--border-violet-soft);
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  font-weight: 600;
+  color: var(--violet-dark);
+}
+
+.contact .contact__steps li:first-child .contact__sn { color: var(--coral-dark); border-color: var(--border-coral-soft); }
+.contact .contact__steps li:last-child .contact__sn { color: var(--violet-dark); }
+
+.contact .contact__direct {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 2rem;
+}
+
+.contact .contact__mail {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  background: var(--coral-tint);
+  color: var(--coral-dark);
+}
+
+.contact .contact__mail svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.contact .contact__direct-text {
+  font-size: 0.94rem;
+  margin-top: 0.4rem;
+}
+
+/* ── the form card (LeadForm .lf__card + the contact page's frame) ── */
+.contact .lf__card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.contact .lf__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--grad-vapor-line);
+}
+
+/* no form yet (WPForms missing): a plain line with the email */
+.contact .lf__missing {
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.contact .lf__card .mats-note {
+  width: auto;
+  margin: 0 0 1.25rem;
+}
+
+@media (max-width: 56rem) {
+  .contact {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .contact > div:first-child > .eyebrow,
+  .contact .contact__title,
+  .contact > div:first-child > .lead {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .contact .contact__aside {
+    margin-top: 2.5rem;
+  }
+
+  .contact .lf__card {
+    padding: 1.5rem 1.25rem;
+  }
+}

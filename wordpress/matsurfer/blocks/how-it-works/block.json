@@ -15,14 +15,26 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "how-it-works"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "how-title"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "viewScript": "file:./view.js",
   "matsurfer": {
     "fields": [
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto que aparece en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -42,17 +54,20 @@
       {
         "key": "caption",
         "type": "text",
-        "label": "Pie del vídeo"
+        "label": "Pie del vídeo",
+        "help": "Frase pequeña debajo del vídeo."
       },
       {
         "key": "playLabel",
         "type": "text",
-        "label": "Texto del botón de reproducir (accesibilidad)"
+        "label": "Texto del botón de reproducir (accesibilidad)",
+        "help": "No se ve en pantalla: es lo que leen los lectores de pantalla en el botón de reproducir. Si lo dejas vacío se usa el pie del vídeo, luego el título y, si tampoco hay, «Reproducir vídeo»."
       },
       {
         "key": "placeholder",
         "type": "text",
-        "label": "Aviso cuando no hay vídeo"
+        "label": "Aviso cuando no hay vídeo",
+        "help": "Solo se muestra si no hay vídeo, sobre una foto del laboratorio."
       },
       {
         "key": "steps",
@@ -74,7 +89,8 @@
         ],
         "min": 1,
         "max": 6,
-        "titleField": "title"
+        "titleField": "title",
+        "help": "Tarjetas numeradas debajo del vídeo. El número (01, 02…) se pone solo."
       }
     ]
   }

@@ -1,0 +1,82 @@
+/* Home research + team strip — port of the "research + team strip" rules in
+   src/pages/[...lang]/index.astro. Every selector is scoped under the
+   section root .explore (Astro scoped these per page). */
+
+.sec.explore {
+  padding-block: clamp(2rem, 4vw, 3rem);
+}
+
+.explore .explore__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.explore .explore__card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+
+/* a vapour wash slides in from the left on hover */
+.explore .explore__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, var(--violet-tint) 0%, transparent 55%);
+  opacity: 0;
+  transform: translateX(-12%);
+  transition: opacity 400ms var(--ease), transform 500ms var(--ease-out);
+  pointer-events: none;
+}
+
+.explore .explore__card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-violet-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.explore .explore__card:hover::before {
+  opacity: 1;
+  transform: none;
+}
+
+.explore .explore__card > * {
+  position: relative;
+}
+
+.explore .explore__card h2 {
+  font-size: 1.19rem;
+}
+
+.explore .explore__card p {
+  font-size: 0.88rem;
+  margin-top: 0.4rem;
+  max-width: 34ch;
+}
+
+.explore .explore__card .btn {
+  flex: none;
+}
+
+@media (max-width: 56rem) {
+  .explore .explore__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 40rem) {
+  .explore .explore__card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .explore .explore__card .btn {
+    width: 100%;
+  }
+}

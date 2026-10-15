@@ -1,0 +1,16 @@
+/* Stand-alone section introduction — port of src/components/SectionHeader.astro.
+   Eyebrow, title (.h2) and lead (.lead) use the global utilities from
+   base.css; only the optional kicker-note row is specific to this header. */
+
+.sec-intro .sec-head__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+@media (max-width: 40rem) {
+  .sec-intro .sec-head__note {
+    display: none;
+  }
+}

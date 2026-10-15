@@ -188,6 +188,20 @@
   .header__cta { display: none; }
 }
 
+/* WordPress only: a sixth menu item (News, once articles are published)
+   must still fit on one line just above the burger breakpoint. Matches
+   only when the menu has 8 entries (6 pages + languages + CTA), so the
+   five-item menu stays exactly like the original. */
+@media (min-width: 64.0625rem) and (max-width: 70rem) {
+  .header__inner:has(.header__menu > li:nth-child(8)) { gap: 1rem; }
+  .header__menu:has(> li:nth-child(8)) { gap: 1rem; }
+}
+
+.header__menu:has(> li:nth-child(8)) > li > a:not(.btn),
+.header__menu:has(> li:nth-child(8)) .lang {
+  white-space: nowrap;
+}
+
 /* ── footer ───────────────────────────────────────────────────────────── */
 /* v3: warm coral-tinted footer */
 .footer {
@@ -355,6 +369,23 @@
 @media (max-width: 600px) {
   .admin-bar .header {
     top: 0;
+  }
+}
+
+/* in-page anchors (#faq…) also clear the admin bar of logged-in editors */
+html:has(> body.admin-bar) {
+  scroll-padding-top: calc(var(--header-h) + 32px + 1rem);
+}
+
+@media (max-width: 782px) {
+  html:has(> body.admin-bar) {
+    scroll-padding-top: calc(var(--header-h) + 46px + 1rem);
+  }
+}
+
+@media (max-width: 600px) {
+  html:has(> body.admin-bar) {
+    scroll-padding-top: calc(var(--header-h) + 1rem);
   }
 }
 

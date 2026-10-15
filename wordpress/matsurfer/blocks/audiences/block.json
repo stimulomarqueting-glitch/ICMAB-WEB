@@ -3,7 +3,7 @@
   "apiVersion": 3,
   "name": "matsurfer/audiences",
   "title": "Para quién es",
-  "description": "Cuatro tipos de equipo con icono.",
+  "description": "Cuatro tipos de equipo con icono, en paneles que se abren uno a uno.",
   "category": "matsurfer",
   "icon": "groups",
   "textdomain": "matsurfer",
@@ -15,14 +15,27 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "who-is-it-for"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "audiences-title"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
+  "viewScript": "file:./view.js",
   "matsurfer": {
     "fields": [
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto pequeño en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -56,7 +69,8 @@
                 "value": "modularity",
                 "label": "Socios de equipamiento"
               }
-            ]
+            ],
+            "help": "Icono de la marca que acompaña a este tipo de equipo."
           },
           {
             "key": "title",
@@ -72,7 +86,8 @@
         ],
         "min": 4,
         "max": 4,
-        "titleField": "title"
+        "titleField": "title",
+        "help": "En ordenador se abre un panel cada vez (el primero al cargar); en móvil se ven los cuatro abiertos."
       }
     ]
   }

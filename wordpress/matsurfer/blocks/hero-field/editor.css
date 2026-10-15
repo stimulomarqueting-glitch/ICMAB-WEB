@@ -1,0 +1,42 @@
+/* Hero (inicio) — block editor preview only (block.json "editorStyle"),
+   never loaded on the public site. The preview wrapper is .mats-preview. */
+
+/* static copy: the entrance rise would replay on every preview refresh */
+.mats-preview .field .rise {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+/* the marquee words are edited in place, so they hold still */
+.mats-preview .field .field__track {
+  animation: none;
+}
+
+/* clicks on the photo reach it through the duotone layer (click to replace);
+   core sets `.wp-block img:not([draggable]) { pointer-events: none }` */
+.mats-preview .field .plate__tint {
+  pointer-events: none;
+}
+
+.mats-preview .field img[data-mats-image] {
+  pointer-events: auto;
+}
+
+/* no photo yet (the site then shows no plate at all): the click-to-choose
+   placeholder fills the card, centred and readable above the duotone */
+.mats-preview .field .plate__card .mats-image-empty {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 0;
+  border-color: rgba(255, 255, 255, 0.6);
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+/* the marquee sits over the grid's bottom padding: keep it clickable */
+.mats-preview .field .field__marquee {
+  z-index: 1;
+}

@@ -44,10 +44,13 @@ function mats_text( $value ): string {
 	return esc_html( is_scalar( $value ) ? (string) $value : '' );
 }
 
-/** Attribute accessor with a default: mats_attr( $attributes, 'cta.label' ). */
+/** Attribute accessor with a default: mats_get( $attributes, 'cta.label' ). */
 function mats_get( array $attributes, string $path, $default = '' ) {
 	$node = $attributes;
 	foreach ( explode( '.', $path ) as $segment ) {
+		if ( is_object( $node ) ) {
+			$node = (array) $node;
+		}
 		if ( is_array( $node ) && array_key_exists( $segment, $node ) ) {
 			$node = $node[ $segment ];
 		} else {
@@ -98,6 +101,9 @@ function mats_words( string $text, string $wrap, int $start = 0 ): string {
  *   decorative => true → alt=""
  */
 function mats_image( $image, array $args = array() ): string {
+	if ( is_object( $image ) ) {
+		$image = (array) $image; // empty object attributes arrive as stdClass
+	}
 	$image = is_array( $image ) ? $image : array( 'url' => (string) $image );
 	$id    = absint( $image['id'] ?? 0 );
 	$url   = (string) ( $image['url'] ?? '' );
@@ -155,6 +161,9 @@ function mats_image( $image, array $args = array() ): string {
 
 /** Plain URL of an image value (for CSS backgrounds, OG tags…). */
 function mats_image_url( $image, string $size = 'large' ): string {
+	if ( is_object( $image ) ) {
+		$image = (array) $image; // empty object attributes arrive as stdClass
+	}
 	$image = is_array( $image ) ? $image : array( 'url' => (string) $image );
 	$id    = absint( $image['id'] ?? 0 );
 	if ( $id ) {

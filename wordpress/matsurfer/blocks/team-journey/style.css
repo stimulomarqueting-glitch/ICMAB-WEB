@@ -1,0 +1,159 @@
+/* "From the lab to the bench" — port of src/components/TeamJourney.astro.
+   Every selector is scoped under the section root (.tjourney). */
+
+.tjourney .journey {
+  --line: 1.1rem; /* vertical position of the connecting line */
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+}
+
+/* one vapour line runs behind the three nodes */
+.tjourney .journey::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--line) + 3.2rem);
+  left: 0.6rem;
+  right: 0.6rem;
+  height: 2px;
+  background: var(--grad-vapor-line, var(--grad-vapor));
+  opacity: 0.55;
+}
+
+.tjourney .journey__step {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  /* stagger the reveal a touch per step */
+  transition-delay: calc(var(--i) * 90ms);
+}
+
+.tjourney .journey__num {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 4vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: var(--grad-vapor);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tjourney .journey__node {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0.5rem 0 0.9rem;
+  border-radius: 50%;
+  background: var(--bg-page);
+  border: 2px solid var(--violet);
+  box-shadow: 0 0 0 6px var(--bg-mist-violet, #f2eafe);
+}
+
+.tjourney .journey__step:nth-child(2) .journey__node { border-color: var(--magenta, #ce4262); }
+.tjourney .journey__step:nth-child(3) .journey__node { border-color: var(--coral); }
+
+.tjourney .journey__title {
+  font-family: var(--font-body);
+  font-size: 1.19rem;
+}
+
+.tjourney .journey__text {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  max-width: 34ch;
+}
+
+.tjourney .journey__facts {
+  margin-top: 3rem;
+  padding: 1.75rem 2rem;
+  border-color: var(--border-violet-soft);
+}
+
+.tjourney .journey__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin: 0;
+}
+
+.tjourney .journey__fact {
+  display: grid;
+  gap: 0.25rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.tjourney .journey__fact:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.tjourney .journey__value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.tjourney .journey__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tjourney .journey__note {
+  margin-top: 1.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tjourney .journey__note a {
+  margin-left: 0.35rem;
+  font-weight: 600;
+}
+
+@media (max-width: 56rem) {
+  .tjourney .journey {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-left: 2.1rem;
+  }
+
+  /* the line turns vertical, running through the nodes */
+  .tjourney .journey::before {
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+
+  .tjourney .journey__node {
+    position: absolute;
+    left: -2.1rem;
+    top: calc(var(--line) + 2.2rem);
+    margin: 0;
+  }
+
+  .tjourney .journey__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tjourney .journey__fact:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}

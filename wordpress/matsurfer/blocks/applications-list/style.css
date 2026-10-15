@@ -1,0 +1,157 @@
+/* Applications list — port of the <style> of src/pages/[...lang]/applications.astro
+   (sticky application nav + application blocks). Every selector is scoped
+   under one of the block's two roots: nav.apps-nav and section.apps-list. */
+
+/* ── sticky application nav ─────────────────────────────────────── */
+.apps-nav {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 30;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.apps-nav .apps-nav__inner {
+  display: flex;
+  gap: 0.5rem;
+  padding-block: 0.6rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.apps-nav .apps-nav__inner::-webkit-scrollbar {
+  display: none;
+}
+
+.apps-nav .apps-nav__pill {
+  flex: none;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 0.81rem;
+  font-weight: 600;
+  color: var(--text-body);
+  background: var(--bg-panel);
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+
+.apps-nav .apps-nav__pill:hover {
+  color: var(--ink);
+  border-color: var(--border-violet-soft);
+}
+
+.apps-nav .apps-nav__pill[aria-current] {
+  color: #fff;
+  background: var(--bg-inverse);
+  border-color: var(--bg-inverse);
+}
+
+/* ── application blocks ─────────────────────────────────────────── */
+.apps-list .apps {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.apps-list .app {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  /* anchor landing: keep the header below the sticky glass navbar */
+  scroll-margin-top: calc(var(--header-h) + 4.5rem);
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+}
+
+/* the deposited layer stands on the card's left edge and grows in on reveal */
+.apps-list .app::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 0;
+  background: var(--grad-vapor-rise);
+  transition: height 900ms var(--ease-out);
+  transition-delay: 200ms;
+}
+
+.apps-list .app.is-visible::before {
+  height: 100%;
+}
+
+.apps-list .app:hover {
+  border-color: var(--border-violet-soft);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* landing on an anchor from the home chips: a brief violet halo */
+.apps-list .app:target {
+  animation: app-land 1800ms var(--ease-out);
+}
+
+@keyframes app-land {
+  0% { box-shadow: 0 0 0 0 rgba(108, 18, 248, 0.35); border-color: var(--violet); }
+  100% { box-shadow: 0 0 0 18px rgba(108, 18, 248, 0); border-color: var(--border-subtle); }
+}
+
+.apps-list .app__head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.apps-list .app__tag {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.04em;
+  color: var(--violet-dark);
+  background: var(--violet-tint);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.65rem;
+}
+
+.apps-list .app__head h2 {
+  font-size: 1.35rem;
+}
+
+.apps-list .app__cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.apps-list .app__label {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coral-dark);
+}
+
+.apps-list .app__cols p {
+  font-size: 0.94rem;
+  line-height: 1.55;
+  margin-top: 0.5rem;
+}
+
+.apps-list .app__cta {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 56rem) {
+  .apps-list .app__cols {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .apps-list .app__cta {
+    width: 100%;
+  }
+}

@@ -17,6 +17,7 @@
   },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "viewScript": "file:./view.js",
   "matsurfer": {
     "fields": [
       {
@@ -28,18 +29,21 @@
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto en mayúsculas encima del título."
       },
       {
         "key": "title",
         "type": "text",
-        "label": "Título de la página (H1)"
+        "label": "Título de la página (H1)",
+        "help": "Es el título principal de la página. No lo dejes vacío: sin él, la página se queda sin título principal."
       },
       {
         "key": "lead",
         "type": "textarea",
         "label": "Texto (solo si aún no hay perfiles publicados)",
-        "rows": 3
+        "rows": 3,
+        "help": "Solo se ve mientras no haya ninguna persona publicada en Equipo; entonces la sección se muestra como una cabecera sencilla con este texto."
       },
       {
         "type": "panel",
@@ -48,27 +52,44 @@
       {
         "key": "pickerLabel",
         "type": "text",
-        "label": "Rótulo del selector de personas (accesibilidad)"
+        "label": "Rótulo del selector de personas (accesibilidad)",
+        "help": "No se ve: lo leen los lectores de pantalla para el grupo de fotos pequeñas."
       },
       {
         "key": "showLabel",
         "type": "text",
-        "label": "Texto «Mostrar» (accesibilidad)"
+        "label": "Texto «Mostrar» (accesibilidad)",
+        "help": "No se ve: los lectores de pantalla leen este texto seguido del nombre en cada foto pequeña (por ejemplo «Mostrar a Núria…»)."
       },
       {
         "key": "noBio",
         "type": "text",
-        "label": "Texto cuando falta la biografía"
+        "label": "Texto cuando falta la biografía",
+        "help": "Se muestra en lugar de la biografía de una persona que todavía no la tiene."
+      },
+      {
+        "key": "linkedinLabel",
+        "type": "text",
+        "label": "Texto del enlace a LinkedIn",
+        "help": "Se ve junto al icono de LinkedIn de cada persona."
+      },
+      {
+        "key": "websiteLabel",
+        "type": "text",
+        "label": "Texto del enlace a la web personal",
+        "help": "Solo se usa para personas sin LinkedIn que tienen una web."
       },
       {
         "key": "linkedinOf",
         "type": "text",
-        "label": "«en LinkedIn» (accesibilidad)"
+        "label": "«en LinkedIn» (accesibilidad)",
+        "help": "No se ve: los lectores de pantalla leen el nombre seguido de este texto en el enlace a LinkedIn."
       },
       {
         "key": "websiteOf",
         "type": "text",
-        "label": "«web» (accesibilidad)"
+        "label": "«web» (accesibilidad)",
+        "help": "No se ve: los lectores de pantalla leen el nombre seguido de este texto en el enlace a la web personal (solo si la persona no tiene LinkedIn)."
       }
     ]
   }

@@ -46,6 +46,9 @@ return array(
 		'seo_title' => 'MatSurfer — Compact Surface Functionalization Device for Lab-Scale R&D',
 		'seo_description' => 'MatSurfer is a compact lab-scale device for controlled deposition and functionalization of materials directly on final surfaces. Developed at ICMAB-CSIC for surface-related R&D.',
 		'og_alt' => 'MatSurfer — compact device for direct deposition and functionalization on final surfaces',
+		'blog_cta_title' => 'Bring surface experiments to your own bench',
+		'blog_cta_text' => 'Tell us about your research needs and what you would like to explore.',
+		'blog_cta_button' => 'Talk to the team',
 	),
 	'es' => array(
 		'header_cta' => 'Habla con el equipo',
@@ -77,5 +80,8 @@ return array(
 		'seo_title' => 'MatSurfer — Dispositivo compacto de funcionalización de superficies para I+D a escala de laboratorio',
 		'seo_description' => 'MatSurfer es un dispositivo compacto, a escala de laboratorio, para la deposición controlada y la funcionalización de materiales directamente sobre superficies finales. Desarrollado en el ICMAB-CSIC para la I+D relacionada con superficies.',
 		'og_alt' => 'MatSurfer — dispositivo compacto para la deposición y la funcionalización directas sobre superficies finales',
+		'blog_cta_title' => 'Lleva los experimentos con superficies a tu propia mesa de laboratorio',
+		'blog_cta_text' => 'Cuéntanos tus necesidades de investigación y qué te gustaría explorar.',
+		'blog_cta_button' => 'Habla con el equipo',
 	),
 );

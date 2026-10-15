@@ -15,10 +15,24 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "researchCtaSource": {
+      "type": "string",
+      "default": "home-research"
+    },
+    "teamCtaSource": {
+      "type": "string",
+      "default": "home-team"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
   "matsurfer": {
     "fields": [
+      {
+        "type": "panel",
+        "label": "Tarjeta 1"
+      },
       {
         "key": "researchTitle",
         "type": "text",

@@ -1,7 +1,8 @@
 <?php
 /**
- * Pages. Landing pages built from MatSurfer sections render edge to edge;
- * any other page (legal texts…) uses the reading layout.
+ * Pages. Landing pages built from MatSurfer sections render edge to edge,
+ * exactly as their sections draw them; any other page (legal texts…) uses
+ * the reading layout of template-parts/page-prose.php.
  *
  * @package matsurfer
  */

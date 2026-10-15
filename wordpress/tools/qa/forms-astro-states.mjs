@@ -1,0 +1,24 @@
+/** QA (forms): error + success states of the Astro reference form. node forms-astro-states.mjs <outDir> */
+import { launch } from './wp-login.mjs';
+const out = process.argv[2] || '/tmp';
+const browser = await launch();
+const ctx = await browser.newContext({ viewport: { width: Number(process.env.QA_WIDTH || 1440), height: 1100 }, reducedMotion: 'reduce' });
+const page = await ctx.newPage();
+await page.goto('http://127.0.0.1:4321/contact/?interest=research&application=coatings', { waitUntil: 'networkidle' });
+await page.goto('http://127.0.0.1:4321/contact/?interest=research&application=coatings', { waitUntil: 'networkidle' });
+await page.click('.lf__submit');
+await page.waitForTimeout(300);
+await page.locator('.lf__card').screenshot({ path: `${out}/astro-errors.png` });
+await page.fill('#lf-fullname', 'Ada Lovelace');
+await page.fill('#lf-email', 'ada@example.org');
+await page.fill('#lf-org', 'ICMAB-CSIC');
+await page.fill('#lf-role', 'Researcher');
+await page.fill('#lf-message', 'Testing');
+await page.check('#lf-consent');
+await page.click('.lf__submit');
+await page.waitForSelector('.lf__success:not([hidden])');
+await page.waitForTimeout(800);
+await page.locator('.lf__card').screenshot({ path: `${out}/astro-success.png` });
+const m = await page.evaluate(() => { const b = document.querySelector('.lf__success').getBoundingClientRect(); const c = document.querySelector('.lf__card').getBoundingClientRect(); return { success: [b.x - c.x, b.y - c.y, b.width, b.height], card: [c.width, c.height] }; });
+console.log(JSON.stringify(m));
+await browser.close();

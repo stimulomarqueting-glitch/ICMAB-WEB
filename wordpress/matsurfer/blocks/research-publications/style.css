@@ -1,0 +1,62 @@
+/* Publications — port of the publication-list rules in the <style> of
+   src/pages/[...lang]/research.astro. Every selector is scoped under the
+   section root .research-publications. */
+
+.research-publications .research__head {
+  font-size: 1.35rem;
+}
+
+.research-publications .research__pubs {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.research-publications .research__pub {
+  position: relative;
+  padding: 1.25rem 0 1.25rem 0;
+  border-top: 1px solid var(--border-subtle);
+  transition: padding-left var(--dur-base) var(--ease);
+}
+
+/* a short vapour tick slides in as the row is hovered */
+.research-publications .research__pub::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--grad-vapor-line);
+  transform: translateY(-50%);
+  transition: width var(--dur-base) var(--ease);
+}
+
+.research-publications .research__pub:hover {
+  padding-left: 1.25rem;
+}
+
+.research-publications .research__pub:hover::before {
+  width: 0.75rem;
+}
+
+.research-publications .research__pub h3 {
+  font-family: var(--font-body);
+  font-size: 1.06rem;
+}
+
+.research-publications .research__meta {
+  font-size: 0.88rem;
+  margin-top: 0.4rem;
+}
+
+.research-publications .research__doi {
+  font-family: var(--font-mono);
+  font-size: 0.81rem;
+}
+
+.research-publications .research__desc {
+  font-size: 0.88rem;
+  margin-top: 0.4rem;
+  max-width: 68ch;
+}

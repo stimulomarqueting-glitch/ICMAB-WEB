@@ -1,0 +1,110 @@
+/* Audiences — block editor preview only (block.json "editorStyle"), never
+   loaded on the public site. The preview wrapper is .mats-preview.
+
+   view.js does not run in the editor, so CSS stands in for it: pointing at
+   a panel, or editing a text inside it, opens that panel the way a
+   visitor's hover does on the site (so every description can be edited in
+   place), and the resting first panel steps back meanwhile. */
+
+/* the panel being edited keeps the plum look of the active panel */
+.mats-preview .audiences .aud__panel:focus-within {
+  background: var(--bg-inverse);
+  border-color: transparent;
+  color: var(--text-on-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.mats-preview .audiences .aud__panel:focus-within .aud__spot {
+  opacity: 1;
+}
+
+.mats-preview .audiences .aud__panel:focus-within .aud__icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.mats-preview .audiences .aud__panel:focus-within .aud__title {
+  color: #fff;
+}
+
+.mats-preview .audiences .aud__panel:focus-within .aud__more p {
+  color: var(--text-on-dark-2);
+}
+
+/* the editing outline reads on the plum tile */
+.mats-preview:hover .audiences .aud__panel:is(:hover, :focus-within, [data-active]) [data-mats-edit],
+.mats-preview.is-selected .audiences .aud__panel:is(:hover, :focus-within, [data-active]) [data-mats-edit] {
+  outline-color: rgba(233, 220, 253, 0.4);
+}
+
+.mats-preview .audiences .aud__panel [data-mats-edit]:hover {
+  outline-color: rgba(233, 220, 253, 0.85) !important;
+}
+
+/* the resting active panel steps back while another one is open */
+.mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) {
+  background: var(--bg-panel);
+  border-color: var(--border-subtle);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__spot {
+  opacity: 0;
+}
+
+.mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__icon {
+  background: var(--coral-tint);
+  color: var(--coral-dark);
+}
+
+.mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__title {
+  color: var(--ink);
+}
+
+.mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__more p {
+  color: var(--text-body);
+}
+
+.mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__layer {
+  width: 0;
+}
+
+.mats-preview .audiences .aud__panel:is(:hover, :focus-within) .aud__layer {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__layer {
+    width: 100%;
+  }
+}
+
+/* desktop row: the open panel grows and shows its description */
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  .mats-preview .audiences .aud__panel:is(:hover, :focus-within) {
+    flex-grow: 2.3;
+  }
+
+  .mats-preview .audiences .aud__panel:is(:hover, :focus-within) .aud__more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .mats-preview .audiences .aud__panel:is(:hover, :focus-within) .aud__title {
+    max-width: 24ch;
+  }
+
+  .mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) {
+    flex-grow: 1;
+  }
+
+  .mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__more {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  .mats-preview .audiences .aud:has(.aud__panel:not([data-active]):is(:hover, :focus-within)) .aud__panel[data-active]:not(:hover):not(:focus-within) .aud__title {
+    max-width: 14ch;
+  }
+}

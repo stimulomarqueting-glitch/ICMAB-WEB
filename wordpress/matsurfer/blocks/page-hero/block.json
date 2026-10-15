@@ -19,33 +19,44 @@
     "ctaSource": {
       "type": "string",
       "default": ""
+    },
+    "headingId": {
+      "type": "string",
+      "default": "page-title"
     }
   },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "viewScript": "file:./view.js",
   "matsurfer": {
     "fields": [
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto en mayúsculas encima del título."
       },
       {
         "key": "kickerNote",
         "type": "text",
         "label": "Nota a la derecha de la etiqueta",
-        "help": "Opcional."
+        "help": "Opcional. No se muestra en móvil ni en tableta."
       },
       {
         "key": "title",
         "type": "text",
-        "label": "Título de la página (H1)"
+        "label": "Título de la página (H1)",
+        "help": "Las palabras aparecen una a una al cargar la página."
       },
       {
         "key": "lead",
         "type": "textarea",
         "label": "Texto de entrada",
         "rows": 3
+      },
+      {
+        "type": "panel",
+        "label": "Botón y foto"
       },
       {
         "key": "cta",
@@ -56,7 +67,8 @@
       {
         "key": "photo",
         "type": "image",
-        "label": "Foto (opcional)"
+        "label": "Foto (opcional)",
+        "help": "Con foto, el título ocupa la columna izquierda y la foto la derecha. Sin foto, el título va a todo el ancho."
       }
     ]
   }

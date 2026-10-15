@@ -1,0 +1,285 @@
+/* "Últimas noticias" section (.lposts) + the news card (.post-card) that the
+   News page, archives and search share with it (template-parts/post-card.php).
+   The card is a v3 panel: radius 16, violet-tinted shadow, a vapour line that
+   draws along the photo's edge on hover, the photo leaning in slightly. */
+
+/* ── section ──────────────────────────────────────────────────────────── */
+.lposts .lposts__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.lposts .lposts__cta {
+  flex: none;
+}
+
+.lposts .lposts__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 64rem) {
+  .lposts .lposts__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lposts .lposts__grid--3 > :nth-child(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .lposts .lposts__head {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .lposts .lposts__head .h2 {
+    margin-inline: auto;
+  }
+
+  .lposts .lposts__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lposts .lposts__grid--3 > :nth-child(3) {
+    display: flex;
+  }
+}
+
+/* ── card ─────────────────────────────────────────────────────────────── */
+.post-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  transition: opacity var(--dur-slow) var(--ease-out) var(--rd, 0s), transform var(--dur-slow) var(--ease-out),
+    border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+
+.post-card:hover,
+.post-card:focus-within {
+  border-color: var(--border-violet-soft);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.post-card:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.post-card .post-card__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--grad-bg-soft);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* the vapour line draws along the photo's lower edge */
+.post-card .post-card__media::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 3px;
+  width: 0;
+  background: var(--grad-vapor-line);
+  transition: width 700ms var(--ease-out);
+}
+
+.post-card:hover .post-card__media::after,
+.post-card:focus-within .post-card__media::after {
+  width: 100%;
+}
+
+.post-card .post-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 900ms var(--ease-out);
+}
+
+.post-card:hover .post-card__img {
+  transform: scale(1.035);
+}
+
+/* no featured image: soft vapour plate with the isotype */
+.post-card .post-card__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(60% 70% at 70% 25%, rgba(108, 18, 248, 0.14), transparent 70%),
+    radial-gradient(50% 60% at 20% 90%, rgba(240, 83, 47, 0.12), transparent 70%),
+    var(--grad-bg-soft);
+}
+
+.post-card .post-card__mark {
+  opacity: 0.55;
+  transition: transform 900ms var(--ease-out), opacity var(--dur-base) var(--ease);
+}
+
+.post-card:hover .post-card__mark {
+  opacity: 0.75;
+  transform: translateY(-4px);
+}
+
+.post-card .post-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.35rem 1.5rem 1.5rem;
+}
+
+.post-card .post-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.post-card .post-card__cat {
+  color: var(--violet-dark);
+}
+
+.post-card .post-card__sep {
+  color: var(--silica);
+}
+
+.post-card .post-card__title {
+  margin-top: 0.7rem;
+  font-size: 1.19rem;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+
+.post-card .post-card__link {
+  color: var(--ink);
+  transition: color var(--dur-fast) var(--ease);
+}
+
+/* the title link covers the whole card */
+.post-card .post-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.post-card .post-card__link:focus-visible {
+  outline: none;
+}
+
+.post-card:hover .post-card__link {
+  color: var(--ink);
+}
+
+.post-card .post-card__excerpt {
+  display: -webkit-box;
+  margin-top: 0.6rem;
+  overflow: hidden;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.post-card .post-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--coral-dark);
+}
+
+.post-card .post-card__arrow {
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.post-card:hover .post-card__arrow {
+  transform: translateX(3px);
+}
+
+/* the newest article on the News page: wide, photo beside the text */
+.post-card.post-card--featured {
+  grid-column: 1 / -1;
+  flex-direction: row;
+}
+
+.post-card--featured .post-card__media {
+  flex: 0 0 58%;
+  aspect-ratio: auto;
+  min-height: 23rem;
+  border-bottom: 0;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.post-card--featured .post-card__body {
+  justify-content: center;
+  padding: clamp(1.75rem, 3vw, 2.75rem);
+}
+
+.post-card--featured .post-card__title {
+  font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.post-card--featured .post-card__excerpt {
+  margin-top: 0.85rem;
+  font-size: 1rem;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.post-card--featured .post-card__more {
+  margin-top: 0;
+  padding-top: 1.5rem;
+}
+
+@media (max-width: 56rem) {
+  .post-card.post-card--featured {
+    flex-direction: column;
+  }
+
+  .post-card--featured .post-card__media {
+    flex: none;
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .post-card--featured .post-card__body {
+    padding: 1.35rem 1.5rem 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-card:hover,
+  .post-card:focus-within,
+  .post-card:hover .post-card__img {
+    transform: none;
+  }
+}

@@ -542,7 +542,7 @@
             node.setAttribute('title', 'Haz clic para editar este texto');
             node.addEventListener('focus', function () {
               editingRef.current = true;
-              original = node.innerText;
+              original = node.textContent;
               node.classList.add('is-editing');
             });
             node.addEventListener('keydown', function (e) {
@@ -551,7 +551,7 @@
                 node.blur();
               } else if (e.key === 'Escape') {
                 e.preventDefault();
-                node.innerText = original;
+                node.textContent = original;
                 node.blur();
               }
               e.stopPropagation();
@@ -564,7 +564,9 @@
             node.addEventListener('blur', function () {
               editingRef.current = false;
               node.classList.remove('is-editing');
-              var value = node.innerText.replace(/\s+/g, ' ').trim();
+              // textContent, not innerText: innerText applies CSS text-transform, which
+              // would save uppercase-styled copy (eyebrows, tags) in capitals.
+              var value = node.textContent.replace(/\s+/g, ' ').trim();
               var current = getPath(attrsRef.current, path);
               if (value !== String(current == null ? '' : current)) {
                 setAttrPath(attrsRef.current, setAttributes, path, value);

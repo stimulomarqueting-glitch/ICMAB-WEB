@@ -1,0 +1,540 @@
+/*
+ * "Ajustes de la web" (inc/modules/settings.php). Loaded only on that
+ * screen; everything is scoped to .mats-set. Uses the brand variables of
+ * assets/css/admin.css when present, with fallbacks.
+ */
+
+.mats-set {
+  --set-coral: var(--mats-coral, #f0532f);
+  --set-coral-dark: var(--mats-coral-dark, #c93e1e);
+  --set-ink: var(--mats-ink, #26241f);
+  --set-body: var(--mats-body, #57534a);
+  --set-muted: var(--mats-muted, #8a837d);
+  --set-line: var(--mats-line, #e7e1dc);
+  --set-mist: var(--mats-mist, #fceee7);
+  --set-page: var(--mats-page, #fdfbf8);
+  --set-radius: 12px;
+  max-width: 1280px;
+  color: var(--set-body);
+}
+
+.mats-set__title {
+  font-family: var(--mats-display, inherit);
+  color: var(--set-ink);
+}
+
+.mats-set__lead {
+  max-width: 62rem;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 10px 0 0;
+}
+
+.mats-set__lead--small {
+  color: var(--set-muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.mats-set__notice a {
+  white-space: nowrap;
+}
+
+/* ── quick links to the sections ─────────────────────────────────────── */
+.mats-set__toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 6px;
+}
+
+.mats-set__toc a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 10px;
+  border: 1px solid var(--set-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--set-ink);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.mats-set__toc a:hover,
+.mats-set__toc a:focus {
+  border-color: var(--set-coral);
+  background: var(--set-mist);
+  color: var(--set-ink);
+}
+
+.mats-set__toc .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--set-coral-dark);
+}
+
+/* ── sections (cards) ────────────────────────────────────────────────── */
+.mats-set__form {
+  margin-top: 8px;
+}
+
+.mats-set__section {
+  margin: 18px 0 0;
+  padding: 22px 24px 10px;
+  background: #fff;
+  border: 1px solid var(--set-line);
+  border-radius: var(--set-radius);
+  box-shadow: 0 1px 2px rgba(38, 36, 31, 0.04);
+  scroll-margin-top: 50px;
+}
+
+.mats-set__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 14px;
+}
+
+.mats-set__icon.dashicons {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--set-mist);
+  color: var(--set-coral-dark);
+  font-size: 20px;
+  line-height: 36px;
+  text-align: center;
+}
+
+.mats-set__headtext {
+  flex: 1;
+  min-width: 0;
+}
+
+.mats-set__headtext h2 {
+  margin: 4px 0 4px;
+  font-family: var(--mats-display, inherit);
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--set-ink);
+}
+
+.mats-set__headtext p {
+  margin: 0;
+  max-width: 52rem;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--set-body);
+}
+
+.mats-set__restore.button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.mats-set__restore .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  vertical-align: middle;
+}
+
+.mats-set__restore .dashicons::before {
+  line-height: 16px;
+}
+
+.mats-set__badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f0f0f1;
+  color: #50575e;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+
+/* ── the grid: label | English | Español ─────────────────────────────── */
+.mats-set__cols,
+.mats-set__row {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.8fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px 20px;
+}
+
+.mats-set__cols {
+  padding: 8px 0;
+  border-top: 1px solid var(--set-line);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--set-muted);
+}
+
+.mats-set__cols > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mats-set__row {
+  padding: 14px 0;
+  border-top: 1px solid var(--set-line);
+  align-items: start;
+}
+
+.mats-set__row--global .mats-set__field {
+  grid-column: 2 / -1;
+  max-width: 34rem;
+}
+
+.mats-set__group {
+  padding: 18px 0 6px;
+  border-top: 1px solid var(--set-line);
+}
+
+.mats-set__group h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--set-ink);
+}
+
+.mats-set__group p {
+  margin: 4px 0 0;
+  max-width: 52rem;
+  font-size: 13px;
+  color: var(--set-muted);
+}
+
+.mats-set__group + .mats-set__row {
+  border-top: 0;
+}
+
+.mats-set__name {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--set-ink);
+  padding-top: 7px;
+}
+
+.mats-set__help {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--set-muted);
+}
+
+/* input with its language tag */
+.mats-set__control {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #8c8f94;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mats-set__control:focus-within {
+  border-color: var(--set-coral);
+  box-shadow: 0 0 0 1px var(--set-coral);
+}
+
+.mats-set__control--area {
+  align-items: stretch;
+}
+
+.mats-set__tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 30px;
+  padding: 0 6px;
+  background: var(--set-page);
+  border-right: 1px solid var(--set-line);
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--set-muted);
+}
+
+.mats-set__control--area .mats-set__tag {
+  align-items: flex-start;
+  padding-top: 9px;
+}
+
+.mats-set__cols .mats-set__tag {
+  min-width: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--set-line);
+  border-radius: 4px;
+}
+
+.mats-set .mats-set__control input,
+.mats-set .mats-set__control textarea {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--set-ink);
+}
+
+.mats-set .mats-set__control textarea {
+  min-height: 74px;
+  resize: vertical;
+  field-sizing: content;
+}
+
+/* one line of text in a box that grows with it */
+.mats-set .mats-set__control textarea[data-single] {
+  min-height: 38px;
+  resize: none;
+}
+
+.mats-set .mats-set__control input:focus,
+.mats-set .mats-set__control textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.mats-set .mats-set__control ::placeholder {
+  color: #a7a29d;
+  opacity: 1;
+}
+
+.mats-set__field.has-error .mats-set__control {
+  border-color: #d63638;
+  box-shadow: 0 0 0 1px #d63638;
+}
+
+.mats-set__error {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: #b32d2e;
+  font-weight: 500;
+}
+
+.mats-set__count {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: var(--set-muted);
+}
+
+.mats-set__count.is-over {
+  color: #9a5b00;
+}
+
+.mats-set__orig {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--set-muted);
+}
+
+.mats-set__orig[hidden] {
+  display: none;
+}
+
+.mats-set__origlabel {
+  font-weight: 600;
+}
+
+.mats-set__origtext {
+  font-style: italic;
+}
+
+.mats-set .mats-set__back.button-link {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--set-coral-dark);
+  text-decoration: underline;
+}
+
+.mats-set .mats-set__back.button-link:hover,
+.mats-set .mats-set__back.button-link:focus {
+  color: var(--set-ink);
+}
+
+/* ── the save bar, always at hand ────────────────────────────────────── */
+.mats-set__implicit {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.mats-set__savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 18px 0 0;
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--set-line);
+  border-radius: var(--set-radius) var(--set-radius) 0 0;
+  box-shadow: 0 -6px 24px rgba(38, 36, 31, 0.08);
+}
+
+.mats-set .mats-set__savebar .button-primary {
+  background: var(--set-coral);
+  border-color: var(--set-coral);
+  border-radius: 999px;
+  padding-inline: 22px;
+}
+
+.mats-set .mats-set__savebar .button-primary:hover,
+.mats-set .mats-set__savebar .button-primary:focus {
+  background: var(--set-coral-dark);
+  border-color: var(--set-coral-dark);
+}
+
+.mats-set .mats-set__savebar .button-primary:focus {
+  box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--set-coral-dark);
+}
+
+.mats-set__savehint {
+  font-size: 13px;
+  color: var(--set-muted);
+}
+
+.mats-set__dirty {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b26200;
+}
+
+.mats-set__dirty[hidden] {
+  display: none;
+}
+
+/* ── admin-only info (forms) ─────────────────────────────────────────── */
+.mats-set__section--info {
+  margin-top: 28px;
+  padding-bottom: 18px;
+  background: var(--set-page);
+}
+
+.mats-set__forms {
+  border-color: var(--set-line);
+}
+
+.mats-set__forms td,
+.mats-set__forms th {
+  vertical-align: middle;
+}
+
+.mats-set__actions {
+  text-align: right;
+}
+
+.mats-set__muted {
+  color: var(--set-muted);
+}
+
+.mats-set__infoline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-left: 4px solid #dba617;
+  background: #fff;
+}
+
+.mats-set__note {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+}
+
+/* ── narrower screens ────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .mats-set__cols,
+  .mats-set__row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .mats-set__cols > span:first-child {
+    display: none;
+  }
+
+  .mats-set__label {
+    grid-column: 1 / -1;
+  }
+
+  .mats-set__name {
+    padding-top: 0;
+  }
+
+  .mats-set__row--global .mats-set__field {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 782px) {
+  .mats-set__section {
+    padding: 18px 14px 6px;
+  }
+
+  .mats-set__head {
+    flex-wrap: wrap;
+  }
+
+  .mats-set__restore.button {
+    order: 3;
+    margin-left: 50px;
+  }
+
+  .mats-set__cols {
+    display: none;
+  }
+
+  .mats-set__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mats-set__savebar {
+    padding: 12px 14px;
+  }
+
+  .mats-set__savehint {
+    display: none;
+  }
+
+  .mats-set__forms thead {
+    display: none;
+  }
+
+  .mats-set__forms td {
+    display: block;
+    text-align: left;
+  }
+}

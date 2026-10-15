@@ -1,0 +1,46 @@
+/* Home product teaser (#technology) — port of the "product teaser" rules in
+   src/pages/[...lang]/index.astro. Every selector is scoped under the
+   section root .product-teaser (Astro scoped these per page). */
+
+.product-teaser .pt__grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+  perspective: 1400px;
+}
+
+.product-teaser .pt__cta {
+  margin-top: 1.75rem;
+}
+
+.product-teaser .pt__photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--border-violet-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transform-origin: 40% 50%;
+  transition: transform 700ms var(--ease-out), box-shadow 700ms var(--ease-out);
+}
+
+/* the photo leans in a little when the visitor comes close */
+.product-teaser .pt__grid:hover .pt__photo {
+  transform: rotateY(-4deg) rotateX(2deg) translateZ(14px);
+  box-shadow: 0 30px 60px rgba(108, 18, 248, 0.16);
+}
+
+@media (max-width: 56rem) {
+  .product-teaser .pt__grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .product-teaser .pt__cta .btn {
+    width: 100%;
+  }
+}

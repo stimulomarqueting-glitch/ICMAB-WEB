@@ -22,7 +22,8 @@
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -55,7 +56,8 @@
         ],
         "min": 3,
         "max": 3,
-        "titleField": "title"
+        "titleField": "title",
+        "help": "Siempre tres: cada uno lleva su número grande (01, 02, 03) y un punto sobre la línea de color."
       },
       {
         "key": "facts",
@@ -76,17 +78,20 @@
         ],
         "min": 1,
         "max": 6,
-        "titleField": "label"
+        "titleField": "label",
+        "help": "Cifras que ya se publican en otras páginas (patentes, validaciones, publicaciones). Actualízalas cuando cambien allí."
       },
       {
         "key": "factsNote",
         "type": "text",
-        "label": "Nota bajo las cifras"
+        "label": "Nota bajo las cifras",
+        "help": "Frase corta bajo las cifras, antes del enlace."
       },
       {
         "key": "factsLink",
         "type": "link",
-        "label": "Enlace bajo las cifras"
+        "label": "Enlace bajo las cifras",
+        "help": "Normalmente lleva a la página de casos de estudio."
       }
     ]
   }

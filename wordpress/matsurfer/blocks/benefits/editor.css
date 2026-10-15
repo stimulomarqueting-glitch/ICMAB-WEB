@@ -1,0 +1,12 @@
+/* Benefits — block editor preview only (block.json "editorStyle"), never
+   loaded on the public site. The preview wrapper is .mats-preview. */
+
+/* the editing outline reads on the plum band */
+.mats-preview:hover .bene--dark [data-mats-edit],
+.mats-preview.is-selected .bene--dark [data-mats-edit] {
+  outline-color: rgba(233, 220, 253, 0.4);
+}
+
+.mats-preview .bene--dark [data-mats-edit]:hover {
+  outline-color: rgba(233, 220, 253, 0.85) !important;
+}

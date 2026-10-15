@@ -107,7 +107,7 @@ function mats_register_blocks(): void {
 		}
 		$fields     = $meta['matsurfer']['fields'] ?? array();
 		$attributes = array_merge( mats_fields_to_attributes( $fields ), $meta['attributes'] ?? array() );
-		$type       = register_block_type( dirname( $file ), array( 'attributes' => $attributes ) );
+		$type = register_block_type( dirname( $file ), array( 'attributes' => $attributes ) );
 		if ( $type ) {
 			$registry[ $type->name ] = array(
 				'title'       => $meta['title'] ?? $type->name,
@@ -120,6 +120,25 @@ function mats_register_blocks(): void {
 	$GLOBALS['mats_blocks'] = $registry;
 }
 add_action( 'init', 'mats_register_blocks', 20 );
+
+/**
+ * Asset versions of our blocks follow their files (style.css, view.js…), so
+ * a theme update is never served from a stale browser cache.
+ */
+add_filter(
+	'block_type_metadata',
+	static function ( array $metadata ): array {
+		if ( empty( $metadata['name'] ) || ! str_starts_with( $metadata['name'], 'matsurfer/' ) || empty( $metadata['file'] ) ) {
+			return $metadata;
+		}
+		$stamp = 0;
+		foreach ( glob( dirname( $metadata['file'] ) . '/*.{css,js,json}', GLOB_BRACE ) ?: array() as $asset ) {
+			$stamp = max( $stamp, (int) filemtime( $asset ) );
+		}
+		$metadata['version'] = MATS_VERSION . '.' . $stamp;
+		return $metadata;
+	}
+);
 
 /** Registry of our blocks: name => [ title, fields, scope ]. */
 function mats_blocks(): array {

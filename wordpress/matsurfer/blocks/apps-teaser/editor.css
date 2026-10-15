@@ -1,0 +1,9 @@
+/* Applications teaser — block editor preview only (block.json
+   "editorStyle"), never loaded on the public site. The preview wrapper is
+   .mats-preview. */
+
+/* the editor note sits inside the section's container */
+.mats-preview .apps-teaser .mats-note {
+  width: auto;
+  margin: 1.25rem 0 0;
+}

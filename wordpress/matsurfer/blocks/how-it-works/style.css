@@ -1,0 +1,186 @@
+/* How it works — port of the "how it works (video + steps, v3 process
+   cards)" rules of the <style> in src/pages/[...lang]/product.astro, scoped
+   under the section's root class .tech. The header (eyebrow, .h2) uses the
+   global utilities from base.css. Values are identical to the Astro source;
+   the placeholder photo is the theme's copy of /img/tech-detail.jpg. */
+
+.tech .tech__media {
+  margin: 2.25rem 0 0;
+}
+
+.tech .tech__video,
+.tech .tech__video-ph {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-inverse);
+  display: block;
+  object-fit: cover;
+}
+
+.tech .tech__videobox {
+  position: relative;
+}
+
+.tech .tech__poster {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background:
+    var(--glow-vapor),
+    var(--bg-inverse);
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease);
+}
+
+.tech .tech__play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 50%;
+  background: var(--coral);
+  color: #fff;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+
+.tech .tech__play svg {
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-left: 0.2rem;
+}
+
+.tech .tech__poster:hover .tech__play {
+  background: var(--coral-dark);
+  transform: scale(1.05);
+}
+
+.tech .tech__poster:focus-visible {
+  outline: 3px solid var(--violet);
+  outline-offset: 3px;
+}
+
+.tech .tech__video-ph {
+  position: relative;
+  background:
+    linear-gradient(rgba(35, 21, 54, 0.55), rgba(35, 21, 54, 0.75)),
+    url('../../assets/media/tech-detail.jpg') center / cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tech .tech__video-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgba(248, 246, 243, 0.35);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-on-dark);
+  background: rgba(35, 21, 54, 0.45);
+}
+
+.tech .tech__media-cap {
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.tech .tech__steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  list-style: none;
+  margin: 2.25rem 0 0;
+  padding: 0;
+}
+
+/* the process runs through the four cards */
+.tech .tech__steps::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 2%;
+  right: 2%;
+  height: 2px;
+  background: var(--grad-vapor-line);
+  opacity: 0.45;
+}
+
+/* process cards (v3): white card, phase-coloured 8px bar on top */
+.tech .tech__step {
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.35rem 1.35rem 1.45rem;
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+}
+
+.tech .tech__step:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-violet-soft);
+}
+
+.tech .tech__step::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--grad-vapor-line);
+}
+
+/* the bar walks the sublimation: solid → heating → vapour → layer */
+.tech .tech__step:nth-child(1)::before { background: var(--coral); }
+.tech .tech__step:nth-child(2)::before { background: linear-gradient(90deg, var(--coral), var(--magenta)); }
+.tech .tech__step:nth-child(3)::before { background: linear-gradient(90deg, var(--magenta), var(--violet)); }
+.tech .tech__step:nth-child(4)::before { background: var(--violet); }
+
+.tech .tech__sn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--violet-dark);
+}
+
+.tech .tech__step h3 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  margin: 0.4rem 0 0;
+}
+
+.tech .tech__step p {
+  font-size: 0.88rem;
+  margin-top: 0.4rem;
+}
+
+/* ── responsive ── */
+@media (max-width: 56rem) {
+  .tech .tech__steps { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 40rem) {
+  .tech .tech__steps { grid-template-columns: 1fr; }
+}

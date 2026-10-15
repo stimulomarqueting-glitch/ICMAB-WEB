@@ -1,0 +1,355 @@
+/* Setup wizard — MatSurfer → Puesta en marcha (admin only).
+   Scoped under .mats-setup; WordPress admin buttons and notices are kept. */
+
+.mats-setup {
+	--ms-ink: #26241f;
+	--ms-body: #57534a;
+	--ms-muted: #6f6962;
+	--ms-line: #e4ddd8;
+	--ms-panel: #fff;
+	--ms-ok: #1d7a46;
+	--ms-ok-tint: #e6f4ec;
+	--ms-bad: #b42318;
+	--ms-bad-tint: #fbe7e6;
+	--ms-warn: #8a5a00;
+	--ms-warn-tint: #fdf2d9;
+	--ms-info: #4b3fa8;
+	--ms-info-tint: #efeafd;
+	--ms-accent: #6c12f8;
+	max-width: 62rem;
+	color: var(--ms-body);
+}
+
+.mats-setup__title {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	font-size: 1.75rem;
+	line-height: 1.2;
+	color: var(--ms-ink);
+}
+
+.mats-setup__mark {
+	flex: none;
+}
+
+.mats-setup__lead {
+	max-width: 46rem;
+	font-size: 1rem;
+	line-height: 1.55;
+}
+
+.mats-setup__hero {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem 2rem;
+	margin: 1.25rem 0 0.5rem;
+	padding: 1.25rem 1.5rem;
+	border: 1px solid var(--ms-line);
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fceee7 0%, #f8ecf3 50%, #f2eafe 100%);
+}
+
+.mats-setup__summary {
+	flex: 1 1 22rem;
+}
+
+.mats-setup__progress p {
+	margin: 0.6rem 0 0;
+	font-size: 0.95rem;
+	color: var(--ms-ink);
+}
+
+.mats-setup__bar {
+	height: 10px;
+	border-radius: 999px;
+	background: rgba(38, 36, 31, 0.1);
+	overflow: hidden;
+}
+
+.mats-setup__bar span {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: linear-gradient(90deg, #f0532f, #ce4262, #6c12f8);
+	transition: width 0.4s ease;
+}
+
+.mats-setup__all {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.4rem;
+}
+
+.mats-setup__hint {
+	max-width: 18rem;
+	font-size: 0.85rem;
+	color: var(--ms-muted);
+}
+
+.mats-setup__live p {
+	margin: 0.75rem 0;
+	padding: 0.6rem 0.9rem;
+	border-left: 4px solid var(--ms-accent);
+	background: var(--ms-panel);
+	font-weight: 600;
+	color: var(--ms-ink);
+}
+
+.mats-setup__live:empty {
+	display: none;
+}
+
+.mats-setup__steps {
+	margin: 1rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mats-step {
+	margin: 0 0 1rem;
+	padding: 1.25rem 1.5rem 1.1rem;
+	border: 1px solid var(--ms-line);
+	border-left: 5px solid var(--ms-line);
+	border-radius: 12px;
+	background: var(--ms-panel);
+}
+
+.mats-step[data-state="done"] {
+	border-left-color: var(--ms-ok);
+}
+
+.mats-step[data-state="todo"] {
+	border-left-color: var(--ms-bad);
+}
+
+.mats-step[data-state="warn"] {
+	border-left-color: #e09a3e;
+}
+
+.mats-step[data-state="info"] {
+	border-left-color: var(--ms-info);
+}
+
+.mats-step.is-running {
+	box-shadow: 0 0 0 2px rgba(108, 18, 248, 0.35);
+}
+
+.mats-step__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem 0.9rem;
+}
+
+.mats-step__num {
+	display: inline-grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	background: var(--ms-ink);
+	color: #fff;
+	font-weight: 700;
+	font-size: 0.95rem;
+}
+
+.mats-step__title {
+	margin: 0;
+	font-size: 1.2rem;
+	line-height: 1.3;
+	color: var(--ms-ink);
+}
+
+.mats-step__status {
+	margin-left: auto;
+}
+
+.mats-step__pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.2rem 0.7rem;
+	border-radius: 999px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.mats-step__pill.is-done {
+	background: var(--ms-ok-tint);
+	color: var(--ms-ok);
+}
+
+.mats-step__pill.is-todo {
+	background: var(--ms-bad-tint);
+	color: var(--ms-bad);
+}
+
+.mats-step__pill.is-warn {
+	background: var(--ms-warn-tint);
+	color: var(--ms-warn);
+}
+
+.mats-step__pill.is-info {
+	background: var(--ms-info-tint);
+	color: var(--ms-info);
+}
+
+.mats-step__intro {
+	margin: 0.7rem 0 0.4rem;
+	max-width: 48rem;
+	font-size: 0.95rem;
+	line-height: 1.55;
+}
+
+.mats-step__checks,
+.mats-step__messages {
+	margin: 0.6rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mats-step__checks li,
+.mats-step__messages li {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.55rem;
+	margin: 0 0 0.35rem;
+	line-height: 1.5;
+}
+
+.mats-step__icon {
+	flex: none;
+	display: inline-grid;
+	place-items: center;
+	width: 1.3rem;
+	height: 1.3rem;
+	margin-top: 0.08rem;
+	border-radius: 50%;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.mats-step__checks .is-ok .mats-step__icon,
+.mats-step__messages .is-ok .mats-step__icon {
+	background: var(--ms-ok-tint);
+	color: var(--ms-ok);
+}
+
+.mats-step__checks .is-bad .mats-step__icon,
+.mats-step__messages .is-error .mats-step__icon {
+	background: var(--ms-bad-tint);
+	color: var(--ms-bad);
+}
+
+.mats-step__messages .is-warn .mats-step__icon {
+	background: var(--ms-warn-tint);
+	color: var(--ms-warn);
+}
+
+.mats-step__checks .is-info .mats-step__icon,
+.mats-step__messages .is-info .mats-step__icon {
+	background: var(--ms-info-tint);
+	color: var(--ms-info);
+}
+
+.mats-step__messages .is-error .mats-step__text {
+	color: var(--ms-bad);
+}
+
+.mats-step__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem 1rem;
+	margin-top: 0.9rem;
+}
+
+.mats-step__option {
+	flex: 1 1 100%;
+	margin: 0 0 0.25rem;
+	padding: 0.7rem 0.9rem;
+	border-radius: 8px;
+	background: #faf7f4;
+}
+
+.mats-step__option label {
+	font-weight: 600;
+	color: var(--ms-ink);
+}
+
+.mats-step__help {
+	display: block;
+	margin-top: 0.3rem;
+	font-size: 0.85rem;
+	color: var(--ms-muted);
+}
+
+.mats-step__secondary.button-link {
+	text-decoration: underline;
+}
+
+.mats-step__spinner {
+	float: none;
+	margin: 0;
+}
+
+.mats-step__result:empty {
+	display: none;
+}
+
+.mats-step__result {
+	margin-top: 0.9rem;
+	padding-top: 0.8rem;
+	border-top: 1px dashed var(--ms-line);
+}
+
+.mats-step__when,
+.mats-step__working {
+	margin: 0 0 0.4rem;
+	font-size: 0.85rem;
+	color: var(--ms-muted);
+}
+
+.mats-step__working {
+	font-weight: 600;
+	color: var(--ms-accent);
+}
+
+.mats-setup__form.is-busy .mats-step:not(.is-running) {
+	opacity: 0.75;
+}
+
+.mats-setup__noscript {
+	font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+	.mats-setup__hero,
+	.mats-step {
+		padding: 1rem;
+	}
+
+	.mats-step__status {
+		margin-left: 0;
+		flex-basis: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mats-setup__bar span {
+		transition: none;
+	}
+}
+
+/* The forms module's own "Crear los formularios de contacto" notice repeats
+   step 4 of this screen: hidden here only (this file loads on no other screen). */
+.mats-setup .notice:has(input[value="mats_wpforms_create"]),
+#wpbody-content > .notice:has(input[value="mats_wpforms_create"]) {
+	display: none;
+}

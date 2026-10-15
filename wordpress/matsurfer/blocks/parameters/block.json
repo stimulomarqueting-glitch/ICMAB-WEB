@@ -15,6 +15,16 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "parameters"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "params-title"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
   "matsurfer": {
@@ -22,7 +32,8 @@
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto que aparece en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -33,7 +44,8 @@
         "key": "lead",
         "type": "textarea",
         "label": "Texto",
-        "rows": 3
+        "rows": 3,
+        "help": "Texto debajo del título."
       },
       {
         "key": "items",
@@ -44,7 +56,8 @@
           {
             "key": "symbol",
             "type": "text",
-            "label": "Símbolo"
+            "label": "Símbolo",
+            "help": "Una letra o símbolo corto (d, m, P, T, t…)."
           },
           {
             "key": "label",
@@ -54,7 +67,8 @@
         ],
         "min": 1,
         "max": 8,
-        "titleField": "label"
+        "titleField": "label",
+        "help": "La primera tarjeta aparece destacada en color violeta."
       }
     ]
   }

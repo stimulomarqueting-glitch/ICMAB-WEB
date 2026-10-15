@@ -15,14 +15,30 @@
     "lock": false,
     "renaming": false
   },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "technology"
+    },
+    "headingId": {
+      "type": "string",
+      "default": "product-teaser-title"
+    },
+    "ctaSource": {
+      "type": "string",
+      "default": "home-product"
+    }
+  },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
   "matsurfer": {
     "fields": [
       {
         "key": "kicker",
         "type": "text",
-        "label": "Etiqueta superior"
+        "label": "Etiqueta superior",
+        "help": "Texto corto en mayúsculas encima del título."
       },
       {
         "key": "title",
@@ -43,7 +59,8 @@
       {
         "key": "photo",
         "type": "image",
-        "label": "Foto"
+        "label": "Foto",
+        "help": "Se recorta en formato 4:3. Al pasar el ratón, la foto se inclina un poco."
       }
     ]
   }

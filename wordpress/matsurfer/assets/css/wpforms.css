@@ -1,0 +1,507 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   WPForms inside the contact section's form card (.lf__card) — restyled to
+   look exactly like the original LeadForm (src/components/LeadForm.astro):
+   2-column grid for the first six fields, full-width message / consent /
+   button, MatSurfer labels, controls, focus ring, error text, select arrow,
+   coral pill button and the violet thank-you box with the dotted surface
+   line.
+
+   Works with WPForms' "modern" markup (CSS variables --wpforms-*) and the
+   classic one, with or without WPForms' own stylesheet (the editor preview
+   has none). Every rule is scoped under .contact .lf__card (the contact
+   section's form card) and is more specific than WPForms' selectors
+   (div.wpforms-container-full .wpforms-form …), so the order in which the
+   stylesheets load does not matter.
+   Loaded only on pages with the contact section (inc/modules/wpforms.php).
+
+   Field layout comes from the CSS classes set on the fields in WPForms
+   (field options → Advanced → CSS Classes): "lf-half" = half width.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* WPForms' modern variables, mapped to the design tokens */
+.contact .lf__card .wpforms-container {
+  --wpforms-field-border-radius: var(--radius-md);
+  --wpforms-field-border-style: solid;
+  --wpforms-field-border-size: 1px;
+  --wpforms-field-background-color: #ffffff;
+  --wpforms-field-border-color: var(--silica);
+  --wpforms-field-border-color-spare: var(--text-body);
+  --wpforms-field-text-color: var(--ink);
+  --wpforms-field-menu-color: #ffffff;
+  --wpforms-label-color: var(--ink);
+  --wpforms-label-sublabel-color: var(--text-muted);
+  --wpforms-label-error-color: var(--valve-red-90);
+  --wpforms-button-border-radius: 999px;
+  --wpforms-button-border-style: none;
+  --wpforms-button-border-size: 0;
+  --wpforms-button-background-color: var(--coral);
+  --wpforms-button-border-color: var(--coral);
+  --wpforms-button-text-color: #ffffff;
+  --wpforms-page-break-color: var(--coral);
+  --wpforms-field-size-font-size: 0.94rem;
+  --wpforms-field-size-padding-h: 0.9rem;
+  --wpforms-field-size-checkbox-size: 1.1rem;
+  --wpforms-field-size-sublabel-spacing: 0.45rem;
+  --wpforms-label-size-font-size: 0.81rem;
+  --wpforms-label-size-sublabel-font-size: 0.81rem;
+  --wpforms-button-size-font-size: 1rem;
+  --wpforms-button-size-margin-top: 1.25rem;
+  --wpforms-container-shadow-size-box-shadow: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  background: none;
+  box-shadow: none;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form *,
+.contact .lf__card .wpforms-container .wpforms-form *::before,
+.contact .lf__card .wpforms-container .wpforms-form *::after {
+  box-sizing: border-box;
+}
+
+/* ── grid: 6 half-width fields, then full-width rows ─────────────────── */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container > .wpforms-field {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  float: none;
+  clear: none;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  border: 0;
+  background: none;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container > .wpforms-field.lf-half {
+  grid-column: auto;
+}
+
+/* honeypot, spinner, title and description never show */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container > .wpforms-field-hp,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-hp {
+  display: none !important;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-spinner,
+.contact .lf__card .wpforms-container .wpforms-head-container {
+  display: none !important;
+}
+
+/* ── labels ──────────────────────────────────────────────────────────── */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field .wpforms-field-label {
+  display: block;
+  float: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.81rem;
+  font-weight: 600;
+  font-style: normal;
+  line-height: 1.55;
+  letter-spacing: normal;
+  color: var(--ink);
+  word-break: normal;
+}
+
+/* the original form has no asterisks (inputs keep their required attribute) */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-required-label {
+  display: none;
+}
+
+/* "(optional)" after the label of fields people may skip */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field.lf-optional > .wpforms-field-label::after {
+  content: ' ' var(--lf-opt, '');
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* visually hidden labels (consent legend) stay readable for screen readers */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field .wpforms-label-hide,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field .wpforms-field-label.wpforms-label-hide {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-description,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-sublabel {
+  margin: 0;
+  font-size: 0.81rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ── controls ────────────────────────────────────────────────────────── */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input[type='text'], input[type='email'], input[type='tel'], input[type='url'], input[type='number'], select, textarea) {
+  display: block;
+  float: none;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.94rem;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: normal;
+  color: var(--ink);
+  background-color: #fff;
+  border: 1px solid var(--silica);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input[type='text'], input[type='email'], input[type='tel'], input[type='url'], input[type='number'], select, textarea):focus {
+  outline: none;
+  border-color: var(--silica);
+  box-shadow: none;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input[type='text'], input[type='email'], input[type='tel'], input[type='url'], input[type='number'], select, textarea):hover {
+  border-color: var(--text-body);
+}
+
+/* one-line controls size to their text, like the original (WPForms sets a fixed height) */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input[type='text'], input[type='email'], input[type='tel'], input[type='url'], input[type='number'], select) {
+  height: auto;
+}
+
+/* v3 focus: violet border + soft violet ring */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input[type='text'], input[type='email'], input[type='tel'], input[type='url'], input[type='number'], select, textarea):focus-visible {
+  outline: none;
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px rgba(108, 18, 248, 0.15);
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input, textarea)::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2357534A' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: auto;
+  padding-right: 2.4rem;
+  cursor: pointer;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field select > option {
+  color: var(--ink);
+  opacity: 1;
+}
+
+/* rows="5" of the original textarea (5 lines + padding + border) */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field textarea {
+  height: 8.1875rem;
+  height: calc(5lh + 1.5rem + 2px);
+  min-height: 7rem;
+  resize: vertical;
+  overflow: auto;
+}
+
+/* ── consent checkbox ────────────────────────────────────────────────── */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field fieldset {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-checkbox ul,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-gdpr-checkbox ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  background: none;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-checkbox ul li,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-gdpr-checkbox ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  background: none;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field input[type='checkbox'] {
+  -webkit-appearance: auto;
+  appearance: auto;
+  position: static;
+  display: inline-block;
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  min-width: 0;
+  margin: 0.15rem 3px 3px 4px !important;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  accent-color: var(--coral);
+  cursor: pointer;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field input[type='checkbox']::before,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field input[type='checkbox']::after {
+  content: none !important;
+  display: none !important;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field .wpforms-field-label-inline {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-body);
+  cursor: pointer;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field .wpforms-field-label-inline a {
+  color: var(--coral-dark);
+  text-decoration: none;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field .wpforms-field-label-inline a:hover {
+  color: var(--coral);
+}
+
+/* ── errors ──────────────────────────────────────────────────────────── */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input, select, textarea).wpforms-error,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field :where(input, select, textarea)[aria-invalid='true'],
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container .wpforms-field.wpforms-has-error :where(input[type='text'], input[type='email'], select, textarea) {
+  border-color: var(--valve-red-90);
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field :is(em, label, p, div).wpforms-error {
+  display: block;
+  position: static;
+  float: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.81rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--valve-red-90);
+  background: none;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field :is(em, label, p, div).wpforms-error::before,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field :is(em, label, p, div).wpforms-error::after {
+  content: none;
+  display: none;
+}
+
+/* the consent error sits under the checkbox row (fieldset is not a flex box) */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field fieldset > .wpforms-error,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-field-checkbox ul + .wpforms-error {
+  margin-top: 0.45rem;
+}
+
+/* form-level message (server error, JavaScript disabled) */
+.contact .lf__card .wpforms-container .wpforms-error-container,
+.contact .lf__card .wpforms-container .wpforms-error-noscript {
+  margin: 0 0 1rem;
+  padding: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--valve-red-90);
+  background: none;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-error-container p {
+  margin: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-error-container a {
+  color: var(--valve-red-90);
+  text-decoration: underline;
+}
+
+/* ── submit: the coral pill .btn, full width ─────────────────────────── */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  float: none;
+  clear: none;
+  position: relative;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:not(:hover):not(:active) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 1rem 1.75rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none;
+  text-shadow: none;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--coral);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  transform: none;
+  transition: background var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-base) var(--ease);
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:hover {
+  background: linear-gradient(100deg, var(--coral) 0%, var(--magenta) 100%);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(38, 36, 31, 0.14);
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:active {
+  transform: scale(0.985);
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit[disabled] {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* ── thank-you message (replaces the form) ───────────────────────────── */
+.contact .lf__card .wpforms-container .wpforms-confirmation-container-full,
+.contact .lf__card .wpforms-confirmation-container-full {
+  margin: 0;
+  padding: 2rem;
+  color: var(--text-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  background: var(--violet-tint);
+  border: 1px solid var(--lavender);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+/* .surface-line.surface-line--dots: deposition dots resting on a 1px line
+   (the dots overlap the line by one pixel, as in the original) */
+.contact .lf__card .wpforms-confirmation-container-full::before {
+  content: '';
+  display: block;
+  height: 4px;
+  margin: -3px 0 1rem;
+  background:
+    radial-gradient(circle, rgba(108, 18, 248, 0.55) 1.2px, transparent 1.4px) 0 1px / 12px 3px repeat-x,
+    linear-gradient(var(--text-body), var(--text-body)) 0 100% / 100% 1px no-repeat;
+}
+
+.contact .lf__card .wpforms-confirmation-container-full h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.contact .lf__card .wpforms-confirmation-container-full p {
+  margin: 0.7rem 0 0;
+  font-size: 0.94rem;
+  max-width: 44ch;
+}
+
+.contact .lf__card .wpforms-confirmation-container-full > :first-child,
+.contact .lf__card .wpforms-confirmation-container-full > p:first-child {
+  margin-top: 0;
+}
+
+.contact .lf__card .wpforms-confirmation-container-full:focus {
+  outline: none;
+}
+
+.contact .lf__card .wpforms-confirmation-container-full:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── phones ──────────────────────────────────────────────────────────── */
+@media (max-width: 40rem) {
+  .contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contact .lf__card .wpforms-container .wpforms-form .wpforms-field-container > .wpforms-field.lf-half {
+    grid-column: 1 / -1;
+  }
+
+  /* base.css: main .btn spans the column, capped and centred */
+  .contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit,
+  .contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:not(:hover):not(:active) {
+    max-width: 24rem;
+    margin-inline: auto;
+    white-space: normal;
+    text-align: center;
+  }
+}

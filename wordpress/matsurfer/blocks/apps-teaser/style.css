@@ -1,0 +1,208 @@
+/* Home applications teaser (#applications) — port of the "applications
+   teaser" rules in src/pages/[...lang]/index.astro and of the
+   src/components/AppsIsotype.astro styles. Every selector is scoped under
+   the section root .apps-teaser (Astro scoped these per component). */
+
+/* ── isotype figure (AppsIsotype.astro) ─────────────────────────────── */
+.apps-teaser .isotype {
+  margin: 2.25rem auto 0;
+  max-width: 36rem;
+}
+
+.apps-teaser .isotype__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+@media (max-width: 40rem) {
+  /* the chips underneath name the fields, so the callouts go and the
+     capsule is scaled up to fill the column */
+  .apps-teaser .isotype {
+    margin-top: 1.5rem;
+    overflow: hidden;
+    padding-top: 3rem;
+  }
+
+  .apps-teaser .isotype__svg {
+    transform: scale(1.5);
+    transform-origin: 50% 50%;
+  }
+
+  /* the scaled figure overflows its box by ~45px top and bottom */
+  .apps-teaser .isotype .isotype__caption {
+    margin-top: 3.75rem;
+  }
+
+  .apps-teaser .iso__label,
+  .apps-teaser .iso__line,
+  .apps-teaser .iso__end {
+    display: none;
+  }
+}
+
+.apps-teaser .isotype__caption {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* hover link from the chips: the field lights up */
+.apps-teaser .iso__callout[data-hot] .iso__label { fill: var(--coral-dark); }
+.apps-teaser .iso__callout[data-hot] .iso__ring { stroke: var(--coral); stroke-width: 2.5; }
+.apps-teaser .iso__callout[data-hot] .iso__line { stroke: var(--coral); }
+.apps-teaser .iso__callout[data-hot] .iso__end { fill: var(--coral); }
+
+.apps-teaser .iso__label,
+.apps-teaser .iso__ring,
+.apps-teaser .iso__line,
+.apps-teaser .iso__end {
+  transition: fill var(--dur-base) var(--ease), stroke var(--dur-base) var(--ease), stroke-width var(--dur-base) var(--ease);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* draw-in: capsule first, then each callout in turn */
+  .apps-teaser .iso__capsule {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1600ms var(--ease-out);
+  }
+
+  .apps-teaser .iso__line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 700ms var(--ease-out);
+    transition-delay: calc(700ms + var(--i) * 140ms);
+  }
+
+  .apps-teaser .iso__ring {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0);
+    transition: transform 500ms var(--ease-out), stroke var(--dur-base) var(--ease), stroke-width var(--dur-base) var(--ease);
+    transition-delay: calc(600ms + var(--i) * 140ms);
+  }
+
+  .apps-teaser .iso__end,
+  .apps-teaser .iso__label {
+    opacity: 0;
+    transition: opacity 500ms var(--ease-out), fill var(--dur-base) var(--ease);
+    transition-delay: calc(1250ms + var(--i) * 140ms);
+  }
+
+  .apps-teaser .iso__label {
+    transform: translateX(var(--nudge, 6px));
+    transition: opacity 500ms var(--ease-out), transform 600ms var(--ease-out), fill var(--dur-base) var(--ease);
+    transition-delay: calc(1250ms + var(--i) * 140ms);
+  }
+
+  .apps-teaser .isotype.is-visible .iso__capsule,
+  .apps-teaser .isotype.is-visible .iso__line {
+    stroke-dashoffset: 0;
+  }
+
+  .apps-teaser .isotype.is-visible .iso__ring {
+    transform: scale(1);
+  }
+
+  .apps-teaser .isotype.is-visible .iso__end,
+  .apps-teaser .isotype.is-visible .iso__label {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* the dot field breathes */
+  .apps-teaser .iso__dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: iso-drift var(--dur, 6s) ease-in-out var(--delay, 0s) infinite alternate;
+  }
+
+  @keyframes iso-drift {
+    from { transform: translateY(var(--amp, 2px)) scale(0.96); }
+    to { transform: translateY(calc(var(--amp, 2px) * -1)) scale(1.04); }
+  }
+
+  /* the five fields pulse one after another */
+  .apps-teaser .isotype.is-visible .iso__pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: iso-pulse 4.5s ease-out calc(2s + var(--i) * 0.9s) infinite;
+  }
+
+  .apps-teaser .iso__pulse {
+    opacity: 0;
+  }
+
+  @keyframes iso-pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    18% { transform: scale(1.9); opacity: 0; }
+    100% { transform: scale(1.9); opacity: 0; }
+  }
+}
+
+/* ── application chips + button (index.astro) ───────────────────────── */
+.apps-teaser .apps__links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+  list-style: none;
+  margin: 2.25rem 0 0;
+  padding: 0;
+}
+
+.apps-teaser .apps__chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.2rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.94rem;
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+
+.apps-teaser .apps__chip span {
+  color: var(--coral);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.apps-teaser .apps__chip:hover,
+.apps-teaser .apps__chip:focus-visible {
+  color: var(--coral-dark);
+  border-color: var(--border-coral-soft);
+  background: linear-gradient(120deg, var(--coral-tint) 0%, var(--bg-panel) 60%);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.apps-teaser .apps__chip:hover span {
+  transform: translateX(3px);
+}
+
+.apps-teaser .apps__cta {
+  margin-top: 2rem;
+}
+
+@media (max-width: 56rem) {
+  .apps-teaser .apps__links {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 40rem) {
+  .apps-teaser .apps__links {
+    grid-template-columns: 1fr;
+  }
+
+  .apps-teaser .apps__cta .btn {
+    width: 100%;
+  }
+}

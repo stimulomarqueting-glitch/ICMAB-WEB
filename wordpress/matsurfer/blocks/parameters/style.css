@@ -1,0 +1,64 @@
+/* Parameters — port of the "parameters" rules of the <style> in
+   src/pages/[...lang]/product.astro, scoped under the section's root class
+   .params. The header (eyebrow, .h2, .lead) uses the global utilities from
+   base.css. Values are identical to the Astro source. */
+
+.params .params__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.25rem;
+  list-style: none;
+  margin: 2.25rem 0 0;
+  padding: 0;
+}
+
+.params .params__card {
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+
+.params .params__card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-violet-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.params .params__symbol {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--violet-dark);
+  transition: color var(--dur-base) var(--ease);
+}
+
+.params .params__card:hover .params__symbol {
+  background: var(--grad-vapor-line);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.params .params__card:first-child {
+  background: var(--violet-tint);
+  border-color: var(--border-violet-soft);
+}
+
+.params .params__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── responsive ── */
+@media (max-width: 56rem) {
+  .params .params__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 40rem) {
+  .params .params__grid { grid-template-columns: 1fr 1fr; }
+}

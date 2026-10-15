@@ -1,0 +1,7 @@
+/* Invitation panel — block editor preview only (block.json "editorStyle"),
+   never loaded on the public site. */
+
+/* the email after the sentence comes from the MatSurfer settings: not editable here */
+.mats-preview .invite .page__contact a {
+  cursor: default;
+}

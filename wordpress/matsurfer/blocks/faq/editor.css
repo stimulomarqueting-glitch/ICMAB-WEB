@@ -1,0 +1,12 @@
+/* FAQ — block editor preview only (block.json "editorStyle"), never loaded
+   on the public site. The preview wrapper is .mats-preview. The preview
+   prints every answer open (render.php) so it can be edited in place. */
+
+/* the question is edited inside its button: a text cursor, not a hand */
+.mats-preview .faq .acc__trigger {
+  cursor: default;
+}
+
+.mats-preview .faq .acc__trigger [data-mats-edit] {
+  cursor: text;
+}

@@ -1,0 +1,8 @@
+/* Product teaser — block editor preview only (block.json "editorStyle"),
+   never loaded on the public site. The preview wrapper is .mats-preview. */
+
+/* clicks on the photo reach it (click to replace); core sets
+   `.wp-block img:not([draggable]) { pointer-events: none }` */
+.mats-preview .product-teaser img[data-mats-image] {
+  pointer-events: auto;
+}

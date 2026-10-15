@@ -19,21 +19,29 @@
     "ctaSource": {
       "type": "string",
       "default": "hero"
+    },
+    "ctaSourceSecondary": {
+      "type": "string",
+      "default": "hero-product"
     }
   },
   "render": "file:./render.php",
   "style": "file:./style.css",
+  "editorStyle": "file:./editor.css",
+  "viewScript": "file:./view.js",
   "matsurfer": {
     "fields": [
       {
-        "key": "eyebrow",
+        "key": "claim",
         "type": "text",
-        "label": "Línea superior (institución y patente)"
+        "label": "Lema (encima del titular)",
+        "help": "La última palabra se muestra en negrita. Por ejemplo: «Superficies para todos.»"
       },
       {
         "key": "headline",
         "type": "text",
-        "label": "Titular principal"
+        "label": "Titular principal",
+        "help": "Las palabras aparecen una a una al cargar la página."
       },
       {
         "key": "descriptor",
@@ -55,6 +63,12 @@
         "key": "ctaSecondary",
         "type": "link",
         "label": "Botón secundario"
+      },
+      {
+        "key": "eyebrow",
+        "type": "text",
+        "label": "Línea inferior (institución y patente)",
+        "help": "Texto pequeño en mayúsculas bajo los botones."
       },
       {
         "type": "panel",

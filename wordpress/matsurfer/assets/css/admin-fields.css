@@ -1,0 +1,640 @@
+/*
+ * MatSurfer — admin screens of Equipo, Aplicaciones, Publicaciones and
+ * Valoraciones (inc/modules/content-types-admin.php).
+ * Loaded only on those list / edit screens; everything is scoped to our own
+ * classes or to the body classes .mats-cpta-edit / .mats-cpta-list, so the
+ * rest of the admin keeps its familiar WordPress look.
+ */
+
+.mats-cpta-screen {
+  --mats-cpta-line: #dcdcde;
+  --mats-cpta-soft: #f6f7f7;
+  --mats-cpta-text: #1d2327;
+  --mats-cpta-muted: #50575e;
+  --mats-cpta-accent: var(--mats-violet, #6c12f8);
+  --mats-cpta-warn: #8a5a00;
+  --mats-cpta-warn-bg: #fcf6e5;
+  --mats-cpta-warn-line: #dba617;
+  --mats-cpta-ok: #00703c;
+  --mats-cpta-ok-bg: #edfaef;
+}
+
+/* ═══ Edit screen ═════════════════════════════════════════════════════ */
+
+/* label + help around the title field */
+.mats-cpta-title-label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mats-cpta-text);
+}
+.mats-cpta-optional {
+  font-weight: 400;
+  color: var(--mats-cpta-muted);
+}
+.mats-cpta-edit #poststuff {
+  padding-top: 0;
+}
+.mats-cpta-edit #titlediv {
+  margin-bottom: 18px;
+}
+.mats-cpta-edit #titlediv #title {
+  margin: 0;
+}
+.mats-cpta-title-help {
+  margin: 6px 0 0;
+  color: var(--mats-cpta-muted);
+}
+.mats-cpta-where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--mats-cpta-soft);
+  color: var(--mats-cpta-text);
+}
+.mats-cpta-where .dashicons {
+  color: var(--mats-cpta-muted);
+}
+
+/* "Publicar" box */
+.mats-cpta-edit #visibility {
+  display: none; /* password / private make no sense here: the website shows published records */
+}
+.mats-cpta-status-help {
+  padding-top: 10px;
+  padding-bottom: 12px;
+  border-top: 1px solid #f0f0f1;
+}
+.mats-cpta-status-help p {
+  margin: 8px 0 0;
+  color: var(--mats-cpta-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mats-cpta-status-help strong {
+  color: var(--mats-cpta-text);
+}
+
+/* pills (status, languages) */
+.mats-cpta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.7;
+  white-space: nowrap;
+  background: #f0f0f1;
+  color: var(--mats-cpta-muted);
+}
+.mats-cpta-pill::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+.mats-cpta-pill.is-visible {
+  background: var(--mats-cpta-ok-bg);
+  color: var(--mats-cpta-ok);
+}
+.mats-cpta-pill.is-visible::before {
+  background: currentColor;
+}
+.mats-cpta-pill.is-future {
+  background: #eef3fd;
+  color: #1e4fa8;
+}
+
+/* featured image box + order box */
+.mats-cpta-thumb-help,
+.mats-cpta-order__help {
+  margin: 10px 0 0;
+  color: var(--mats-cpta-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mats-cpta-edit #postimagediv .inside img {
+  border-radius: 6px;
+}
+.mats-cpta-order {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 10px;
+  padding-top: 4px;
+}
+.mats-cpta-order__label {
+  font-weight: 600;
+}
+.mats-cpta-order input[type='number'] {
+  width: 90px;
+  font-size: 16px;
+}
+.mats-cpta-order__help {
+  grid-column: 1 / -1;
+}
+
+/* ── "Contenido" box ─────────────────────────────────────────────── */
+.mats-cpta-edit #mats-cpta-content {
+  margin-top: 0;
+}
+.mats-cpta-edit #mats-cpta-content .hndle {
+  cursor: default;
+}
+.mats-cpta {
+  color: var(--mats-cpta-text);
+}
+.mats-cpta__intro {
+  margin: 4px 0 14px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--mats-cpta-accent);
+  border-radius: 0 6px 6px 0;
+  background: var(--mats-mist-violet, #f2eafe);
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 80ch;
+}
+
+.mats-cpta__langs {
+  position: sticky;
+  top: 32px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 0 -12px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--mats-cpta-line);
+  border-bottom: 1px solid var(--mats-cpta-line);
+  background: rgba(255, 255, 255, 0.96);
+  font-weight: 600;
+  font-size: 13px;
+}
+.mats-cpta__langs-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mats-cpta__pill {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--mats-cpta-text);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  text-align: center;
+}
+[data-lang='es'] > .mats-cpta__lang .mats-cpta__pill,
+.mats-cpta__langs-col + .mats-cpta__langs-col .mats-cpta__pill,
+.mats-cpta-cell__line.is-secondary .mats-cpta__pill {
+  background: var(--mats-coral-dark, #c93e1e);
+}
+.mats-cpta__pill--small {
+  min-width: 0;
+  padding: 0 4px;
+  font-size: 10px;
+}
+
+.mats-cpta__row {
+  padding: 16px 0 18px;
+  border-bottom: 1px solid #f0f0f1;
+}
+.mats-cpta__row:last-child {
+  border-bottom: 0;
+  padding-bottom: 6px;
+}
+.mats-cpta__label {
+  display: block;
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.mats-cpta__help {
+  margin: 0 0 10px;
+  max-width: 80ch;
+  color: var(--mats-cpta-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.mats-cpta__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+}
+.mats-cpta__col {
+  min-width: 0;
+}
+.mats-cpta__lang {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mats-cpta-muted);
+}
+
+.mats-cpta .mats-cpta__input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.mats-cpta textarea.mats-cpta__input {
+  resize: vertical;
+  min-height: 3.2em;
+}
+.mats-cpta .mats-cpta__input--short {
+  max-width: 12em;
+}
+.mats-cpta .mats-cpta__input--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.mats-cpta__row--url .mats-cpta__input,
+.mats-cpta__row--doi .mats-cpta__input,
+.mats-cpta__row--text:not(.mats-cpta__row--i18n) .mats-cpta__input {
+  max-width: 36em;
+}
+
+.mats-cpta__count {
+  margin: 4px 0 0;
+  color: #646970;
+  font-size: 12px;
+  text-align: right;
+}
+.mats-cpta__row:not(.mats-cpta__row--i18n) .mats-cpta__count {
+  max-width: 36em;
+}
+.mats-cpta__row--textarea:not(.mats-cpta__row--i18n) .mats-cpta__count {
+  max-width: none;
+}
+.mats-cpta__count.is-over {
+  color: var(--mats-cpta-warn);
+  font-weight: 600;
+}
+
+.mats-cpta__col.is-missing .mats-cpta__input {
+  border-color: var(--mats-cpta-warn-line);
+  background: var(--mats-cpta-warn-bg);
+}
+.mats-cpta__missing {
+  margin: 4px 0 0;
+  color: var(--mats-cpta-warn);
+  font-size: 12px;
+}
+.mats-cpta__missing::before {
+  content: '! ';
+  font-weight: 700;
+}
+
+/* application identifier */
+.mats-cpta__slug {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.mats-cpta__slug-prefix {
+  color: var(--mats-cpta-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.mats-cpta .mats-cpta__slug .mats-cpta__input {
+  flex: 1 1 16em;
+  width: auto;
+  max-width: 26em;
+}
+.mats-cpta__slug.is-locked .mats-cpta__input {
+  background: var(--mats-cpta-soft);
+  color: var(--mats-cpta-muted);
+  border-style: dashed;
+}
+.mats-cpta__slug-lock,
+.mats-cpta__slug-warn {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 0;
+  max-width: 80ch;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--mats-cpta-muted);
+}
+.mats-cpta__slug-warn {
+  color: var(--mats-cpta-warn);
+}
+.mats-cpta__slug-lock .dashicons,
+.mats-cpta__slug-warn .dashicons {
+  flex: none;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+.mats-cpta__slug-lock[hidden],
+.mats-cpta__slug-warn[hidden] {
+  display: none;
+}
+
+/* photo picker */
+.mats-cpta__media {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 16px 20px;
+  align-items: start;
+}
+.mats-cpta__media-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--mats-cpta-line);
+  border-radius: 8px;
+  /* checkerboard: shows whether the background is really transparent */
+  background-color: #fff;
+  background-image: conic-gradient(#ececec 25%, transparent 0 50%, #ececec 0 75%, transparent 0);
+  background-size: 16px 16px;
+}
+.mats-cpta__media-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.mats-cpta__media-empty {
+  padding: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--mats-cpta-muted);
+  font-size: 12px;
+  text-align: center;
+}
+.mats-cpta__media-file {
+  margin: 0 0 8px;
+  color: var(--mats-cpta-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+.mats-cpta__media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0;
+}
+.mats-cpta .mats-cpta__media-remove {
+  color: #b32d2e;
+}
+.mats-cpta__media-warn {
+  display: flex;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--mats-cpta-warn-line);
+  background: var(--mats-cpta-warn-bg);
+  color: var(--mats-cpta-warn);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mats-cpta__media-warn[hidden],
+.mats-cpta__media-file[hidden],
+.mats-cpta [hidden] {
+  display: none;
+}
+
+/* notices */
+.mats-cpta-notice ul {
+  margin: 0 0 8px 1.4em;
+  list-style: disc;
+}
+
+/* narrow screens: languages stacked */
+@media (max-width: 1100px) {
+  .mats-cpta__langs {
+    display: none;
+  }
+  .mats-cpta__cols {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 782px) {
+  .mats-cpta__media {
+    grid-template-columns: 1fr;
+  }
+  .mats-cpta__media-preview {
+    width: min(200px, 100%);
+  }
+  .mats-cpta-order input[type='number'] {
+    width: 110px;
+  }
+  .mats-cpta-title-label {
+    margin-top: 8px;
+  }
+}
+
+/* ═══ List screen ═════════════════════════════════════════════════════ */
+
+.mats-cpta-list .notice.mats-cpta-intro {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 0 4px;
+  padding: 10px 14px;
+  max-width: 100ch;
+  border: 1px solid var(--mats-cpta-line);
+  border-left: 3px solid var(--mats-cpta-accent);
+  border-radius: 0 6px 6px 0;
+  background: #fff;
+  box-shadow: none;
+}
+.mats-cpta-list .notice.mats-cpta-list .notice.mats-cpta-intro p {
+  margin: 0;
+  padding: 0;
+  line-height: 1.55;
+}
+.mats-cpta-list .notice.mats-cpta-intro .dashicons {
+  flex: none;
+  color: var(--mats-cpta-accent);
+}
+
+.mats-cpta-list .wp-list-table td {
+  vertical-align: middle;
+}
+.mats-cpta-list .wp-list-table .column-mats_thumb {
+  width: 56px;
+}
+.mats-cpta-list .wp-list-table .column-mats_cutout {
+  width: 64px;
+}
+.mats-cpta-list .wp-list-table .column-mats_langs {
+  width: 15%;
+}
+.mats-cpta-list .wp-list-table .column-mats_order {
+  width: 108px;
+}
+.mats-cpta-list .wp-list-table .column-mats_status {
+  width: 136px;
+}
+.mats-cpta-list .wp-list-table .column-mats_year,
+.mats-cpta-list .wp-list-table .column-mats_date {
+  width: 120px;
+}
+.mats-cpta-list .wp-list-table .column-mats_slug {
+  width: 16%;
+}
+
+.mats-cpta-thumb {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--mats-cpta-soft);
+}
+.mats-cpta-thumb.is-round {
+  border-radius: 50%;
+}
+.mats-cpta-thumb.is-empty {
+  border: 1px dashed #c3c4c7;
+}
+.mats-cpta-cutout {
+  display: block;
+  width: 44px;
+  height: 52px;
+  border: 1px solid var(--mats-cpta-line);
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #fff;
+  background-image: conic-gradient(#ececec 25%, transparent 0 50%, #ececec 0 75%, transparent 0);
+  background-size: 10px 10px;
+}
+.mats-cpta-cutout img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mats-cpta-cell__line {
+  display: block;
+  line-height: 1.5;
+}
+.mats-cpta-cell__line.is-secondary {
+  color: var(--mats-cpta-muted);
+}
+.mats-cpta-cell__empty {
+  color: #8c8f94;
+  font-style: italic;
+}
+.mats-cpta-code {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.mats-cpta-langs {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mats-cpta-langs.is-ok {
+  color: var(--mats-cpta-ok);
+  font-weight: 600;
+}
+.mats-cpta-langs.is-missing {
+  color: var(--mats-cpta-warn);
+}
+.mats-cpta-langs__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--mats-cpta-warn-line);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.mats-cpta-order-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mats-cpta-order-cell__n {
+  min-width: 2em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.mats-cpta-move {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--mats-cpta-text);
+  font-size: 11px;
+  text-decoration: none;
+}
+a.mats-cpta-move:hover,
+a.mats-cpta-move:focus {
+  border-color: var(--mats-cpta-accent);
+  color: var(--mats-cpta-accent);
+}
+.mats-cpta-move.is-disabled {
+  opacity: 0.35;
+}
+
+.mats-cpta-list #the-list tr.mats-cpta-moved {
+  background: var(--mats-mist-violet, #f2eafe);
+  transition: background-color 0.6s ease;
+}
+
+/* Quick edit: only what matters here (title, order, status) */
+.mats-cpta-list .inline-edit-row .inline-edit-date,
+.mats-cpta-list .inline-edit-row .inline-edit-group:has(.inline-edit-password-input) {
+  display: none;
+}
+
+/* narrow screens: keep the essentials visible (WordPress shows the
+   columns placed before the name as full rows: the photo goes away) */
+@media (max-width: 782px) {
+  .mats-cpta-list .wp-list-table tr th.column-mats_thumb,
+  .mats-cpta-list .wp-list-table tr td.column-mats_thumb {
+    display: none !important;
+  }
+  .mats-cpta-list .wp-list-table .column-mats_order,
+  .mats-cpta-list .wp-list-table .column-mats_status,
+  .mats-cpta-list .wp-list-table .column-mats_langs {
+    width: auto;
+  }
+  .mats-cpta-move {
+    width: 36px;
+    height: 36px;
+  }
+}

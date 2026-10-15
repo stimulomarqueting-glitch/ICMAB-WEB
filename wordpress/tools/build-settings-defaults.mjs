@@ -1,7 +1,12 @@
 /**
  * Writes wordpress/matsurfer/inc/data/settings-defaults.php (header/footer
- * copy, default SEO texts) from the Astro content export.
+ * copy, default SEO texts, closing band of the news pages) from the Astro
+ * content export. These are the values "Ajustes de la web" shows as the
+ * originals and goes back to with "Restaurar valores originales".
  *   node wordpress/tools/export-content.mjs && node wordpress/tools/build-settings-defaults.mjs
+ *
+ * Keys are a contract with inc/modules/settings.php and the templates:
+ * never rename or remove one.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -15,6 +20,8 @@ const perLang = (lang) => {
   const s = c[lang].site;
   const nav = Object.fromEntries(s.header.nav.map((n) => [n.href.replace('/', ''), n.label]));
   const [col1, col2, col3] = s.footer.columns;
+  /* the news pages close with the home page's final call to action */
+  const finalCta = c[lang].home.finalCta;
   return {
     header_cta: s.header.cta,
     nav_product: nav.product,
@@ -45,6 +52,9 @@ const perLang = (lang) => {
     seo_title: s.meta.title,
     seo_description: s.meta.description,
     og_alt: s.meta.ogAlt,
+    blog_cta_title: finalCta.title,
+    blog_cta_text: finalCta.text,
+    blog_cta_button: finalCta.button,
   };
 };
 

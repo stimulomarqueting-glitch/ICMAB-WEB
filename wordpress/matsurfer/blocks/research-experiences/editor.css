@@ -1,0 +1,8 @@
+/* Expert experiences — block editor preview only (block.json
+   "editorStyle"), never loaded on the public site. */
+
+/* the editor-only note sits above the section title */
+.mats-preview .research-experiences .mats-note {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
