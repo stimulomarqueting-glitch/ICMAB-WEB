@@ -809,23 +809,19 @@
   display: none !important;
 }
 
-/* …and their language cannot be changed (Polylang box): it shows as plain
-   text (flag + name, so editors see which version they are editing) and the
-   menu does not open; admin.js takes it out of the keyboard order. The
-   server keeps the stored language anyway (inc/modules/editor.php). */
+/* …and their language cannot be changed (Polylang box): the selector is
+   hidden (it stays in the form; the server keeps the stored language anyway,
+   inc/modules/editor.php) but the row still says which language the page is
+   in — its flag, plus the name written next to it by admin.js */
 .mats-is-editor.mats-structural #ml_box #post_lang_choice {
-  pointer-events: none;
-  -webkit-appearance: none;
-  appearance: none;
-  min-height: 0;
-  margin: 0;
-  padding: 0 0 0 4px;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  color: #1e1e1e;
+  display: none !important;
+}
+
+.mats-lang-readonly {
+  margin-left: 6px;
   font-weight: 600;
-  cursor: default;
+  color: #1e1e1e;
+  vertical-align: middle;
 }
 
 /* the inserter has no patterns to show */

@@ -12,8 +12,8 @@
  *     are removed, and the block style variations that are not part of the
  *     design (rounded image, outline button, striped table…) disappear, so
  *     the "Styles" panel never shows up;
- *   - editors on structural pages: the language in the «Idiomas» box is
- *     shown read-only (see admin.css).
+ *   - editors on structural pages: the «Idiomas» box shows the page's
+ *     language as plain text (its selector is hidden by admin.css).
  */
 (function () {
   'use strict';
@@ -114,23 +114,22 @@
   }
 
   /*
-   * Editors on the fixed pages: the «Idiomas» box shows the page's language
-   * as plain text (admin.css); the select stays in the form (Polylang reads
-   * it on save) but cannot be reached with the keyboard either.
+   * Editors on the fixed pages: the language selector of the «Idiomas» box
+   * is hidden (admin.css; it stays in the form, Polylang reads it on save).
+   * Its current language is written next to the flag, as plain text, so the
+   * box still says which version is being edited.
    */
   function lockLanguageChoice() {
     if (cfg.isAdmin || !cfg.structural) return;
     var select = document.getElementById('post_lang_choice');
-    if (!select) return;
-    select.setAttribute('tabindex', '-1');
-    select.setAttribute('aria-readonly', 'true');
-    select.setAttribute('title', 'El idioma de las páginas principales no se puede cambiar.');
-    select.addEventListener('keydown', function (event) {
-      if (event.key !== 'Tab') event.preventDefault();
-    });
-    select.addEventListener('mousedown', function (event) {
-      event.preventDefault();
-    });
+    if (!select || !select.parentNode || select.parentNode.querySelector('.mats-lang-readonly')) return;
+    var option = select.options[select.selectedIndex];
+    if (!option) return;
+    var label = document.createElement('span');
+    label.className = 'mats-lang-readonly';
+    label.textContent = option.textContent;
+    label.title = 'El idioma de las páginas principales no se puede cambiar.';
+    select.parentNode.insertBefore(label, select.nextSibling);
   }
 
   var start = function () {
