@@ -1212,7 +1212,7 @@ add_action(
 		$status = mats_wpforms_status();
 		if ( ! $status['active'] ) {
 			if ( in_array( $id, array( 'dashboard', 'plugins' ), true ) ) {
-				echo '<div class="notice notice-warning"><p><strong>Falta el plugin WPForms.</strong> Sin él, la página Contacto solo muestra el email de contacto. Instálalo y actívalo en <a href="' . esc_url( admin_url( 'plugin-install.php?s=wpforms&tab=search&type=term' ) ) . '">Plugins → Añadir nuevo plugin</a> (busca «WPForms»).</p></div>';
+				echo '<div class="notice notice-warning"><p><strong>Falta el plugin WPForms.</strong> Sin él, la página Contacto solo muestra el email de contacto. Instálalo y actívalo en <a href="' . esc_url( admin_url( 'plugin-install.php?s=wpforms&tab=search&type=term' ) ) . '">Plugins → Añadir plugin</a> (busca «WPForms»).</p></div>';
 			}
 			return;
 		}

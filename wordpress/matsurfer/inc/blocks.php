@@ -31,6 +31,21 @@
  * Optional on any field: "default", "help", "placeholder", "inline": false
  * (opt out of in-place editing), "rows" (textarea).
  *
+ * REQUIRED TEXTS (editor only; render.php still decides what is printed)
+ *   "required": true          the field must be filled (top-level field, or a
+ *                             field inside each repeater item); on a list or
+ *                             repeater: at least one filled item
+ *   "requiredGroup": "name"   at least one of the fields sharing that name
+ *                             must be filled (render.php: title OR text…)
+ *   "requiredMessage": "…"    optional, with "required": the warning shown
+ *                             instead of «… necesita … para mostrarse en la
+ *                             web», for a text whose absence hides nothing
+ *                             (e.g. the H1 of team-showcase)
+ * While one is missing, the section, its side panel and a notice at the top
+ * say which text is needed, and saving the page stays locked
+ * (assets/js/editor/blocks.js). Flag a field only when render.php drops the
+ * section or the item without it, or when the message says why it matters.
+ *
  * @package matsurfer
  */
 

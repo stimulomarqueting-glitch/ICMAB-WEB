@@ -167,7 +167,8 @@ if (NEWS.length) {
     });
     check(v.length === 0, `${path} axe landmark-unique/region/image-alt`, v.join(' ') || 'clean');
   }
-  /* alt text: ES cards and article use the Spanish title; EN keeps the image's own alt */
+  /* alt text: the article's own photo description (_mats_thumb_alt) when set,
+     otherwise the image's alt — never the title (blog2 fix) */
   for (const lang of NEWS) {
     const list = lang === 'en' ? '/news/' : '/es/noticias/';
     await page.goto(BASE + list, { waitUntil: 'load' });
@@ -176,8 +177,7 @@ if (NEWS.length) {
     );
     check(cards.length > 0, `${list} has cards with a photo`, String(cards.length));
     for (const c of cards) {
-      if (lang === 'es') check(c.alt === c.title, `${list} card alt = Spanish title`, `alt="${c.alt}"`);
-      else check(!!c.alt && c.alt !== c.title, `${list} card alt = the image's own alt`, `alt="${c.alt}"`);
+      check(!!c.alt && c.alt !== c.title, `${list} card alt = description or image alt (not the title)`, `alt="${c.alt}"`);
     }
     if (cards[0]) {
       await page.goto(cards[0].href, { waitUntil: 'load' });
@@ -186,11 +186,7 @@ if (NEWS.length) {
         h1: document.querySelector('.post-hero__title')?.textContent.replace(/\s+/g, ' ').trim() || '',
         og: document.querySelector('meta[property="og:image:alt"]')?.getAttribute('content') || '',
       }));
-      if (lang === 'es') {
-        check(a.alt === a.h1 && a.og === a.h1, `${rel(cards[0].href)} photo alt + og:image:alt = Spanish title`, `alt="${a.alt}" og="${a.og}"`);
-      } else {
-        check(a.alt === cards[0].alt && a.og === a.alt, `${rel(cards[0].href)} photo alt + og:image:alt = image alt`, `alt="${a.alt}" og="${a.og}"`);
-      }
+      check(a.alt === cards[0].alt && a.og === a.alt && a.alt !== a.h1, `${rel(cards[0].href)} photo alt + og:image:alt = card alt (not the title)`, `alt="${a.alt}" og="${a.og}"`);
     }
   }
   await browser.close();

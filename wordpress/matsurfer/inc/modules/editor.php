@@ -485,12 +485,27 @@ function mats_editor_structure_error( int $post_id, string $content ): ?WP_Error
 	);
 }
 
-/* REST API (block editor saves and autosaves, wp.apiFetch…): refused with the message */
+/** Is this REST request an autosave (POST /wp/v2/pages/<id>/autosaves)? */
+function mats_editor_is_autosave_request( $request ): bool {
+	return $request instanceof WP_REST_Request && str_ends_with( untrailingslashit( (string) $request->get_route() ), '/autosaves' );
+}
+
+/*
+ * REST API (block editor saves, wp.apiFetch…): refused with the message.
+ * Autosaves pass: they are kept apart from the page (one per person, never
+ * shown on the web), and WordPress' autosave endpoint ignores the error —
+ * it would store an EMPTY autosave («Ver el autoguardado» would show a
+ * blank page). Restoring an autosave or saving it is still checked here
+ * and by wp_insert_post_data below.
+ */
 add_filter(
 	'rest_pre_insert_page',
 	static function ( $prepared, $request ) {
 		if ( is_wp_error( $prepared ) || ! is_object( $prepared ) || empty( $prepared->ID ) || ! isset( $prepared->post_content ) ) {
 			return $prepared; // no content in the request: nothing to check
+		}
+		if ( mats_editor_is_autosave_request( $request ) ) {
+			return $prepared;
 		}
 		$error = mats_editor_structure_error( (int) $prepared->ID, (string) $prepared->post_content );
 		return $error ? $error : $prepared;
@@ -797,11 +812,23 @@ add_action(
 			);
 			echo '</p></div>';
 		}
+		/* the two languages only exist while Polylang runs with its languages set up */
+		$bilingual = function_exists( 'pll_languages_list' ) && count( (array) pll_languages_list() ) > 1;
 		echo '<div class="notice notice-info mats-pages-notice"><p>';
 		echo '<span class="dashicons dashicons-lock" aria-hidden="true"></span> ';
-		echo esc_html( 'Las páginas principales (Inicio, Producto, Aplicaciones, Casos de estudio, Equipo, Contacto, Noticias y los textos legales) están protegidas: puedes cambiar sus textos y fotos, pero no borrarlas ni cambiar su dirección o su idioma, porque las usan el menú y los botones de la web. Cada una existe en inglés y en español: las columnas con banderas llevan a cada versión.' );
+		echo esc_html( 'Las páginas principales (Inicio, Producto, Aplicaciones, Casos de estudio, Equipo, Contacto, Noticias y los textos legales) están protegidas: puedes cambiar sus textos y fotos, pero no borrarlas ni cambiar su dirección' . ( $bilingual ? ' o su idioma' : '' ) . ', porque las usan el menú y los botones de la web.' );
+		if ( $bilingual ) {
+			echo ' ' . esc_html( 'Cada una existe en inglés y en español: las columnas con banderas llevan a cada versión.' );
+		} elseif ( function_exists( 'mats_installer_spanish_offline' ) && mats_installer_spanish_offline() ) {
+			echo ' ' . esc_html( 'Ahora mismo la web en español no se ve (lee el aviso de arriba); mientras tanto, esta lista muestra juntas las páginas en inglés y en español.' );
+		}
 		if ( mats_editor_is_admin() ) {
-			echo ' ' . esc_html( 'Administradores: para retirar una página principal, quítale antes su papel (el campo _mats_role de la página y de su traducción, y su entrada en la opción mats_page_roles); después ya se podrá borrar.' );
+			echo ' ' . esc_html( 'Administradores: para poder borrar una página principal hay que quitarle antes su papel de página principal, en ella y en su traducción. Es un cambio técnico:' );
+			if ( function_exists( 'mats_admin_guide_url' ) ) {
+				echo ' <a href="' . esc_url( mats_admin_guide_url( 'administradores' ) ) . '">' . esc_html( 'la Guía de uso explica cómo' ) . '</a>.';
+			} else {
+				echo ' ' . esc_html( 'la Guía de uso explica cómo.' );
+			}
 		}
 		echo '</p></div>';
 	}

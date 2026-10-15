@@ -33,6 +33,16 @@ Each section of the Astro pages is one block in `blocks/<name>/`:
   `inc/blocks.php`). Field keys are a contract with the importer: never
   rename or remove a key; you may improve labels/help, add fields, or add
   non-editable attributes under `"attributes"`.
+  **Required texts:** flag the fields render.php cannot do without —
+  `"required": true` (a top-level field, or a field inside each repeater
+  item; on a list/repeater: at least one filled item) or
+  `"requiredGroup": "name"` (at least one of the fields sharing the name,
+  for "title OR text" sections). While one is empty the editor shows a red
+  warning on the section and in its side panel, a notice at the top, and
+  keeps saving locked. The default message says the section (or item)
+  will not show on the web; when that is not what happens (e.g. the H1 of
+  `team-showcase`, which only loses its title), add
+  `"requiredMessage": "…"` next to `"required"` with the real reason.
 * `render.php` — server rendering. Must output **the same markup and classes
   as the Astro component** so the ported CSS gives a pixel match. Receives
   `$attributes`. Escape everything (`mats_text`, `esc_attr`, `esc_url`,

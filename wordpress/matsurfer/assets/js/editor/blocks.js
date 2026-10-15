@@ -20,6 +20,10 @@
  *                             on a list/repeater: at least one filled item
  *   "requiredGroup": "name"   at least one of the fields sharing the name
  *                             must be filled (render.php: title OR text…)
+ *   "requiredMessage": "…"    optional, with "required": what to say when the
+ *                             field is empty, instead of «… necesita … para
+ *                             mostrarse en la web» (for a text whose absence
+ *                             does not hide anything, e.g. an H1)
  * While one is missing, the section and the side panel say which text is
  * needed and saving the page is locked (lockPostSaving, one key per block).
  */
@@ -163,7 +167,7 @@
     var out = {};
     (field.fields || []).forEach(function (f) {
       if (f.key && f.required === true && !isFilled(f, item && typeof item === 'object' ? item[f.key] : undefined)) {
-        out[f.key] = 'Obligatorio: sin este texto, este elemento no se muestra en la web.';
+        out[f.key] = f.requiredMessage || 'Obligatorio: sin este texto, este elemento no se muestra en la web.';
       }
     });
     return out;
@@ -182,10 +186,10 @@
       if (!f.key) return;
       var value = attrs ? attrs[f.key] : undefined;
       if (f.required === true && !isFilled(f, value)) {
-        messages.push('Esta sección necesita ' + fieldName(f) + ' para mostrarse en la web.');
-        hints[f.key] = f.type === 'repeater' || f.type === 'list'
+        messages.push(f.requiredMessage || 'Esta sección necesita ' + fieldName(f) + ' para mostrarse en la web.');
+        hints[f.key] = f.requiredMessage || (f.type === 'repeater' || f.type === 'list'
           ? 'Obligatorio: rellena al menos un elemento; si no, la sección no se muestra en la web.'
-          : 'Obligatorio: sin este texto, la sección no se muestra en la web.';
+          : 'Obligatorio: sin este texto, la sección no se muestra en la web.');
       }
       if (f.requiredGroup) {
         if (!groups[f.requiredGroup]) {
@@ -199,7 +203,7 @@
           var miss = itemMissing(f, item);
           Object.keys(miss).forEach(function (k) {
             var sub = fieldAt(f.fields || [], k) || { label: k };
-            messages.push((f.itemLabel || 'Elemento') + ' ' + (i + 1) + ' necesita ' + fieldName(sub) + ' para mostrarse en la web.');
+            messages.push((f.itemLabel || 'Elemento') + ' ' + (i + 1) + (sub.requiredMessage ? ': ' + sub.requiredMessage : ' necesita ' + fieldName(sub) + ' para mostrarse en la web.'));
             hints[f.key] = hints[f.key] || 'Hay elementos sin un texto obligatorio (marcados en rojo).';
           });
         });
@@ -666,7 +670,7 @@
   var REQUIRED_STYLE = {
     position: 'relative',
     zIndex: 26,
-    margin: '2.6rem auto 0.75rem', // below the section's name badge
+    margin: '0 auto 0.75rem',
     width: 'min(100% - 2rem, 75rem)',
     padding: '0.75rem 1rem',
     borderRadius: '10px',
@@ -675,6 +679,11 @@
     color: '#8a1414',
     font: "500 13px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   };
+
+  /* room for the section's name badge (top left) above the warning: padding,
+     not a top margin — a margin would collapse through the block and the
+     badge would sit on the warning's first line */
+  var REQUIRED_WRAP_STYLE = { paddingTop: '2.6rem' };
 
   function releaseRequired(clientId) {
     var lockKey = 'mats-required-' + clientId;
@@ -954,12 +963,16 @@
           requiredText && !isPreview
             ? el(
                 'div',
-                { className: 'mats-required', role: 'alert', style: REQUIRED_STYLE },
-                el('strong', { style: { display: 'block', marginBottom: '0.2rem' } }, def.title + ': falta un texto obligatorio'),
-                problems.messages.map(function (m, i) {
-                  return el('p', { key: i, style: { margin: 0, font: 'inherit', color: 'inherit' } }, m);
-                }),
-                el('p', { style: { margin: '0.35rem 0 0', font: 'inherit', fontWeight: 400, color: 'inherit' } }, REQUIRED_HELP)
+                { className: 'mats-required-wrap', style: REQUIRED_WRAP_STYLE },
+                el(
+                  'div',
+                  { className: 'mats-required', role: 'alert', style: REQUIRED_STYLE },
+                  el('strong', { style: { display: 'block', marginBottom: '0.2rem' } }, def.title + ': falta un texto obligatorio'),
+                  problems.messages.map(function (m, i) {
+                    return el('p', { key: i, style: { margin: 0, font: 'inherit', color: 'inherit' } }, m);
+                  }),
+                  el('p', { style: { margin: '0.35rem 0 0', font: 'inherit', fontWeight: 400, color: 'inherit' } }, REQUIRED_HELP)
+                )
               )
             : null,
           error ? el(c.Notice, { status: 'error', isDismissible: false }, error) : null,

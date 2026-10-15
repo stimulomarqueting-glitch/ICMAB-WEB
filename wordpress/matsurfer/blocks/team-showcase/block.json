@@ -36,6 +36,7 @@
         "key": "title",
         "type": "text",
         "required": true,
+        "requiredMessage": "El título de la página (H1) no puede quedar vacío: Google y los lectores de pantalla lo necesitan.",
         "label": "Título de la página (H1)",
         "help": "Es el título principal de la página. No lo dejes vacío: sin él, la página se queda sin título principal."
       },

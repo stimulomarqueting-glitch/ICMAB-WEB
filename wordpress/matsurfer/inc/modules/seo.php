@@ -20,7 +20,8 @@
  *  hreflang         printed by Polylang; x-default (English) added to it
  *  robots           noindex,follow on 404s, on the News page of a language
  *                   with no article yet, on the default category ("News"
- *                   / "Noticias", a copy of the News page) and on date
+ *                   / "Noticias", a copy of the News page), on categories
+ *                   with no article in their language yet and on date
  *                   archives — mats_seo_noindex()
  *  sitemaps         core wp-sitemap.xml with pages, news and news
  *                   categories only, minus those noindex pages; listed in
@@ -276,6 +277,71 @@ function mats_seo_news_empty( string $lang ): bool {
 	return function_exists( 'mats_has_news' ) && ! mats_has_news( $lang );
 }
 
+/**
+ * Is this news category (or tag) without any published article in its
+ * language (its sub-categories included, like its archive page)? Then its
+ * archive only says «Nothing published yet» and, like an empty News page,
+ * it is kept out of Google — noindex, out of the sitemap, no hreflang /
+ * og:locale alternates from or to it — but still answers, and all of it
+ * comes back by itself with its first article.
+ */
+function mats_seo_term_empty( WP_Term $term ): bool {
+	static $cache = array();
+	$id = (int) $term->term_id;
+	if ( ! isset( $cache[ $id ] ) ) {
+		$args = array(
+			'post_type'           => 'post',
+			'post_status'         => 'publish',
+			'posts_per_page'      => 1,
+			'fields'              => 'ids',
+			'no_found_rows'       => true,
+			'ignore_sticky_posts' => true,
+			'tax_query'           => array( // phpcs:ignore WordPress.DB.SlowDBQuery
+				array(
+					'taxonomy'         => $term->taxonomy,
+					'field'            => 'term_id',
+					'terms'            => $id,
+					'include_children' => true,
+				),
+			),
+		);
+		if ( function_exists( 'pll_get_term_language' ) ) {
+			$lang         = pll_get_term_language( $id );
+			$args['lang'] = $lang ? (string) $lang : mats_lang();
+		}
+		$cache[ $id ] = ! get_posts( $args );
+	}
+	return $cache[ $id ];
+}
+
+/** Is the version of this term in another language missing or empty (mats_seo_term_empty())? */
+function mats_seo_term_translation_empty( WP_Term $term, string $lang ): bool {
+	$tr      = function_exists( 'pll_get_term' ) ? (int) pll_get_term( (int) $term->term_id, $lang ) : 0;
+	$tr_term = $tr ? get_term( $tr, $term->taxonomy ) : null;
+	return ! $tr_term instanceof WP_Term || mats_seo_term_empty( $tr_term );
+}
+
+/** IDs of the terms of a taxonomy (every language) without articles in their language. */
+function mats_seo_empty_term_ids( string $taxonomy ): array {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => false,
+			'lang'       => '',
+		)
+	);
+	if ( ! is_array( $terms ) ) {
+		return array();
+	}
+	$ids = array();
+	foreach ( $terms as $term ) {
+		if ( $term instanceof WP_Term && mats_seo_term_empty( $term ) ) {
+			$ids[] = (int) $term->term_id;
+		}
+	}
+	return $ids;
+}
+
 /** HTML language codes of the site languages ('en', 'es'). */
 function mats_seo_languages(): array {
 	$langs = function_exists( 'pll_languages_list' ) ? (array) pll_languages_list( array( 'fields' => 'slug' ) ) : array();
@@ -324,7 +390,7 @@ function mats_seo_image( int $post_id = 0 ): array {
 				$alt  = mats_seo_clean( get_post_meta( $thumb, '_wp_attachment_image_alt', true ) );
 				$post = get_post( $post_id );
 				if ( $post && function_exists( 'mats_blog_thumb_alt' ) ) {
-					$alt = mats_seo_clean( mats_blog_thumb_alt( $post, $alt ) ); // the page's own language, like the image on the page
+					$alt = mats_seo_clean( mats_blog_thumb_alt( $post, $alt ) ); // the article's own «Descripción de la foto destacada», else the image's alt — like the photo on the page
 				}
 				return array(
 					'url'    => (string) $src[0],
@@ -498,6 +564,7 @@ function mats_seo_context(): array {
 			$ctx['url']         = mats_seo_paged_url( $first );
 			$ctx['canonical']   = $ctx['url'];
 			$ctx['locales']     = function_exists( 'pll_get_term_translations' ) ? $translations( (array) pll_get_term_translations( $term->term_id ), false ) : array();
+			$ctx['locales']     = mats_seo_term_empty( $term ) ? array() : array_values( array_filter( $ctx['locales'], static fn( $l ) => ! mats_seo_term_translation_empty( $term, $l ) ) ); // like hreflang
 			$middle             = ( $news_crumb && 0 !== strcasecmp( $news_crumb[0], $name ) ) ? $news_crumb : array(); // no "News → News"
 			$ctx['breadcrumb']  = array_values( array_filter( array( array( $home_name, $home_url ), $middle, array( $name, $first ) ) ) );
 			if ( '' === $ctx['description'] && '' !== $news_desc ) {
@@ -574,6 +641,8 @@ add_filter(
  *    by itself with the first article);
  *  - the default category's archive ("News" / "Noticias"): almost every
  *    article lands there, so it repeats the News page with the same title;
+ *  - a category (or tag) with no published article in its language yet —
+ *    the same thin «Nothing published yet» page (mats_seo_term_empty());
  *  - date archives (/2026/09/): nothing links to them, they repeat the list.
  * Visitors (and Google) still follow their links.
  */
@@ -584,7 +653,11 @@ function mats_seo_noindex(): bool {
 	if ( is_home() && ! is_front_page() && mats_seo_news_empty( mats_lang() ) ) {
 		return true;
 	}
-	return is_category() && mats_seo_is_default_category( get_queried_object() );
+	$term = is_category() || is_tag() ? get_queried_object() : null;
+	if ( $term instanceof WP_Term && mats_seo_term_empty( $term ) ) {
+		return true;
+	}
+	return is_category() && mats_seo_is_default_category( $term );
 }
 
 add_filter(
@@ -682,13 +755,30 @@ add_action( 'wp_head', 'mats_seo_head', 1 );
 
 /* Polylang prints the hreflang links; add x-default → the English version.
    On the News page, an empty News page of another language (noindex) is
-   not offered as its alternate; with one language left, no links at all. */
+   not offered as its alternate; with one language left, no links at all.
+   The same for a category / tag archive and its versions without articles. */
 add_filter(
 	'pll_rel_hreflang_attributes',
 	static function ( $hreflangs ) {
 		if ( is_array( $hreflangs ) && mats_seo_active() && is_home() && ! is_front_page() ) {
 			foreach ( array_keys( $hreflangs ) as $code ) {
 				if ( 'x-default' !== $code && mats_seo_news_empty( mats_normalize_lang( substr( (string) $code, 0, 2 ) ) ) ) {
+					unset( $hreflangs[ $code ] );
+				}
+			}
+			if ( count( array_diff( array_keys( $hreflangs ), array( 'x-default' ) ) ) < 2 ) {
+				return array();
+			}
+		}
+		$term = is_array( $hreflangs ) && mats_seo_active() && ( is_category() || is_tag() ) ? get_queried_object() : null;
+		if ( $term instanceof WP_Term ) {
+			if ( mats_seo_term_empty( $term ) ) {
+				return array();
+			}
+			$current = mats_lang();
+			foreach ( array_keys( $hreflangs ) as $code ) {
+				$code_lang = mats_normalize_lang( substr( (string) $code, 0, 2 ) );
+				if ( 'x-default' !== $code && $code_lang !== $current && mats_seo_term_translation_empty( $term, $code_lang ) ) {
 					unset( $hreflangs[ $code ] );
 				}
 			}
@@ -932,13 +1022,14 @@ add_filter(
 	2
 );
 
-/* not the default category either (noindex: it repeats the News page) */
+/* not the default category either (noindex: it repeats the News page), nor a
+   category without articles in its language (noindex, see mats_seo_noindex()) */
 add_filter(
 	'wp_sitemaps_taxonomies_query_args',
 	static function ( $args, $taxonomy ) {
-		$default = 'category' === $taxonomy ? mats_seo_default_category_ids() : array();
-		if ( $default ) {
-			$args['exclude'] = array_values( array_unique( array_merge( array_map( 'intval', wp_parse_id_list( $args['exclude'] ?? array() ) ), $default ) ) );
+		$skip = 'category' === $taxonomy ? array_merge( mats_seo_default_category_ids(), mats_seo_empty_term_ids( 'category' ) ) : array();
+		if ( $skip ) {
+			$args['exclude'] = array_values( array_unique( array_merge( array_map( 'intval', wp_parse_id_list( $args['exclude'] ?? array() ) ), $skip ) ) );
 		}
 		return $args;
 	},

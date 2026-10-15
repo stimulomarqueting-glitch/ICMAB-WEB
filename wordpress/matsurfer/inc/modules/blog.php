@@ -216,23 +216,70 @@ function mats_blog_cta( string $source = 'news-final' ): string {
 	return WP_Block_Type_Registry::get_instance()->is_registered( 'matsurfer/page-cta' ) ? mats_render_section( 'matsurfer/page-cta', $attrs ) : '';
 }
 
+/* Post meta: the article's own description of its featured image («Descripción de la foto destacada»). */
+const MATS_BLOG_THUMB_ALT = '_mats_thumb_alt';
+
 /**
  * Alt text of a post's featured image. Polylang does not translate media
- * (the installer leaves media translation off), so one image — with one alt
- * text, written in whatever language the team used, English for the site
- * photos the installer imported — serves every language version of an
- * article. The image's own alt is used only on the default-language
- * version; any other language, or an image without alt text, gets the
- * title of that version instead, which is always in the right language.
+ * (the installer leaves media translation off), so the language versions of
+ * an article share one image — and its one «Texto alternativo», written in
+ * whatever language the team used (English for the site photos the
+ * installer imported). Each article therefore has its own optional
+ * «Descripción de la foto destacada», written in its language under the
+ * photo in the editor (assets/js/post-thumb-alt.js): it wins when filled;
+ * otherwise the image's own alt is used as it is ('' = no description: the
+ * title is always next to the photo, so it is never repeated as its alt).
+ * Used by the article header, the cards (News page, archives, search,
+ * «Últimas noticias») and og:image:alt / twitter:image:alt.
  */
 function mats_blog_thumb_alt( WP_Post $post, string $attachment_alt ): string {
-	$attachment_alt = trim( $attachment_alt );
-	$other_lang     = function_exists( 'mats_post_lang' ) && mats_post_lang( $post->ID ) !== mats_default_lang();
-	if ( '' === $attachment_alt || $other_lang ) {
-		return trim( wp_strip_all_tags( get_the_title( $post ) ) );
-	}
-	return $attachment_alt;
+	$own = trim( (string) get_post_meta( $post->ID, MATS_BLOG_THUMB_ALT, true ) );
+	return '' !== $own ? $own : trim( $attachment_alt );
 }
+
+/** Plain one-line text, at most 300 characters (a description, not a caption). */
+function mats_blog_sanitize_thumb_alt( $value ): string {
+	return mb_substr( sanitize_text_field( (string) $value ), 0, 300 );
+}
+
+/* saved with the article from the block editor (REST), only by people who may edit it */
+add_action(
+	'init',
+	static function () {
+		register_post_meta(
+			'post',
+			MATS_BLOG_THUMB_ALT,
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'default'           => '',
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'mats_blog_sanitize_thumb_alt',
+				'auth_callback'     => static fn( $allowed, $meta_key, $post_id ) => current_user_can( 'edit_post', (int) $post_id ),
+			)
+		);
+	}
+);
+
+/* the field under the photo of the «Foto destacada» panel: news articles only */
+add_action(
+	'enqueue_block_editor_assets',
+	static function () {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		$post   = get_post();
+		if ( ! $screen || 'post' !== $screen->base || 'post' !== $screen->post_type || ! $post instanceof WP_Post || 'post' !== $post->post_type ) {
+			return;
+		}
+		wp_enqueue_script(
+			'matsurfer-post-thumb-alt',
+			MATS_URI . '/assets/js/post-thumb-alt.js',
+			array( 'wp-hooks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data', 'wp-editor' ),
+			mats_ver( 'assets/js/post-thumb-alt.js' ),
+			true
+		);
+		wp_add_inline_script( 'matsurfer-post-thumb-alt', 'window.matsThumbAlt = ' . wp_json_encode( array( 'key' => MATS_BLOG_THUMB_ALT ) ) . ';', 'before' );
+	}
+);
 
 /** Featured image of a post as an image value for mats_image(), [] when none (alt: mats_blog_thumb_alt()). */
 function mats_blog_thumb( $post = null ): array {
@@ -730,4 +777,14 @@ add_action(
 		}
 		mats_jsonld_add( $node );
 	}
+);
+
+/* Each translation keeps its own photo description, even if someone turns
+   on Polylang's custom-field synchronisation later. */
+add_filter(
+	'pll_copy_post_metas',
+	static function ( $metas ) {
+		return is_array( $metas ) ? array_values( array_diff( $metas, array( MATS_BLOG_THUMB_ALT ) ) ) : $metas;
+	},
+	20
 );
