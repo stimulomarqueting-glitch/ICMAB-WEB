@@ -134,6 +134,24 @@ try {
     );
   });
   await page.screenshot({ path: `${OUT}/editor-post-sidebar.png` });
+  /* the text colour picker of a paragraph: only the five brand colours, no custom colour */
+  await page.evaluate(() => {
+    const be = wp.data.select('core/block-editor');
+    const first = be.getBlocks().find((b) => b.name === 'core/paragraph');
+    if (first) wp.data.dispatch('core/block-editor').selectBlock(first.clientId);
+    wp.data.dispatch('core/edit-post').openGeneralSidebar('edit-post/block');
+  });
+  await page.waitForTimeout(1000);
+  const colorBtn = page.locator('.block-editor-panel-color-gradient-settings__dropdown, .block-editor-tools-panel-color-gradient-settings__dropdown button').first();
+  if (await colorBtn.count()) {
+    await colorBtn.click();
+    await page.waitForTimeout(700);
+    report.swatches = await page.$$eval('.components-popover .components-circular-option-picker__option', (els) => els.map((e) => e.getAttribute('aria-label') || ''));
+    report.customColor = await page.$$eval('.components-popover .components-color-palette__custom-color-wrapper, .components-popover button[aria-label*="ustom"]', (els) => els.length);
+    await page.screenshot({ path: `${OUT}/editor-post-colors.png` });
+    await page.keyboard.press('Escape');
+  }
+  check((report.swatches || []).length === 5 && report.customColor === 0, 'editor news: text colour picker offers the 5 brand colours only');
   check(!report.post.allowed.includes('matsurfer/page-cta'), 'editor news: page-cta not allowed');
   check(report.post.palette.join() === 'ink,coral,violet,plum,cream', 'editor news: brand palette');
   check(report.post.sizes.join() === 'small,normal,large,x-large', 'editor news: S/M/L/XL sizes');

@@ -211,7 +211,9 @@ try {
     wp.data.dispatch('core/edit-post').openGeneralSidebar('edit-post/block');
     return new Promise((r) => setTimeout(() => r(document.querySelector('.block-editor-block-inspector')?.innerText || ''), 1200));
   });
-  check(!/Typography|Tipografía|Color|Dimensions|Dimensiones|Advanced|Avanzado/.test(report.editorParagraphInspector), 'paragraph inspector without design controls');
+  /* theme.json offers the brand colours and S/M/L/XL sizes; nothing else (no dimensions, line height, letter spacing, advanced) */
+  check(!/Dimensions|Dimensiones|Advanced|Avanzado|Line height|Altura de línea|Letter spacing|Espaciado|Padding|Margin|Relleno|Margen/.test(report.editorParagraphInspector), 'paragraph inspector without free design controls');
+  check(/\nS\nM\nL\nXL\n/.test(report.editorParagraphInspector), 'paragraph inspector: font size is S / M / L / XL only');
   check(po.imageStyles.length === 0 && po.buttonStyles.length === 0, 'no block style variations for editors');
 
   /* inserter of a news article */
