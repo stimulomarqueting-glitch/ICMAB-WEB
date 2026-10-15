@@ -11,6 +11,17 @@
  * The field schema comes from each block.json ("matsurfer.fields"), passed
  * in window.matsBlocks by inc/blocks.php. No build step: plain JS on the
  * wp.* globals.
+ *
+ * Required texts: render.php prints nothing on the public site when a key
+ * text is empty (the whole section, or one list item, disappears). Fields
+ * that guard this carry a flag in block.json:
+ *   "required": true          this field must be filled (top-level field,
+ *                             or a field inside each item of a repeater);
+ *                             on a list/repeater: at least one filled item
+ *   "requiredGroup": "name"   at least one of the fields sharing the name
+ *                             must be filled (render.php: title OR text…)
+ * While one is missing, the section and the side panel say which text is
+ * needed and saving the page is locked (lockPostSaving, one key per block).
  */
 (function (wp, data) {
   'use strict';
@@ -98,14 +109,126 @@
     }
   }
 
+  /* ── required texts ────────────────────────────────────────────────── */
+  /** PHP's trim(): render.php decides with mats_has() = trim() !== ''. */
+  function phpTrim(value) {
+    if (value == null || typeof value === 'object') return '';
+    return String(value).replace(/^[ \t\n\r\0\x0B]+|[ \t\n\r\0\x0B]+$/g, '');
+  }
+
+  var TEXT_TYPES = ['text', 'textarea', 'list', 'link', 'repeater'];
+
+  /** Would render.php consider this value as "something to show"? */
+  function isFilled(field, value) {
+    var obj = value && typeof value === 'object' ? value : null;
+    switch (field.type) {
+      case 'text':
+      case 'textarea':
+      case 'select':
+        return phpTrim(value) !== '';
+      case 'link':
+        return !!obj && phpTrim(obj.label) !== '';
+      case 'image':
+      case 'video':
+        return !!obj && !!(obj.url || obj.id);
+      case 'list':
+        return Array.isArray(value) && value.some(function (v) { return phpTrim(v) !== ''; });
+      case 'repeater':
+        return Array.isArray(value) && value.some(function (item) { return itemFilled(field, item); });
+      default:
+        return true;
+    }
+  }
+
+  function itemFilled(field, item) {
+    if (!item || typeof item !== 'object') return false;
+    return (field.fields || []).some(function (f) {
+      return f.key && TEXT_TYPES.indexOf(f.type) !== -1 && isFilled(f, item[f.key]);
+    });
+  }
+
+  /** «Título», or «Texto del botón» de «Botón» for a button. */
+  function fieldName(field) {
+    var label = field.label || field.key;
+    return field.type === 'link' ? '«Texto del botón» de «' + label + '»' : '«' + label + '»';
+  }
+
+  function joinOr(names) {
+    if (names.length < 2) return names.join('');
+    return names.slice(0, -1).join(', ') + ' o ' + names[names.length - 1];
+  }
+
+  /** Item fields marked "required" that are empty: { key: hint }. */
+  function itemMissing(field, item) {
+    var out = {};
+    (field.fields || []).forEach(function (f) {
+      if (f.key && f.required === true && !isFilled(f, item && typeof item === 'object' ? item[f.key] : undefined)) {
+        out[f.key] = 'Obligatorio: sin este texto, este elemento no se muestra en la web.';
+      }
+    });
+    return out;
+  }
+
+  /**
+   * Required texts of a section that are empty.
+   * Returns { messages: [ '…' ], fields: { topKey: hint } }.
+   */
+  function requiredProblems(fields, attrs) {
+    var messages = [];
+    var hints = {};
+    var groups = {};
+    var order = [];
+    (fields || []).forEach(function (f) {
+      if (!f.key) return;
+      var value = attrs ? attrs[f.key] : undefined;
+      if (f.required === true && !isFilled(f, value)) {
+        messages.push('Esta sección necesita ' + fieldName(f) + ' para mostrarse en la web.');
+        hints[f.key] = f.type === 'repeater' || f.type === 'list'
+          ? 'Obligatorio: rellena al menos un elemento; si no, la sección no se muestra en la web.'
+          : 'Obligatorio: sin este texto, la sección no se muestra en la web.';
+      }
+      if (f.requiredGroup) {
+        if (!groups[f.requiredGroup]) {
+          groups[f.requiredGroup] = [];
+          order.push(f.requiredGroup);
+        }
+        groups[f.requiredGroup].push(f);
+      }
+      if (f.type === 'repeater' && Array.isArray(value)) {
+        value.forEach(function (item, i) {
+          var miss = itemMissing(f, item);
+          Object.keys(miss).forEach(function (k) {
+            var sub = fieldAt(f.fields || [], k) || { label: k };
+            messages.push((f.itemLabel || 'Elemento') + ' ' + (i + 1) + ' necesita ' + fieldName(sub) + ' para mostrarse en la web.');
+            hints[f.key] = hints[f.key] || 'Hay elementos sin un texto obligatorio (marcados en rojo).';
+          });
+        });
+      }
+    });
+    order.forEach(function (name) {
+      var list = groups[name];
+      var any = list.some(function (f) { return isFilled(f, attrs ? attrs[f.key] : undefined); });
+      if (any) return;
+      var names = list.map(fieldName);
+      messages.push('Esta sección necesita ' + joinOr(names) + ' para mostrarse en la web.');
+      list.forEach(function (f) {
+        hints[f.key] = hints[f.key] || 'Rellena al menos uno de estos: ' + joinOr(names) + '. Sin ninguno, la sección no se muestra en la web.';
+      });
+    });
+    return { messages: messages, fields: hints };
+  }
+
+  var REQUIRED_HELP = 'Complétalo en el panel de la derecha (o pulsa Ctrl + Z para deshacer el cambio). Hasta entonces la página no se puede guardar.';
+
   /* ── side panel fields ─────────────────────────────────────────────── */
   var common = { __nextHasNoMarginBottom: true };
 
+  /* p.missing: hint shown in red when a required text is empty */
   function TextField(p) {
     return el(c.TextControl, Object.assign({}, common, {
       __next40pxDefaultSize: true,
       label: p.field.label,
-      help: p.field.help,
+      help: p.missing || p.field.help,
       placeholder: p.field.placeholder,
       value: p.value == null ? '' : String(p.value),
       onChange: p.onChange,
@@ -115,7 +238,7 @@
   function TextareaField(p) {
     return el(c.TextareaControl, Object.assign({}, common, {
       label: p.field.label,
-      help: p.field.help,
+      help: p.missing || p.field.help,
       placeholder: p.field.placeholder,
       rows: p.field.rows || 4,
       value: p.value == null ? '' : String(p.value),
@@ -172,15 +295,50 @@
     frame.open();
   }
 
+  /** Attribute value for a photo picked in the media library. */
+  function imageValue(a) {
+    var thumb = a.sizes && (a.sizes.medium || a.sizes.large);
+    /* the new photo's own description, never the previous photo's one */
+    return { id: a.id, url: a.url, thumb: thumb ? thumb.url : a.url, alt: a.alt || '' };
+  }
+
+  var ALT_MISSING = 'Esta foto no tiene descripción. Escribe qué se ve en ella: la leen los lectores de pantalla y Google.';
+
   function ImageField(p) {
     var v = p.value && typeof p.value === 'object' ? p.value : {};
     var has = !!(v.url || v.id);
+    var altRef = useRef(null);
+    var focusState = useState(false);
+    var wantFocus = focusState[0] || !!p.focus;
+    var setWantFocus = focusState[1];
     var pick = function () {
       openMediaFrame('image', function (a) {
-        var thumb = a.sizes && (a.sizes.medium || a.sizes.large);
-        p.onChange({ id: a.id, url: a.url, thumb: thumb ? thumb.url : a.url, alt: a.alt || '' });
+        var next = imageValue(a);
+        p.onChange(next);
+        if (!next.alt) setWantFocus(true);
       });
     };
+    /* a new photo without description: take the editor to its description */
+    useEffect(
+      function () {
+        if (!wantFocus || !has) return;
+        var timer = setTimeout(function () {
+          var box = altRef.current;
+          var input = box && box.querySelector('textarea');
+          if (input) {
+            if (input.scrollIntoView) input.scrollIntoView({ block: 'center' });
+            input.focus();
+          }
+          setWantFocus(false);
+          if (p.onFocused) p.onFocused();
+        }, 60);
+        return function () {
+          clearTimeout(timer);
+        };
+      },
+      [wantFocus, has]
+    );
+    var altEmpty = has && phpTrim(v.alt) === '';
     return el(
       c.BaseControl,
       { label: p.field.label, help: p.field.help, __nextHasNoMarginBottom: true },
@@ -200,15 +358,19 @@
             : null
         ),
         has
-          ? el(c.TextareaControl, Object.assign({}, common, {
-              label: 'Descripción de la foto',
-              help: 'Para personas que usan lector de pantalla y para Google. Describe lo que se ve.',
-              rows: 2,
-              value: v.alt || '',
-              onChange: function (alt) {
-                p.onChange(Object.assign({}, v, { alt: alt }));
-              },
-            }))
+          ? el(
+              'div',
+              { className: 'mats-field-image__alt' + (altEmpty ? ' is-empty' : ''), ref: altRef },
+              el(c.TextareaControl, Object.assign({}, common, {
+                label: 'Descripción de la foto',
+                help: altEmpty ? ALT_MISSING : 'Para personas que usan lector de pantalla y para Google. Describe lo que se ve.',
+                rows: 2,
+                value: v.alt || '',
+                onChange: function (alt) {
+                  p.onChange(Object.assign({}, v, { alt: alt }));
+                },
+              }))
+            )
           : null
       )
     );
@@ -229,6 +391,7 @@
         'div',
         { className: 'mats-field-video' },
         el('p', { className: 'mats-field-video__name' }, has ? v.name || String(v.url).split('/').pop() : 'Sin vídeo'),
+        p.missing ? el('p', { className: 'mats-field-missing' }, p.missing) : null,
         el(
           'div',
           { className: 'mats-field-image__actions' },
@@ -254,6 +417,7 @@
         : el(c.TextControl, Object.assign({}, common, {
             __next40pxDefaultSize: true,
             label: 'Texto del botón',
+            help: p.missing || undefined,
             value: v.label || '',
             onChange: function (label) {
               p.onChange(Object.assign({}, v, { label: label }));
@@ -355,18 +519,27 @@
       'div',
       { className: 'mats-repeater' },
       field.help ? el('p', { className: 'mats-field-help' }, field.help) : null,
+      p.missing ? el('p', { className: 'mats-field-missing' }, p.missing) : null,
       items.map(function (item, i) {
         var isOpen = open === i;
+        var missing = isList ? {} : itemMissing(field, item);
+        var hasMissing = Object.keys(missing).length > 0;
         return el(
           'div',
-          { className: 'mats-repeater__item' + (isOpen ? ' is-open' : ''), key: i },
+          { className: 'mats-repeater__item' + (isOpen ? ' is-open' : '') + (hasMissing ? ' has-missing' : ''), key: i },
           el(
             'div',
             { className: 'mats-repeater__head' },
             el(
               'button',
-              { type: 'button', className: 'mats-repeater__toggle', 'aria-expanded': isOpen, onClick: function () { setOpen(isOpen ? -1 : i); } },
-              el('span', { className: 'mats-repeater__num' }, i + 1),
+              {
+                type: 'button',
+                className: 'mats-repeater__toggle',
+                'aria-expanded': isOpen,
+                title: hasMissing ? 'Falta un texto obligatorio' : undefined,
+                onClick: function () { setOpen(isOpen ? -1 : i); },
+              },
+              el('span', { className: 'mats-repeater__num' }, hasMissing ? '!' : i + 1),
               el('span', { className: 'mats-repeater__title' }, itemTitle(field, item, i))
             ),
             el(c.Button, { icon: 'arrow-up-alt2', label: 'Subir', size: 'small', disabled: i === 0, onClick: function () { move(i, -1); } }),
@@ -381,7 +554,7 @@
                   ? el(TextareaField, { field: { label: field.itemLabel || 'Texto', rows: 2 }, value: item, onChange: function (v) { update(i, v); } })
                   : renderFields(field.fields || [], item || {}, function (key, v) {
                       update(i, Object.assign({}, item || {}, (function () { var o = {}; o[key] = v; return o; })()));
-                    })
+                    }, { missing: missing })
               )
             : null
         );
@@ -406,16 +579,26 @@
     list: CollectionField,
   };
 
-  function renderFields(fields, values, onChange) {
+  /**
+   * ctx (optional): { missing: { key: hint } } required texts that are
+   * empty; { focus: key, onFocused: fn } photo whose description must get
+   * the focus (a new photo without description).
+   */
+  function renderFields(fields, values, onChange, ctx) {
+    var missing = (ctx && ctx.missing) || {};
     return fields.map(function (field, i) {
       var Comp = FIELD_TYPES[field.type];
       if (!Comp) return null;
+      var hint = field.key ? missing[field.key] : '';
       return el(
         'div',
-        { className: 'mats-field mats-field--' + field.type, key: (field.key || field.type) + i },
+        { className: 'mats-field mats-field--' + field.type + (hint ? ' is-missing' : ''), key: (field.key || field.type) + i },
         el(Comp, {
           field: field,
           value: field.key ? values[field.key] : undefined,
+          missing: hint || '',
+          focus: !!(ctx && field.key && ctx.focus === field.key),
+          onFocused: ctx && ctx.onFocused,
           onChange: function (v) {
             if (field.key) onChange(field.key, v);
           },
@@ -456,6 +639,51 @@
     }
   }
 
+  /** Selects a section and shows its side panel («Bloque» tab). */
+  function showBlockPanel(clientId) {
+    try {
+      wp.data.dispatch('core/block-editor').selectBlock(clientId);
+      var editPost = wp.data.dispatch('core/edit-post');
+      if (editPost && editPost.openGeneralSidebar) editPost.openGeneralSidebar('edit-post/block');
+    } catch (e) {
+      /* not critical */
+    }
+  }
+
+  /** Index of the side-panel group that holds a top-level field. */
+  function groupIndexOf(fields, key) {
+    var groups = groupFields(fields || []);
+    for (var i = 0; i < groups.length; i++) {
+      for (var j = 0; j < groups[i].fields.length; j++) {
+        if (groups[i].fields[j].key === key) return i;
+      }
+    }
+    return -1;
+  }
+
+  /* the canvas is an iframe that only gets the theme's editor styles: the
+     required-text warning on the section carries its own look */
+  var REQUIRED_STYLE = {
+    position: 'relative',
+    zIndex: 26,
+    margin: '2.6rem auto 0.75rem', // below the section's name badge
+    width: 'min(100% - 2rem, 75rem)',
+    padding: '0.75rem 1rem',
+    borderRadius: '10px',
+    border: '1px solid #cc1818',
+    background: '#fcf0f1',
+    color: '#8a1414',
+    font: "500 13px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  };
+
+  function releaseRequired(clientId) {
+    var lockKey = 'mats-required-' + clientId;
+    var editor = wp.data.dispatch('core/editor');
+    var notices = wp.data.dispatch('core/notices');
+    if (editor && editor.unlockPostSaving) editor.unlockPostSaving(lockKey);
+    if (notices) notices.removeNotice(lockKey);
+  }
+
   function makeEdit(name, def) {
     return function Edit(props) {
       var attributes = props.attributes;
@@ -481,6 +709,54 @@
       attrsRef.current = attributes;
       var editingRef = useRef(false);
       var key = JSON.stringify(attributes);
+      var clientId = props.clientId;
+
+      /* inserter / pattern previews are not the page being edited */
+      var isPreview = wp.data.useSelect(function (select) {
+        var settings = select('core/block-editor').getSettings();
+        return !!(settings && settings.isPreviewMode);
+      }, []);
+
+      /* a new photo without description: open its group and focus the field */
+      var focusAltState = useState('');
+      var focusAlt = focusAltState[0];
+      var setFocusAlt = focusAltState[1];
+      var forcedState = useState({});
+      var forcedOpen = forcedState[0];
+      var setForcedOpen = forcedState[1];
+
+      /* required texts: saving stays locked (and the editor says why) until filled */
+      var problems = requiredProblems(def.fields || [], attributes);
+      var problemKey = problems.messages.join('\n');
+
+      useEffect(
+        function () {
+          if (isPreview) return;
+          if (!problemKey) {
+            releaseRequired(clientId);
+            return;
+          }
+          var lockKey = 'mats-required-' + clientId;
+          var editor = wp.data.dispatch('core/editor');
+          var notices = wp.data.dispatch('core/notices');
+          if (editor && editor.lockPostSaving) editor.lockPostSaving(lockKey);
+          if (notices) {
+            var more = problems.messages.length > 1 ? ' (y ' + (problems.messages.length - 1) + ' texto(s) más)' : '';
+            notices.createNotice('error', 'Todavía no se puede guardar. «' + def.title + '»: ' + problems.messages[0] + more, {
+              id: lockKey,
+              isDismissible: false,
+              actions: [{ label: 'Ir a la sección', onClick: function () { showBlockPanel(clientId); } }],
+            });
+          }
+        },
+        [problemKey, isPreview]
+      );
+
+      useEffect(function () {
+        return function () {
+          releaseRequired(clientId);
+        };
+      }, []);
 
       useEffect(
         function () {
@@ -580,14 +856,20 @@
               e.preventDefault();
               e.stopPropagation();
               openMediaFrame('image', function (a) {
-                var thumb = a.sizes && (a.sizes.medium || a.sizes.large);
-                var prev = getPath(attrsRef.current, path) || {};
-                setAttrPath(attrsRef.current, setAttributes, path, {
-                  id: a.id,
-                  url: a.url,
-                  thumb: thumb ? thumb.url : a.url,
-                  alt: a.alt || prev.alt || '',
-                });
+                /* the old photo's description does not describe the new one */
+                var next = imageValue(a);
+                setAttrPath(attrsRef.current, setAttributes, path, next);
+                if (next.alt || path.indexOf('.') !== -1) return;
+                var group = groupIndexOf(def.fields, path);
+                if (group >= 0) {
+                  setForcedOpen(function (prev) {
+                    var copy = Object.assign({}, prev);
+                    copy[group] = (copy[group] || 0) + 1;
+                    return copy;
+                  });
+                }
+                setFocusAlt(path);
+                showBlockPanel(clientId);
               });
             });
           });
@@ -620,6 +902,16 @@
       });
 
       var groups = groupFields(def.fields || []);
+      var fieldCtx = {
+        missing: problems.fields,
+        focus: focusAlt,
+        onFocused: function () {
+          setFocusAlt('');
+        },
+      };
+      var requiredText = problems.messages.length
+        ? problems.messages.map(function (m, i) { return el('p', { key: i, className: 'mats-required__msg' }, m); })
+        : null;
       var inspector = el(
         be.InspectorControls,
         null,
@@ -629,15 +921,24 @@
           el('strong', null, def.title),
           el('span', null, 'Edita los textos aquí o haz clic directamente sobre ellos en la página. Las fotos se cambian haciendo clic encima.')
         ),
+        requiredText
+          ? el(
+              'div',
+              { className: 'mats-required-panel', role: 'alert' },
+              requiredText,
+              el('p', { className: 'mats-required__help' }, REQUIRED_HELP)
+            )
+          : null,
         groups.map(function (g, i) {
+          /* "forced" groups re-open (new key) to show a field that needs attention */
           return el(
             c.PanelBody,
-            { title: g.title, initialOpen: i === 0, key: g.title + i },
+            { title: g.title, initialOpen: i === 0 || !!forcedOpen[i], key: g.title + i + '-' + (forcedOpen[i] || 0) },
             renderFields(g.fields, attributes, function (k, v) {
               var patch = {};
               patch[k] = v;
               setAttributes(patch);
-            })
+            }, fieldCtx)
           );
         })
       );
@@ -650,6 +951,17 @@
           'div',
           blockProps,
           el('span', { className: 'mats-preview__badge' }, def.title),
+          requiredText && !isPreview
+            ? el(
+                'div',
+                { className: 'mats-required', role: 'alert', style: REQUIRED_STYLE },
+                el('strong', { style: { display: 'block', marginBottom: '0.2rem' } }, def.title + ': falta un texto obligatorio'),
+                problems.messages.map(function (m, i) {
+                  return el('p', { key: i, style: { margin: 0, font: 'inherit', color: 'inherit' } }, m);
+                }),
+                el('p', { style: { margin: '0.35rem 0 0', font: 'inherit', fontWeight: 400, color: 'inherit' } }, REQUIRED_HELP)
+              )
+            : null,
           error ? el(c.Notice, { status: 'error', isDismissible: false }, error) : null,
           html === null ? el('div', { className: 'mats-preview__loading' }, el(c.Spinner, null)) : null,
           el('div', { className: 'mats-preview__html', ref: boxRef }),

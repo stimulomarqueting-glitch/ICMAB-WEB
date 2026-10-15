@@ -32,7 +32,8 @@ $mats_paged = max( 1, (int) get_query_var( 'paged' ) );
 	);
 	?>
 
-	<section class="sec hairtop blog-list" aria-label="<?php echo esc_attr( $mats_title ); ?>">
+	<?php /* no aria-label: the header above is already the region named after the title (two regions with one name confuse screen readers) */ ?>
+	<section class="sec hairtop blog-list">
 		<div class="container">
 			<?php if ( have_posts() ) : ?>
 				<?php get_template_part( 'template-parts/blog-categories' ); ?>

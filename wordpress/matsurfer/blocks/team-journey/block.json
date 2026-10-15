@@ -28,6 +28,7 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título"
       },
       {
@@ -39,6 +40,7 @@
       {
         "key": "steps",
         "type": "repeater",
+        "requiredGroup": "section",
         "label": "Tipos de trabajo",
         "itemLabel": "Paso",
         "fields": [
@@ -62,6 +64,7 @@
       {
         "key": "facts",
         "type": "repeater",
+        "requiredGroup": "section",
         "label": "Cifras",
         "itemLabel": "Cifra",
         "fields": [

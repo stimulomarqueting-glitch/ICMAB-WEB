@@ -38,6 +38,7 @@
       {
         "key": "paragraphs",
         "type": "list",
+        "required": true,
         "label": "Párrafos",
         "itemLabel": "Párrafo",
         "min": 1,

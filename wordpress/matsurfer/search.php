@@ -14,7 +14,7 @@ get_header();
 global $wp_query;
 $mats_query = trim( get_search_query( false ) );
 $mats_count = (int) $wp_query->found_posts;
-$mats_title = '' !== $mats_query ? mats_t( 'search_for' ) . ' “' . $mats_query . '”' : mats_t( 'search' );
+$mats_title = '' !== $mats_query ? mats_t( 'search_for' ) . ' ' . mats_blog_quote( $mats_query ) : mats_t( 'search' ); // same as the <title> (inc/modules/seo.php)
 if ( 1 === $mats_count ) {
 	$mats_lead = mats_t( 'result_one' );
 } else {
@@ -32,7 +32,8 @@ if ( 1 === $mats_count ) {
 	);
 	?>
 
-	<section class="sec hairtop blog-list" aria-label="<?php echo esc_attr( $mats_title ); ?>">
+	<?php /* no aria-label: the header above is already the region named after the title (two regions with one name confuse screen readers) */ ?>
+	<section class="sec hairtop blog-list">
 		<div class="container">
 			<div class="blog-search">
 				<?php get_search_form(); ?>

@@ -27,11 +27,13 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título de la página (H1)"
       },
       {
         "key": "lead",
         "type": "textarea",
+        "requiredGroup": "section",
         "label": "Texto de entrada",
         "rows": 4
       },
@@ -42,6 +44,7 @@
       {
         "key": "asideTitle",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título"
       },
       {

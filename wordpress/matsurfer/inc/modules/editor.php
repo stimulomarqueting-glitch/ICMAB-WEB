@@ -409,6 +409,132 @@ add_filter(
 );
 
 /*
+ * The sections of a structural page are fixed for editors on the server
+ * too (templateLock 'all' only exists in the editor screen): a save that
+ * adds, removes or reorders sections — or changes their lock — is refused,
+ * whatever sends it (REST API, classic form, revision restore…). Texts and
+ * photos inside the sections change freely. Administrators are not checked.
+ */
+
+/** Lock attribute of a block, normalised for comparison ('' when none). */
+function mats_editor_norm_lock( $lock ): string {
+	if ( ! is_array( $lock ) ) {
+		return '';
+	}
+	$lock = array_map( static fn( $v ) => (bool) $v, $lock );
+	ksort( $lock );
+	return (string) wp_json_encode( $lock );
+}
+
+/**
+ * Structure of a page's content that editors cannot change: the ordered
+ * top-level MatSurfer sections with their lock setting and, on pages made
+ * of sections (and the News page), every other top-level block too. On the
+ * legal text pages, text blocks stay free.
+ */
+function mats_editor_structure( string $content, string $kind ): array {
+	$all = in_array( $kind, array( 'sections', 'news' ), true );
+	$out = array();
+	foreach ( parse_blocks( $content ) as $block ) {
+		$name = (string) ( $block['blockName'] ?? '' );
+		if ( '' === $name ) {
+			if ( '' === trim( (string) ( $block['innerHTML'] ?? '' ) ) ) {
+				continue; // line breaks between blocks
+			}
+			$name = 'core/freeform';
+		}
+		if ( str_starts_with( $name, 'matsurfer/' ) ) {
+			$out[] = $name . ' ' . mats_editor_norm_lock( $block['attrs']['lock'] ?? null );
+		} elseif ( $all ) {
+			$out[] = $name;
+		}
+	}
+	return $out;
+}
+
+/**
+ * Error when the current (non-administrator) user would change the section
+ * structure of structural page $post_id with $content; null otherwise.
+ */
+function mats_editor_structure_error( int $post_id, string $content ): ?WP_Error {
+	if ( ! $post_id || ! is_user_logged_in() || mats_editor_is_admin() ) {
+		return null;
+	}
+	$old = get_post( $post_id );
+	if ( ! $old || 'page' !== $old->post_type || 'auto-draft' === $old->post_status || ! mats_editor_is_structural( $old ) ) {
+		return null;
+	}
+	/**
+	 * Filters whether the section structure of structural pages is enforced
+	 * on save for non-administrators.
+	 *
+	 * @param bool    $enforce Default true.
+	 * @param WP_Post $post    Page being saved.
+	 */
+	if ( ! apply_filters( 'mats_editor_lock_sections', true, $old ) ) {
+		return null;
+	}
+	$kind = mats_editor_page_info( $old )['kind'];
+	if ( mats_editor_structure( $content, $kind ) === mats_editor_structure( (string) $old->post_content, $kind ) ) {
+		return null;
+	}
+	return new WP_Error(
+		'mats_sections_locked',
+		'No se ha guardado: en las páginas principales de la web no se pueden añadir, quitar ni cambiar de orden las secciones, ni desbloquearlas. Puedes cambiar sus textos y sus fotos. Si esta página necesita otra estructura, pide ayuda a un administrador.',
+		array( 'status' => 403 )
+	);
+}
+
+/* REST API (block editor saves and autosaves, wp.apiFetch…): refused with the message */
+add_filter(
+	'rest_pre_insert_page',
+	static function ( $prepared, $request ) {
+		if ( is_wp_error( $prepared ) || ! is_object( $prepared ) || empty( $prepared->ID ) || ! isset( $prepared->post_content ) ) {
+			return $prepared; // no content in the request: nothing to check
+		}
+		$error = mats_editor_structure_error( (int) $prepared->ID, (string) $prepared->post_content );
+		return $error ? $error : $prepared;
+	},
+	20,
+	2
+);
+
+/*
+ * Any other save (classic form, revision restore, XML-RPC, code): the page
+ * shows the message; where no page can be shown (AJAX, REST, XML-RPC) the
+ * stored sections are kept instead.
+ */
+add_filter(
+	'wp_insert_post_data',
+	static function ( $data, $postarr ) {
+		$id = (int) ( $postarr['ID'] ?? 0 );
+		if ( ! $id || 'page' !== ( $data['post_type'] ?? '' ) ) {
+			return $data;
+		}
+		$error = mats_editor_structure_error( $id, wp_unslash( (string) ( $data['post_content'] ?? '' ) ) );
+		if ( ! $error ) {
+			return $data;
+		}
+		$silent = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || wp_doing_ajax() || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) || wp_doing_cron() || ( defined( 'WP_CLI' ) && WP_CLI );
+		if ( $silent ) {
+			$old                  = get_post( $id );
+			$data['post_content'] = wp_slash( (string) $old->post_content );
+			return $data;
+		}
+		wp_die(
+			esc_html( $error->get_error_message() ),
+			esc_html( 'No se ha guardado' ),
+			array(
+				'response'  => 403,
+				'back_link' => true,
+			)
+		);
+	},
+	21,
+	2
+);
+
+/*
  * Language and translations of the fixed pages (Polylang). The menu and
  * every button find a fixed page through its language and its link to the
  * other language, so editors must never change them. Polylang saves them

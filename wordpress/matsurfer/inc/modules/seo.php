@@ -18,10 +18,18 @@
  *                   articles + every node the sections collected with
  *                   mats_jsonld_add() (publications, team…)
  *  hreflang         printed by Polylang; x-default (English) added to it
+ *  robots           noindex,follow on 404s, on the News page of a language
+ *                   with no article yet, on the default category ("News"
+ *                   / "Noticias", a copy of the News page) and on date
+ *                   archives — mats_seo_noindex()
  *  sitemaps         core wp-sitemap.xml with pages, news and news
- *                   categories only; listed in robots.txt. "Discourage
- *                   search engines" (Ajustes → Lectura) still switches
- *                   everything off (core behaviour).
+ *                   categories only, minus those noindex pages; listed in
+ *                   robots.txt. "Discourage search engines" (Ajustes →
+ *                   Lectura) still switches everything off (core behaviour).
+ *  addresses        the original site's Spanish URLs (/es/product/…) → 301
+ *                   to the Spanish pages; /page/N/ on a page → the page;
+ *                   /favicon.ico → the MatSurfer icon (unless a Site Icon
+ *                   is set) + PNG / apple-touch-icon links.
  *
  * Editors fill the texts in the editor sidebar panel "Google y redes
  * sociales" (assets/js/seo-admin.js) of every page and news article:
@@ -238,6 +246,36 @@ function mats_seo_news_page_id(): int {
 	return $id ?: (int) get_option( 'page_for_posts' );
 }
 
+/**
+ * The default category ("News" / "Noticias", where every article without a
+ * category lands) in every language: term IDs.
+ */
+function mats_seo_default_category_ids(): array {
+	$default = (int) get_option( 'default_category' );
+	if ( ! $default ) {
+		return array();
+	}
+	$ids = array( $default );
+	if ( function_exists( 'pll_get_term_translations' ) ) {
+		$ids = array_merge( $ids, array_map( 'intval', array_values( (array) pll_get_term_translations( $default ) ) ) );
+	}
+	return array_values( array_unique( array_filter( $ids ) ) );
+}
+
+function mats_seo_is_default_category( $term ): bool {
+	return $term instanceof WP_Term && 'category' === $term->taxonomy && in_array( (int) $term->term_id, mats_seo_default_category_ids(), true );
+}
+
+/**
+ * Is the News page of this language empty (no published article in that
+ * language)? Then it is kept out of Google — noindex, out of the sitemap,
+ * not offered as an hreflang alternate — but still answers, and all of
+ * it comes back by itself with the first article.
+ */
+function mats_seo_news_empty( string $lang ): bool {
+	return function_exists( 'mats_has_news' ) && ! mats_has_news( $lang );
+}
+
 /** HTML language codes of the site languages ('en', 'es'). */
 function mats_seo_languages(): array {
 	$langs = function_exists( 'pll_languages_list' ) ? (array) pll_languages_list( array( 'fields' => 'slug' ) ) : array();
@@ -283,7 +321,11 @@ function mats_seo_image( int $post_id = 0 ): array {
 		foreach ( mats_seo_image_sizes( $thumb ) as $size ) {
 			$src = wp_get_attachment_image_src( $thumb, $size );
 			if ( $src && ! empty( $src[0] ) ) {
-				$alt = mats_seo_clean( get_post_meta( $thumb, '_wp_attachment_image_alt', true ) );
+				$alt  = mats_seo_clean( get_post_meta( $thumb, '_wp_attachment_image_alt', true ) );
+				$post = get_post( $post_id );
+				if ( $post && function_exists( 'mats_blog_thumb_alt' ) ) {
+					$alt = mats_seo_clean( mats_blog_thumb_alt( $post, $alt ) ); // the page's own language, like the image on the page
+				}
 				return array(
 					'url'    => (string) $src[0],
 					'width'  => (int) $src[1],
@@ -359,9 +401,12 @@ function mats_seo_context(): array {
 	$site_desc   = mats_seo_clean( mats_setting( 'seo_description' ) );
 	$news_id     = mats_seo_news_page_id();
 	$news_crumb  = array();
+	$news_desc   = ''; // description of the News page: its SEO text, else its excerpt
 	if ( $news_id ) {
 		$news_label = mats_seo_role_label( 'news' );
 		$news_crumb = array( '' !== $news_label ? $news_label : mats_seo_clean( get_the_title( $news_id ) ), (string) get_permalink( $news_id ) );
+		$news_desc  = mats_seo_meta( $news_id, 'description' );
+		$news_desc  = '' !== $news_desc ? $news_desc : mats_seo_clean( get_post_field( 'post_excerpt', $news_id ) );
 	}
 	/* languages with a published translation (posts) or any translation (terms),
 	   like the hreflang links Polylang prints */
@@ -429,6 +474,7 @@ function mats_seo_context(): array {
 			$ctx['description'] = '' !== $meta_desc ? $meta_desc : mats_seo_clean( $page->post_excerpt );
 			$ctx['image']       = mats_seo_image( $id );
 			$ctx['locales']     = function_exists( 'pll_get_post_translations' ) ? $translations( (array) pll_get_post_translations( $id ) ) : array();
+			$ctx['locales']     = mats_seo_news_empty( $lang ) ? array() : array_values( array_filter( $ctx['locales'], static fn( $l ) => ! mats_seo_news_empty( $l ) ) ); // like hreflang
 			$ctx['breadcrumb']  = array( array( $home_name, $home_url ), array( $news_crumb[0] ?? mats_seo_clean( $page->post_title ), $first ) );
 		} else {
 			$ctx['kind']  = 'front';
@@ -454,20 +500,45 @@ function mats_seo_context(): array {
 			$ctx['locales']     = function_exists( 'pll_get_term_translations' ) ? $translations( (array) pll_get_term_translations( $term->term_id ), false ) : array();
 			$middle             = ( $news_crumb && 0 !== strcasecmp( $news_crumb[0], $name ) ) ? $news_crumb : array(); // no "News → News"
 			$ctx['breadcrumb']  = array_values( array_filter( array( array( $home_name, $home_url ), $middle, array( $name, $first ) ) ) );
+			if ( '' === $ctx['description'] && '' !== $news_desc ) {
+				/* a category without its own description: the News page's, named
+				   after the category so each archive has its own text (never the
+				   home page's description) */
+				$ctx['description'] = mats_seo_is_default_category( $term ) ? $news_desc : $name . MATS_SEO_SEP . $news_desc;
+			}
 			if ( '' === $ctx['description'] ) {
 				$ctx['description'] = $site_desc;
 			}
 		}
 	} elseif ( is_search() ) {
+		/* same heading as search.php: "Search results for “…”", or just "Search" when nothing was typed */
 		$ctx['kind']  = 'search';
-		$quotes       = 'es' === $lang ? array( '«', '»' ) : array( '“', '”' );
-		$ctx['title'] = mats_seo_with_brand( mats_t( 'search_for' ) . ' ' . $quotes[0] . mats_seo_clean( get_search_query( false ) ) . $quotes[1] );
+		$query        = mats_seo_clean( get_search_query( false ) );
+		$quoted       = function_exists( 'mats_blog_quote' ) ? mats_blog_quote( $query, $lang ) : '“' . $query . '”';
+		$ctx['title'] = mats_seo_with_brand( '' !== $query ? mats_t( 'search_for' ) . ' ' . $quoted : mats_t( 'search' ) );
+	} elseif ( is_date() ) {
+		/* date archives (nothing links to them; noindex below): the heading of
+		   archive.php in the page language, not WordPress' "September 2026 – …" */
+		$name               = function_exists( 'mats_blog_date_archive_title' ) ? mats_seo_clean( mats_blog_date_archive_title() ) : '';
+		$year               = (int) get_query_var( 'year' );
+		$month              = (int) get_query_var( 'monthnum' );
+		$day                = (int) get_query_var( 'day' );
+		$first              = is_day() ? get_day_link( $year, $month, $day ) : ( is_month() ? get_month_link( $year, $month ) : get_year_link( $year ) );
+		$ctx['kind']        = 'date';
+		$ctx['title']       = mats_seo_with_brand( '' !== $name ? $name : mats_t( 'archive' ) ) . mats_seo_paged_suffix();
+		$ctx['description'] = $news_desc;
+		$ctx['url']         = mats_seo_paged_url( (string) $first );
+		$ctx['canonical']   = $ctx['url'];
+		$ctx['breadcrumb']  = array_values( array_filter( array( array( $home_name, $home_url ), $news_crumb, array( '' !== $name ? $name : mats_t( 'archive' ), (string) $first ) ) ) );
+		if ( '' === $ctx['description'] ) {
+			$ctx['description'] = $site_desc;
+		}
 	} elseif ( is_404() ) {
 		$ctx['kind']  = '404';
 		$ctx['title'] = mats_seo_with_brand( mats_t( 'not_found' ) );
 	}
 
-	if ( ! $ctx['image'] && in_array( $ctx['kind'], array( 'front', 'term' ), true ) ) {
+	if ( ! $ctx['image'] && in_array( $ctx['kind'], array( 'front', 'term', 'date' ), true ) ) {
 		$ctx['image'] = mats_seo_image();
 	}
 	if ( ! function_exists( 'pll_get_post_translations' ) || ! in_array( $ctx['kind'], array( 'front', 'page', 'post', 'blog', 'term' ), true ) ) {
@@ -494,11 +565,32 @@ add_filter(
 	20
 );
 
-/* 404s are never indexed (search results already are not: core) */
+/**
+ * Pages that answer but must not be indexed (search results already are
+ * not: core):
+ *  - 404s;
+ *  - the News page of a language with no published article yet — a thin
+ *    «Nothing published yet» page the menus do not link to (it comes back
+ *    by itself with the first article);
+ *  - the default category's archive ("News" / "Noticias"): almost every
+ *    article lands there, so it repeats the News page with the same title;
+ *  - date archives (/2026/09/): nothing links to them, they repeat the list.
+ * Visitors (and Google) still follow their links.
+ */
+function mats_seo_noindex(): bool {
+	if ( is_404() || is_date() ) {
+		return true;
+	}
+	if ( is_home() && ! is_front_page() && mats_seo_news_empty( mats_lang() ) ) {
+		return true;
+	}
+	return is_category() && mats_seo_is_default_category( get_queried_object() );
+}
+
 add_filter(
 	'wp_robots',
 	static function ( array $robots ): array {
-		if ( mats_seo_active() && is_404() ) {
+		if ( mats_seo_active() && mats_seo_noindex() ) {
 			$robots['noindex'] = true;
 			$robots['follow']  = true;
 		}
@@ -588,10 +680,22 @@ function mats_seo_head(): void {
 }
 add_action( 'wp_head', 'mats_seo_head', 1 );
 
-/* Polylang prints the hreflang links; add x-default → the English version */
+/* Polylang prints the hreflang links; add x-default → the English version.
+   On the News page, an empty News page of another language (noindex) is
+   not offered as its alternate; with one language left, no links at all. */
 add_filter(
 	'pll_rel_hreflang_attributes',
 	static function ( $hreflangs ) {
+		if ( is_array( $hreflangs ) && mats_seo_active() && is_home() && ! is_front_page() ) {
+			foreach ( array_keys( $hreflangs ) as $code ) {
+				if ( 'x-default' !== $code && mats_seo_news_empty( mats_normalize_lang( substr( (string) $code, 0, 2 ) ) ) ) {
+					unset( $hreflangs[ $code ] );
+				}
+			}
+			if ( count( array_diff( array_keys( $hreflangs ), array( 'x-default' ) ) ) < 2 ) {
+				return array();
+			}
+		}
 		if ( ! is_array( $hreflangs ) || isset( $hreflangs['x-default'] ) || count( $hreflangs ) < 2 ) {
 			return $hreflangs;
 		}
@@ -657,7 +761,15 @@ function mats_seo_graph(): array {
 		);
 	}
 
-	/* product.astro: the device itself */
+	/*
+	 * product.astro: the device itself — the same node as the original site.
+	 * Kept on purpose without offers, review or aggregateRating: MatSurfer has
+	 * no public price and no reviews, and none are invented. Google asks for
+	 * one of those three to show a Product rich result, so Search Console may
+	 * list this item as not eligible for product snippets; that is expected,
+	 * it does not affect indexing, and it goes away only if real prices or
+	 * reviews are added here one day.
+	 */
 	if ( 'page' === $ctx['kind'] && 'product' === $ctx['role'] ) {
 		$product = array(
 			'@type'       => 'Product',
@@ -799,6 +911,41 @@ add_filter(
 	20
 );
 
+/* not the News page of a language without articles yet (see mats_seo_noindex()).
+   Each sitemap lists one language: Polylang passes it as 'lang' (index) or
+   it is the current language (a sitemap page, where Polylang also turns the
+   IDs of the query into that language) — so only that language's page. */
+add_filter(
+	'wp_sitemaps_posts_query_args',
+	static function ( $args, $post_type ) {
+		if ( 'page' !== $post_type || ! function_exists( 'mats_page_id' ) ) {
+			return $args;
+		}
+		$lang = ! empty( $args['lang'] ) && is_string( $args['lang'] ) ? mats_normalize_lang( $args['lang'] ) : mats_lang();
+		$news = mats_page_id( 'news', $lang );
+		if ( $news && mats_seo_news_empty( $lang ) ) {
+			$args['post__not_in'] = array_values( array_unique( array_merge( array_map( 'intval', (array) ( $args['post__not_in'] ?? array() ) ), array( $news ) ) ) );
+		}
+		return $args;
+	},
+	20,
+	2
+);
+
+/* not the default category either (noindex: it repeats the News page) */
+add_filter(
+	'wp_sitemaps_taxonomies_query_args',
+	static function ( $args, $taxonomy ) {
+		$default = 'category' === $taxonomy ? mats_seo_default_category_ids() : array();
+		if ( $default ) {
+			$args['exclude'] = array_values( array_unique( array_merge( array_map( 'intval', wp_parse_id_list( $args['exclude'] ?? array() ) ), $default ) ) );
+		}
+		return $args;
+	},
+	20,
+	2
+);
+
 /* no users sitemap (also in the security module) */
 add_filter(
 	'wp_sitemaps_add_provider',
@@ -835,6 +982,114 @@ add_filter(
 	},
 	20,
 	2
+);
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Addresses: old links of the original site, duplicate pages, favicon.ico
+ * (also when an SEO plugin is in charge: these are not head tags)
+ * ═════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Redirects (301) to $url with the query string of the current request
+ * minus the $drop arguments (browsers keep the #hash).
+ */
+function mats_seo_redirect_keeping_query( string $url, array $drop = array() ): void {
+	$query = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_QUERY ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- only re-sent to wp_safe_redirect(), which sanitizes it.
+	$url   = '' !== $query ? $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . $query : $url;
+	wp_safe_redirect( $drop ? remove_query_arg( $drop, $url ) : $url, 301, 'MatSurfer' );
+	exit;
+}
+
+/**
+ * Where an old address of the original (Astro) site goes now, '' when the
+ * request is not one. That site used the English slugs in every language
+ * (/es/product/, /es/applications/, /es/research/, /es/team/, /es/contact/);
+ * here the Spanish pages have Spanish slugs (/es/producto/…), and
+ * WordPress/Polylang would send those old links to the ENGLISH page with
+ * the same slug. They go to the page of the same role in the language of
+ * the /es/ prefix instead (/es/home/ → /es/, /es/news/ → /es/noticias/).
+ */
+function mats_seo_legacy_target(): string {
+	if ( ! function_exists( 'pll_languages_list' ) || ! function_exists( 'mats_page_id' ) ) {
+		return '';
+	}
+	$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- only compared with fixed patterns.
+	$base = (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+	$base = '' !== $base ? $base : '/';
+	if ( 0 !== strpos( $path, $base ) ) {
+		return '';
+	}
+	$langs = array_diff( array_map( 'mats_normalize_lang', (array) pll_languages_list( array( 'fields' => 'slug' ) ) ), array( mats_default_lang() ) );
+	$roles = array_keys( mats_page_roles() );
+	if ( ! $langs || ! preg_match( '#^(' . implode( '|', array_map( 'preg_quote', $langs ) ) . ')/(' . implode( '|', $roles ) . ')/?$#i', substr( $path, strlen( $base ) ), $m ) ) {
+		return '';
+	}
+	$lang = strtolower( $m[1] );
+	$role = strtolower( $m[2] );
+	/* a real page of that language lives at this address: leave it alone */
+	if ( is_singular() && mats_post_lang( get_queried_object_id() ) === $lang ) {
+		return '';
+	}
+	if ( 'home' === $role ) {
+		$target = mats_home_url( $lang );
+	} else {
+		$id     = mats_page_id( $role, $lang );
+		$target = $id ? (string) get_permalink( $id ) : '';
+	}
+	if ( '' === $target || untrailingslashit( (string) wp_parse_url( $target, PHP_URL_PATH ) ) === untrailingslashit( $path ) ) {
+		return '';
+	}
+	return $target;
+}
+
+/* before Polylang's (4) and WordPress' (10) own canonical redirects */
+add_action(
+	'template_redirect',
+	static function () {
+		$legacy = mats_seo_legacy_target();
+		if ( '' !== $legacy ) {
+			mats_seo_redirect_keeping_query( $legacy );
+		}
+		/* /page/7/ on the home page (or /product/page/2/): pages have no list
+		   to page through, but WordPress showed them again for any number —
+		   the home page even with a canonical to a 404 (/7/) */
+		if ( is_page() && (int) get_query_var( 'paged' ) > 1 ) {
+			mats_seo_redirect_keeping_query( is_front_page() ? mats_home_url() : (string) get_permalink( get_queried_object_id() ), array( 'paged' ) );
+		}
+	},
+	2
+);
+
+/*
+ * /favicon.ico (asked for by feed readers, bookmarks, some link previews and
+ * browsers without SVG icons): without a Site Icon WordPress answers with
+ * its own «W» logo. Here it is the MatSurfer isotype, and the head offers
+ * the same PNG to them and as the iPhone/iPad home-screen icon. When a Site
+ * Icon is set (Apariencia → Personalizar → Identidad del sitio; the setup
+ * wizard sets it), WordPress serves and prints that one instead.
+ */
+add_action(
+	'do_faviconico',
+	static function () {
+		if ( has_site_icon() ) {
+			return; // core redirects to the Site Icon
+		}
+		wp_redirect( mats_asset( 'brand/icon-512.png' ), 302, 'MatSurfer' ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- a theme file, like core's own fallback
+		exit;
+	}
+);
+
+add_action(
+	'wp_head',
+	static function () {
+		if ( has_site_icon() ) {
+			return; // core prints the Site Icon tags (wp_site_icon)
+		}
+		$png = esc_url( mats_asset( 'brand/icon-512.png' ) );
+		echo '<link rel="icon" type="image/png" sizes="512x512" href="' . $png . '">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above.
+		echo '<link rel="apple-touch-icon" href="' . $png . '">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above.
+	},
+	3 // right after the SVG icon (inc/assets.php)
 );
 
 /* ═══════════════════════════════════════════════════════════════════════

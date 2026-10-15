@@ -11,7 +11,9 @@
  *   - editors: the Page attributes / Template panels of structural pages
  *     are removed, and the block style variations that are not part of the
  *     design (rounded image, outline button, striped table…) disappear, so
- *     the "Styles" panel never shows up.
+ *     the "Styles" panel never shows up;
+ *   - editors on structural pages: the language in the «Idiomas» box is
+ *     shown read-only (see admin.css).
  */
 (function () {
   'use strict';
@@ -108,6 +110,27 @@
     }
 
     removeStyleVariations();
+    lockLanguageChoice();
+  }
+
+  /*
+   * Editors on the fixed pages: the «Idiomas» box shows the page's language
+   * as plain text (admin.css); the select stays in the form (Polylang reads
+   * it on save) but cannot be reached with the keyboard either.
+   */
+  function lockLanguageChoice() {
+    if (cfg.isAdmin || !cfg.structural) return;
+    var select = document.getElementById('post_lang_choice');
+    if (!select) return;
+    select.setAttribute('tabindex', '-1');
+    select.setAttribute('aria-readonly', 'true');
+    select.setAttribute('title', 'El idioma de las páginas principales no se puede cambiar.');
+    select.addEventListener('keydown', function (event) {
+      if (event.key !== 'Tab') event.preventDefault();
+    });
+    select.addEventListener('mousedown', function (event) {
+      event.preventDefault();
+    });
   }
 
   var start = function () {

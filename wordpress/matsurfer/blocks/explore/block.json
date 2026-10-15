@@ -36,6 +36,7 @@
       {
         "key": "researchTitle",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Tarjeta 1 · Título"
       },
       {
@@ -47,6 +48,7 @@
       {
         "key": "researchCta",
         "type": "link",
+        "requiredGroup": "section",
         "label": "Tarjeta 1 · Botón"
       },
       {
@@ -56,6 +58,7 @@
       {
         "key": "teamTitle",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Tarjeta 2 · Título"
       },
       {
@@ -67,6 +70,7 @@
       {
         "key": "teamCta",
         "type": "link",
+        "requiredGroup": "section",
         "label": "Tarjeta 2 · Botón"
       }
     ]

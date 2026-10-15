@@ -809,10 +809,23 @@
   display: none !important;
 }
 
-/* …and their language cannot be changed (Polylang box): the translations stay visible */
-.mats-is-editor.mats-structural #ml_box #select-post-language,
-.mats-is-editor.mats-structural #ml_box .inside > p:first-of-type {
-  display: none !important;
+/* …and their language cannot be changed (Polylang box): it shows as plain
+   text (flag + name, so editors see which version they are editing) and the
+   menu does not open; admin.js takes it out of the keyboard order. The
+   server keeps the stored language anyway (inc/modules/editor.php). */
+.mats-is-editor.mats-structural #ml_box #post_lang_choice {
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 0 4px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: #1e1e1e;
+  font-weight: 600;
+  cursor: default;
 }
 
 /* the inserter has no patterns to show */

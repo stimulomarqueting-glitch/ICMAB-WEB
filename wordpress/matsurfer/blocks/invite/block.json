@@ -29,11 +29,13 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título"
       },
       {
         "key": "text",
         "type": "textarea",
+        "requiredGroup": "section",
         "label": "Texto (el email se añade solo al final)",
         "rows": 2,
         "help": "El email de contacto (Ajustes de MatSurfer) se añade solo al final, como enlace."

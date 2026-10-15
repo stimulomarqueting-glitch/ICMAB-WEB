@@ -40,11 +40,13 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título"
       },
       {
         "key": "groups",
         "type": "repeater",
+        "requiredGroup": "section",
         "label": "Tipos de equipo",
         "itemLabel": "Equipo",
         "fields": [

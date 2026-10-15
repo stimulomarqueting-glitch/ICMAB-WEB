@@ -34,6 +34,7 @@
       {
         "key": "items",
         "type": "repeater",
+        "required": true,
         "label": "Pasos",
         "itemLabel": "Paso",
         "fields": [

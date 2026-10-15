@@ -39,6 +39,7 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título destacado",
         "help": "La ventaja principal. Aparece grande dentro del recuadro blanco, junto a la «d»."
       },
@@ -52,6 +53,7 @@
       {
         "key": "features",
         "type": "repeater",
+        "requiredGroup": "section",
         "label": "Ventajas",
         "itemLabel": "Ventaja",
         "fields": [

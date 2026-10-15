@@ -93,10 +93,33 @@
   word-break: break-all;
 }
 
-/* repeater */
+/* repeater
+   One column that never grows past the 280px side panel: without
+   minmax(0, 1fr) the implicit grid column takes the min-content width of the
+   longest (nowrap) item title or select option, the panel scrolls sideways
+   and the ▲ ▼ 🗑 buttons of each item end up out of sight. */
 .mats-repeater {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
+  min-width: 0;
+}
+
+.mats-repeater > *,
+.mats-repeater__body {
+  min-width: 0;
+}
+
+.mats-repeater .mats-field-help {
+  overflow-wrap: anywhere;
+}
+
+.mats-repeater__body select,
+.mats-repeater__body input,
+.mats-repeater__body textarea,
+.mats-repeater__body .components-base-control,
+.mats-repeater__body .components-input-control__container {
+  max-width: 100%;
 }
 
 .mats-repeater__item {
@@ -114,7 +137,13 @@
   display: flex;
   align-items: center;
   gap: 2px;
+  min-width: 0;
   padding: 4px 4px 4px 0;
+}
+
+/* ▲ ▼ 🗑 keep their size: the title shrinks (ellipsis) instead */
+.mats-repeater__head > .components-button {
+  flex: none;
 }
 
 .mats-repeater__toggle {
@@ -182,4 +211,66 @@
   display: grid;
   place-items: center;
   min-height: 160px;
+}
+
+/* required texts (block.json "required" / "requiredGroup") */
+.mats-required-panel {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0b8b8;
+  border-left: 4px solid #cc1818;
+  background: #fcf0f1;
+  color: #8a1414;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mats-required-panel p {
+  margin: 0;
+}
+
+.mats-required__msg {
+  font-weight: 600;
+}
+
+.mats-field--text.is-missing input,
+.mats-field--textarea.is-missing textarea,
+.mats-field--link.is-missing input:not([type='url']) {
+  border-color: #cc1818 !important;
+  box-shadow: 0 0 0 1px #cc1818 !important;
+}
+
+.mats-field--text.is-missing .components-base-control__help,
+.mats-field--textarea.is-missing .components-base-control__help,
+.mats-field--link.is-missing .components-base-control__help,
+.mats-field-missing {
+  color: #cc1818;
+}
+
+.mats-field-missing {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mats-repeater__item.has-missing {
+  border-color: #cc1818;
+}
+
+.mats-repeater__item.has-missing .mats-repeater__num {
+  background: #cc1818;
+  color: #fff;
+}
+
+/* a photo without description */
+.mats-field-image__alt.is-empty textarea {
+  border-color: #dba617;
+  box-shadow: 0 0 0 1px #dba617;
+}
+
+.mats-field-image__alt.is-empty .components-base-control__help {
+  color: #8a5a00;
+  font-weight: 600;
 }

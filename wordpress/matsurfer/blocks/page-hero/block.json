@@ -45,6 +45,7 @@
       {
         "key": "title",
         "type": "text",
+        "required": true,
         "label": "Título de la página (H1)",
         "help": "Las palabras aparecen una a una al cargar la página."
       },

@@ -55,6 +55,7 @@
           {
             "key": "q",
             "type": "text",
+            "required": true,
             "label": "Pregunta"
           },
           {

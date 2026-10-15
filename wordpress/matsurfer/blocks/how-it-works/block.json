@@ -39,6 +39,7 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título"
       },
       {
@@ -48,6 +49,7 @@
       {
         "key": "video",
         "type": "video",
+        "requiredGroup": "section",
         "label": "Vídeo del dispositivo",
         "help": "Formato MP4. Si no hay vídeo se muestra el aviso de abajo."
       },
@@ -72,6 +74,7 @@
       {
         "key": "steps",
         "type": "repeater",
+        "requiredGroup": "section",
         "label": "Pasos",
         "itemLabel": "Paso",
         "fields": [

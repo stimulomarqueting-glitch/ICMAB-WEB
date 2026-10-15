@@ -13,6 +13,24 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
+/* logged-in staff: the header sits below the admin bar (chrome.css), so the
+   pills stick below both — same offsets and breakpoints as .admin-bar .header */
+.admin-bar .apps-nav {
+  top: calc(var(--header-h) + 32px);
+}
+
+@media (max-width: 782px) {
+  .admin-bar .apps-nav {
+    top: calc(var(--header-h) + 46px);
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-bar .apps-nav {
+    top: var(--header-h);
+  }
+}
+
 .apps-nav .apps-nav__inner {
   display: flex;
   gap: 0.5rem;

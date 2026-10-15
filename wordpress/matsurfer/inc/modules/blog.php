@@ -93,6 +93,33 @@ function mats_blog_format_date( int $time, string $format = 'long', string $lang
 	return 'es' === $lang ? $day . ' de ' . $name . ' de ' . $year : $day . ' ' . $name . ' ' . $year;
 }
 
+/**
+ * Title of a date archive in the page language, independent of installed
+ * WordPress translations: "15 October 2026" / "15 de octubre de 2026",
+ * "September 2026" / "Septiembre de 2026", "2026". '' when not a date archive.
+ */
+function mats_blog_date_archive_title(): string {
+	if ( ! is_date() ) {
+		return '';
+	}
+	$year  = (int) get_query_var( 'year' );
+	$month = (int) get_query_var( 'monthnum' );
+	$day   = (int) get_query_var( 'day' );
+	if ( is_day() && $year && $month && $day ) {
+		return mats_blog_format_date( (int) mktime( 12, 0, 0, $month, $day, $year ) );
+	}
+	if ( is_month() && $year && $month ) {
+		return mats_blog_format_date( (int) mktime( 12, 0, 0, $month, 15, $year ), 'month' );
+	}
+	return $year ? (string) $year : '';
+}
+
+/** A quoted phrase in the typography of the language: «…» in Spanish, “…” in English. */
+function mats_blog_quote( string $text, string $lang = '' ): string {
+	$lang = $lang ? $lang : mats_lang();
+	return 'es' === $lang ? '«' . $text . '»' : '“' . $text . '”';
+}
+
 /** The category shown on a card / article: the first one that is not the default, else the default. */
 function mats_blog_category( $post = null ): ?WP_Term {
 	$post = get_post( $post );
@@ -189,13 +216,35 @@ function mats_blog_cta( string $source = 'news-final' ): string {
 	return WP_Block_Type_Registry::get_instance()->is_registered( 'matsurfer/page-cta' ) ? mats_render_section( 'matsurfer/page-cta', $attrs ) : '';
 }
 
-/** Featured image of a post as an image value for mats_image(), [] when none. */
+/**
+ * Alt text of a post's featured image. Polylang does not translate media
+ * (the installer leaves media translation off), so one image — with one alt
+ * text, written in whatever language the team used, English for the site
+ * photos the installer imported — serves every language version of an
+ * article. The image's own alt is used only on the default-language
+ * version; any other language, or an image without alt text, gets the
+ * title of that version instead, which is always in the right language.
+ */
+function mats_blog_thumb_alt( WP_Post $post, string $attachment_alt ): string {
+	$attachment_alt = trim( $attachment_alt );
+	$other_lang     = function_exists( 'mats_post_lang' ) && mats_post_lang( $post->ID ) !== mats_default_lang();
+	if ( '' === $attachment_alt || $other_lang ) {
+		return trim( wp_strip_all_tags( get_the_title( $post ) ) );
+	}
+	return $attachment_alt;
+}
+
+/** Featured image of a post as an image value for mats_image(), [] when none (alt: mats_blog_thumb_alt()). */
 function mats_blog_thumb( $post = null ): array {
 	$post = get_post( $post );
 	if ( ! $post || ! has_post_thumbnail( $post ) ) {
 		return array();
 	}
-	return mats_attachment_value( (int) get_post_thumbnail_id( $post ) );
+	$image = mats_attachment_value( (int) get_post_thumbnail_id( $post ) );
+	if ( $image ) {
+		$image['alt'] = mats_blog_thumb_alt( $post, (string) $image['alt'] );
+	}
+	return $image;
 }
 
 /** One post card (template-parts/post-card.php). $args: heading (h2|h3), featured (bool), lazy (bool). */

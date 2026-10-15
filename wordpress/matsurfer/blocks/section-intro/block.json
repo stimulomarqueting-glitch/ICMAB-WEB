@@ -44,6 +44,7 @@
       {
         "key": "title",
         "type": "text",
+        "required": true,
         "label": "Título"
       },
       {

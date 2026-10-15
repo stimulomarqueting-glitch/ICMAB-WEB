@@ -22,9 +22,9 @@
   "style": "file:./style.css",
   "matsurfer": {
     "fields": [
-      { "key": "title", "type": "text", "label": "Título" },
+      { "key": "title", "type": "text", "requiredGroup": "section", "label": "Título" },
       { "key": "text", "type": "textarea", "label": "Texto", "rows": 3 },
-      { "key": "button", "type": "link", "label": "Botón" },
+      { "key": "button", "type": "link", "requiredGroup": "section", "label": "Botón" },
       { "type": "panel", "label": "Opciones" },
       { "key": "centered", "type": "toggle", "label": "Centrar el contenido", "help": "Úsalo cuando esta banda es el único bloque de contacto de la página." },
       { "key": "secondaryLead", "type": "text", "label": "Texto junto al enlace secundario", "help": "Por ejemplo: «o escríbenos a». Déjalo vacío para no mostrar enlace secundario." },

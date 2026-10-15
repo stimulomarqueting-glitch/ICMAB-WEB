@@ -35,11 +35,13 @@
       {
         "key": "title",
         "type": "text",
+        "requiredGroup": "section",
         "label": "Título"
       },
       {
         "key": "text",
         "type": "textarea",
+        "requiredGroup": "section",
         "label": "Texto",
         "rows": 4
       }

@@ -125,7 +125,7 @@ return array(
 						'**Foto destacada**: pulsa **Elegir la foto destacada**, sube la foto o elige una de la biblioteca y pulsa el botón para usarla. Es la foto de la tarjeta de la noticia (se recorta a formato 16:10), la foto grande de la cabecera del artículo y la imagen que se ve al compartirla en redes sociales. Mejor horizontal (ver [Consejos para las fotos](#consejos-fotos)). Sin foto destacada, la tarjeta muestra un fondo suave con el símbolo de MatSurfer.',
 						'**Categorías**: despliega **Categorías** y marca «News» (en inglés) o «Noticias» (en español). Si además marcas otra categoría, esa aparece como etiqueta morada sobre el título y como filtro encima de la lista de noticias. Puedes crear una con **Añadir nueva categoría** (recuerda crear también su versión en el otro idioma en **Noticias → Categorías**).',
 						'**Extracto**: pulsa **Añadir un extracto…** y escribe un resumen de una o dos frases. Se ve como entradilla bajo el título del artículo, en la tarjeta de la noticia y en Google. Si lo dejas vacío, la tarjeta usa el principio del texto y el artículo no muestra entradilla.',
-						'**Fijar en la parte superior del blog**: si la marcas, esa noticia sale la primera, en grande, en la página Noticias, aunque haya otras más nuevas.',
+						'**Fijar la noticia arriba**: no es un recuadro del panel, está en el estado de la noticia. Pulsa el estado (**Borrador** o **Publicada**, en el panel de la derecha) y, en la ventana que se abre, marca **Fijada** («Sticky» si WordPress está en inglés). Una noticia fijada sale la primera, en grande, en la página Noticias, aunque haya otras más nuevas.',
 						'**Google y redes sociales**: el título y la descripción que se ven en Google (ver [Google y redes sociales](#google)). Es opcional.',
 					),
 				),
@@ -289,7 +289,7 @@ return array(
 					'items' => array(
 						'En [Páginas](admin:edit.php?post_type=page) hay dos columnas con las banderas de cada idioma. En la fila de cada página, la **bandera** indica su idioma; en la otra columna, el **lápiz** abre su traducción y un **+** significa que todavía no la tiene.',
 						'Para ver solo las páginas de un idioma, usa el menú de idiomas de la barra negra de arriba («Mostrar todos los idiomas» → **Español** o **English**).',
-						'Dentro del editor, el recuadro **Idiomas** (panel de la derecha) dice en qué idioma está la página y, en **Traducciones**, tiene el lápiz para saltar a la otra versión.',
+						'Dentro del editor, el recuadro **Idiomas** (panel de la derecha, pestaña **Página** o **Noticia**) dice en **Idioma** en qué idioma está la página, con su bandera (en las páginas principales se ve pero no se puede cambiar). Debajo, en **Traducciones**, está la bandera del **otro** idioma con un lápiz para saltar a esa versión.',
 						'Si una página o noticia no tiene todavía traducción, púlsale el **+** para crearla ya enlazada con la original.',
 					),
 				),

@@ -20,16 +20,7 @@ if ( is_category() || is_tag() ) {
 	$mats_lead   = $mats_term instanceof WP_Term ? wp_strip_all_tags( term_description( $mats_term ) ) : '';
 } elseif ( is_date() ) {
 	$mats_kicker = mats_t( 'archive' );
-	$mats_year   = (int) get_query_var( 'year' );
-	$mats_month  = (int) get_query_var( 'monthnum' );
-	$mats_day    = (int) get_query_var( 'day' );
-	if ( is_day() && $mats_year && $mats_month && $mats_day ) {
-		$mats_title = mats_blog_format_date( (int) mktime( 12, 0, 0, $mats_month, $mats_day, $mats_year ) );
-	} elseif ( is_month() && $mats_year && $mats_month ) {
-		$mats_title = mats_blog_format_date( (int) mktime( 12, 0, 0, $mats_month, 15, $mats_year ), 'month' );
-	} else {
-		$mats_title = (string) $mats_year;
-	}
+	$mats_title  = mats_blog_date_archive_title(); // also the <title> (inc/modules/seo.php)
 } else {
 	$mats_title = wp_strip_all_tags( get_the_archive_title() );
 }
@@ -50,7 +41,8 @@ $mats_paged = max( 1, (int) get_query_var( 'paged' ) );
 	);
 	?>
 
-	<section class="sec hairtop blog-list" aria-label="<?php echo esc_attr( $mats_title ); ?>">
+	<?php /* no aria-label: the header above is already the region named after the title (two regions with one name confuse screen readers) */ ?>
+	<section class="sec hairtop blog-list">
 		<div class="container">
 			<?php if ( is_category() ) : ?>
 				<?php get_template_part( 'template-parts/blog-categories' ); ?>

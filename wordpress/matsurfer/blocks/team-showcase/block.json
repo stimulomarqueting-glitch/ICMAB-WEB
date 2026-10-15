@@ -35,6 +35,7 @@
       {
         "key": "title",
         "type": "text",
+        "required": true,
         "label": "Título de la página (H1)",
         "help": "Es el título principal de la página. No lo dejes vacío: sin él, la página se queda sin título principal."
       },
