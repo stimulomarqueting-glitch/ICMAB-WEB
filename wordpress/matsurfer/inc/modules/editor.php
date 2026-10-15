@@ -305,9 +305,10 @@ add_filter(
 /*
  * MatSurfer sections: no CSS class, anchor or HTML editing for anyone.
  * Editors also get no renaming, hiding or lock options; administrators
- * keep "Desbloquear" (⋮ menu) to move or remove a section. For editors
- * canLockBlocks is false as well (block_editor_settings_all above) and
- * admin.js removes renaming / hiding from the core blocks.
+ * keep "Desbloquear" (⋮ menu) to move or remove a section — every
+ * block.json says "lock": false, so it is switched back on here for them.
+ * For editors canLockBlocks is false as well (block_editor_settings_all
+ * above) and admin.js removes renaming / hiding from the core blocks.
  */
 add_filter(
 	'register_block_type_args',
@@ -322,7 +323,9 @@ add_filter(
 			'anchor'          => false,
 			'reusable'        => false,
 		);
-		if ( ! mats_editor_is_admin() ) {
+		if ( mats_editor_is_admin() ) {
+			$off['lock'] = true;
+		} else {
 			$off['renaming']   = false;
 			$off['lock']       = false;
 			$off['visibility'] = false;
@@ -405,6 +408,201 @@ add_filter(
 	2
 );
 
+/*
+ * Language and translations of the fixed pages (Polylang). The menu and
+ * every button find a fixed page through its language and its link to the
+ * other language, so editors must never change them. Polylang saves them
+ * straight from the request, in four places, before WordPress saves the
+ * page: the editor's «Idiomas» box (load-post.php: post_lang_choice and
+ * post_tr_lang), its AJAX language switch (post_lang_choice), quick edit
+ * (inline-save: inline_lang_choice) and bulk edit (load-edit.php:
+ * inline_lang_choice for every ticked post). Each guard below runs just
+ * before Polylang and replaces the request values with the stored ones
+ * (or drops the fixed pages from a bulk action). Administrators keep
+ * Polylang's normal behaviour.
+ */
+
+/** Stored language slug of a post ('' without Polylang or language). */
+function mats_editor_post_lang( int $post_id ): string {
+	return function_exists( 'pll_get_post_language' ) ? (string) pll_get_post_language( $post_id, 'slug' ) : '';
+}
+
+/** Should the language guard protect this post for the current user? */
+function mats_editor_lang_guarded( int $post_id ): bool {
+	return $post_id > 0 && function_exists( 'pll_get_post_translations' ) && is_user_logged_in() && ! mats_editor_is_admin() && mats_editor_is_structural( $post_id );
+}
+
+/** Sets (or, with null, removes) a request value in the given superglobals and $_REQUEST. */
+function mats_editor_set_request( string $key, $value, string $source = 'post' ): void {
+	if ( 'get' === $source ) {
+		$bag = &$_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	} else {
+		$bag = &$_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	}
+	if ( null === $value ) {
+		unset( $bag[ $key ], $_REQUEST[ $key ] );
+		return;
+	}
+	$bag[ $key ]      = $value;
+	$_REQUEST[ $key ] = $value;
+}
+
+/**
+ * Translation links a non-administrator may save for post $post_id in
+ * language $lang: a link to a fixed page is dropped when that page is
+ * already linked to another page in $lang (it would be taken away from
+ * its own translation).
+ */
+function mats_editor_safe_translation_links( int $post_id, string $lang, array $links ): array {
+	$out = array();
+	foreach ( $links as $code => $target ) {
+		$code   = sanitize_key( (string) $code );
+		$target = absint( $target );
+		if ( $target && mats_editor_is_structural( $target ) ) {
+			$theirs = (array) pll_get_post_translations( $target );
+			if ( '' === $lang || ( isset( $theirs[ $lang ] ) && (int) $theirs[ $lang ] !== $post_id ) ) {
+				continue;
+			}
+		}
+		$out[ $code ] = $target;
+	}
+	return $out;
+}
+
+/* the editor's «Idiomas» box, saved with the page (classic form and block editor meta boxes) */
+add_action(
+	'load-post.php',
+	static function () {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Polylang checks its nonce right after; this only narrows the values it reads.
+		if ( mats_editor_is_admin() || ! function_exists( 'pll_get_post_translations' ) || empty( $_POST['post_ID'] ) ) {
+			return;
+		}
+		$post_id = absint( $_POST['post_ID'] );
+		if ( mats_editor_lang_guarded( $post_id ) ) {
+			$lang = mats_editor_post_lang( $post_id );
+			if ( isset( $_POST['post_lang_choice'] ) ) {
+				mats_editor_set_request( 'post_lang_choice', '' !== $lang ? $lang : null );
+			}
+			if ( isset( $_POST['post_tr_lang'] ) ) {
+				$stored = array_map( 'intval', (array) pll_get_post_translations( $post_id ) );
+				unset( $stored[ $lang ] );
+				mats_editor_set_request( 'post_tr_lang', $stored );
+			}
+		} elseif ( $post_id && isset( $_POST['post_tr_lang'] ) && is_array( $_POST['post_tr_lang'] ) ) {
+			$lang = isset( $_POST['post_lang_choice'] ) ? sanitize_key( wp_unslash( $_POST['post_lang_choice'] ) ) : mats_editor_post_lang( $post_id );
+			mats_editor_set_request( 'post_tr_lang', mats_editor_safe_translation_links( $post_id, $lang, wp_unslash( $_POST['post_tr_lang'] ) ) );
+		}
+		// phpcs:enable
+	},
+	1
+);
+
+/* the AJAX language switch of that box (Polylang sets the language at once) */
+add_action(
+	'wp_ajax_post_lang_choice',
+	static function () {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Polylang checks its nonce right after.
+		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		if ( ! mats_editor_lang_guarded( $post_id ) ) {
+			return;
+		}
+		$lang = mats_editor_post_lang( $post_id );
+		if ( '' !== $lang ) {
+			mats_editor_set_request( 'lang', $lang );
+		}
+		// phpcs:enable
+	},
+	1
+);
+
+/* quick edit (Polylang runs at priority 0) */
+add_action(
+	'wp_ajax_inline-save',
+	static function () {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- core and Polylang check the nonce right after.
+		$post_id = isset( $_POST['post_ID'] ) ? absint( $_POST['post_ID'] ) : 0;
+		if ( ! isset( $_POST['inline_lang_choice'] ) || ! mats_editor_lang_guarded( $post_id ) ) {
+			return;
+		}
+		$lang = mats_editor_post_lang( $post_id );
+		mats_editor_set_request( 'inline_lang_choice', '' !== $lang ? $lang : null );
+		// phpcs:enable
+	},
+	-1
+);
+
+/*
+ * Bulk actions of the Pages list (edit, trash…): the fixed pages are left
+ * out for non-administrators — before Polylang (bulk language, priority
+ * 10) and before WordPress handles the action. The list then says why.
+ */
+add_action(
+	'load-edit.php',
+	static function () {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- core checks the bulk nonce right after; this only removes items.
+		if ( mats_editor_is_admin() || ! is_user_logged_in() ) {
+			return;
+		}
+		$action  = isset( $_REQUEST['action'] ) && is_scalar( $_REQUEST['action'] ) ? (string) $_REQUEST['action'] : '-1';
+		$action2 = isset( $_REQUEST['action2'] ) && is_scalar( $_REQUEST['action2'] ) ? (string) $_REQUEST['action2'] : '-1';
+		if ( '-1' === $action && '-1' === $action2 && ! isset( $_REQUEST['bulk_edit'] ) ) {
+			return;
+		}
+		$skipped = 0;
+		if ( ! empty( $_REQUEST['post'] ) && is_array( $_REQUEST['post'] ) ) {
+			$keep = array();
+			foreach ( array_map( 'intval', wp_unslash( $_REQUEST['post'] ) ) as $id ) {
+				if ( mats_editor_is_structural( $id ) ) {
+					++$skipped;
+				} else {
+					$keep[] = $id;
+				}
+			}
+			foreach ( array( 'get', 'post' ) as $source ) {
+				$bag = 'get' === $source ? $_GET : $_POST;
+				if ( isset( $bag['post'] ) ) {
+					mats_editor_set_request( 'post', $keep, $source );
+				}
+			}
+			$_REQUEST['post'] = $keep;
+		}
+		if ( isset( $_REQUEST['ids'] ) && is_scalar( $_REQUEST['ids'] ) ) {
+			$ids  = array_filter( array_map( 'intval', explode( ',', (string) $_REQUEST['ids'] ) ) );
+			$keep = array_values( array_filter( $ids, static fn( $id ) => ! mats_editor_is_structural( $id ) ) );
+			if ( count( $keep ) !== count( $ids ) ) {
+				$skipped += count( $ids ) - count( $keep );
+				mats_editor_set_request( 'ids', implode( ',', $keep ), isset( $_GET['ids'] ) ? 'get' : 'post' );
+			}
+		}
+		// phpcs:enable
+		if ( $skipped ) {
+			add_filter( 'wp_redirect', static fn( $location ) => add_query_arg( 'mats_fixed_skipped', $skipped, $location ) );
+		}
+	},
+	1
+);
+
+add_filter(
+	'removable_query_args',
+	static function ( $args ) {
+		$args[] = 'mats_fixed_skipped';
+		return $args;
+	}
+);
+
+/* editors: the fixed pages have no checkbox in the Pages list ("select all" skips them too) */
+add_filter(
+	'wp_list_table_show_post_checkbox',
+	static function ( $show, $post ) {
+		if ( $show && $post instanceof WP_Post && 'page' === $post->post_type && ! mats_editor_is_admin() && mats_editor_is_structural( $post ) ) {
+			return false;
+		}
+		return $show;
+	},
+	10,
+	2
+);
+
 /* ── page list: say why the main pages have no "Papelera" link ─────────── */
 
 add_filter(
@@ -446,9 +644,20 @@ add_action(
 		if ( ! $screen || 'edit-page' !== $screen->id ) {
 			return;
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display only.
+		$skipped = isset( $_GET['mats_fixed_skipped'] ) ? absint( $_GET['mats_fixed_skipped'] ) : 0;
+		if ( $skipped ) {
+			echo '<div class="notice notice-warning is-dismissible"><p>';
+			echo esc_html(
+				1 === $skipped
+					? 'Una página principal se ha dejado como estaba: las páginas principales no se cambian en grupo ni se mueven a la papelera. Para cambiar sus textos o fotos, ábrela.'
+					: sprintf( '%d páginas principales se han dejado como estaban: las páginas principales no se cambian en grupo ni se mueven a la papelera. Para cambiar sus textos o fotos, ábrelas una a una.', $skipped )
+			);
+			echo '</p></div>';
+		}
 		echo '<div class="notice notice-info mats-pages-notice"><p>';
 		echo '<span class="dashicons dashicons-lock" aria-hidden="true"></span> ';
-		echo esc_html( 'Las páginas principales (Inicio, Producto, Aplicaciones, Casos de estudio, Equipo, Contacto, Noticias y los textos legales) están protegidas: puedes cambiar sus textos y fotos, pero no borrarlas ni cambiar su dirección, porque las usan el menú y los botones de la web. Cada una existe en inglés y en español: las columnas con banderas llevan a cada versión.' );
+		echo esc_html( 'Las páginas principales (Inicio, Producto, Aplicaciones, Casos de estudio, Equipo, Contacto, Noticias y los textos legales) están protegidas: puedes cambiar sus textos y fotos, pero no borrarlas ni cambiar su dirección o su idioma, porque las usan el menú y los botones de la web. Cada una existe en inglés y en español: las columnas con banderas llevan a cada versión.' );
 		if ( mats_editor_is_admin() ) {
 			echo ' ' . esc_html( 'Administradores: para retirar una página principal, quítale antes su papel (el campo _mats_role de la página y de su traducción, y su entrada en la opción mats_page_roles); después ya se podrá borrar.' );
 		}
@@ -509,7 +718,7 @@ function mats_editor_notice( array $info, bool $admin ): string {
 	switch ( $info['kind'] ) {
 		case 'sections':
 			return $admin
-				? 'Página principal formada por secciones bloqueadas. Como administrador puedes desbloquearlas (menú ⋮ de la sección); el equipo del ICMAB solo puede cambiar textos y fotos.'
+				? 'Página principal formada por secciones bloqueadas. Como administrador puedes desbloquear una sección para moverla o quitarla (menú ⋮ de la sección → Desbloquear); el equipo del ICMAB solo puede cambiar textos y fotos.'
 				: 'Esta página está formada por secciones bloqueadas: puedes cambiar textos y fotos, no la estructura.';
 		case 'news':
 			return 'Esta es la página de Noticias: la lista de noticias se rellena sola con las noticias publicadas. Aquí solo se cambian el título, el extracto (la entradilla de la cabecera) y la imagen destacada.';

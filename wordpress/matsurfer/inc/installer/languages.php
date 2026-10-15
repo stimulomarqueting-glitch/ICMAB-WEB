@@ -373,12 +373,12 @@ function mats_installer_install_plugin_translations( array &$result, string $loc
 	require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
-	$installed    = wp_get_installed_translations( 'plugins' );
-	$plugins      = get_plugins();
-	$updates      = array();
-	$names        = array();
-	$already      = array();
-	$failed       = array();
+	$installed = wp_get_installed_translations( 'plugins' );
+	$plugins   = get_plugins();
+	$updates   = array();
+	$names     = array();
+	$already   = array();
+	$failed    = array();
 	foreach ( mats_installer_translated_plugins() as $key ) {
 		$spec = mats_installer_plugin_specs()[ $key ] ?? null;
 		$file = $spec ? mats_installer_plugin_state( $key )['file'] : '';
@@ -413,7 +413,7 @@ function mats_installer_install_plugin_translations( array &$result, string $loc
 			$failed[] = $spec['name'];
 			continue;
 		}
-		$updates[]               = (object) array(
+		$updates[]              = (object) array(
 			'type'       => 'plugin',
 			'slug'       => $spec['slug'],
 			'language'   => $locale,

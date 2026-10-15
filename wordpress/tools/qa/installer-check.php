@@ -25,9 +25,10 @@ $mats_out = array(
 	'forms'           => function_exists( 'mats_wpforms_status' ) ? mats_wpforms_status() : null,
 	'installer_state' => get_option( 'mats_installer_state' ),
 	'attachments'     => (int) ( wp_count_posts( 'attachment' )->inherit ?? 0 ),
+	'wp_languages'    => get_available_languages(),
 );
 
-foreach ( array( 'show_on_front', 'page_on_front', 'page_for_posts', 'wp_page_for_privacy_policy', 'permalink_structure', 'timezone_string', 'gmt_offset', 'date_format', 'start_of_week', 'default_comment_status', 'default_ping_status', 'blogname', 'blogdescription', 'admin_email', 'blog_public', 'mats_page_roles', 'polylang', 'default_category', 'active_plugins' ) as $mats_name ) {
+foreach ( array( 'show_on_front', 'page_on_front', 'page_for_posts', 'wp_page_for_privacy_policy', 'permalink_structure', 'timezone_string', 'gmt_offset', 'date_format', 'start_of_week', 'default_comment_status', 'default_ping_status', 'blogname', 'blogdescription', 'admin_email', 'blog_public', 'mats_page_roles', 'polylang', 'default_category', 'active_plugins', 'WPLANG' ) as $mats_name ) {
 	$mats_out['options'][ $mats_name ] = get_option( $mats_name );
 }
 

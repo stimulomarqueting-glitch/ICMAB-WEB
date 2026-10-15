@@ -27,8 +27,16 @@
  * sociales" (assets/js/seo-admin.js) of every page and news article:
  * post meta '_mats_seo_title' and '_mats_seo_description'. Empty fields fall
  * back to:
- *   home page   Ajustes de la web → SEO title / description of the language
- *   pages       "<page title> — MatSurfer"; excerpt, else the site description
+ *   home page   Ajustes de la web → «Textos por defecto para Google» of the
+ *               language. The installer fills the home page's fields with
+ *               the original copy (= the default of those settings); while
+ *               they still hold exactly that copy they count as empty, so
+ *               editing the settings changes the home page. A text the team
+ *               writes in the home page's panel always wins.
+ *   pages       "<page title> — MatSurfer" (never the general title: pages
+ *               would all share one title); excerpt (reading pages only —
+ *               landing pages have no «Extracto» box), else the site
+ *               description
  *   news        "<article title> — MatSurfer"; excerpt, else the start of the text
  *
  * When Yoast SEO, Rank Math, SEOPress, All in One SEO, The SEO Framework or
@@ -44,7 +52,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/* recommended lengths (characters), also for Ajustes de la web */
 const MATS_SEO_TITLE_MAX = 60;
+const MATS_SEO_DESC_MIN  = 120;
 const MATS_SEO_DESC_MAX  = 155;
 const MATS_SEO_SEP       = ' — ';
 
@@ -118,12 +128,71 @@ function mats_seo_trim( string $text, int $max ): string {
 	if ( false !== $space && $space > $max * 0.6 ) {
 		$cut = mb_substr( $cut, 0, $space );
 	}
-	return rtrim( $cut, " \t\n\r\0\x0B,;:.-—–" ) . '…';
+	/* whole characters only (rtrim() works on bytes and would break "Ó", "π"…) */
+	$trimmed = preg_replace( '/[\s,;:.\-—–]+$/u', '', $cut );
+	return ( is_string( $trimmed ) ? $trimmed : $cut ) . '…';
 }
 
 /** Stored SEO texts of a post (plain). */
 function mats_seo_meta( int $post_id, string $field ): string {
 	return $post_id ? mats_seo_clean( get_post_meta( $post_id, '_mats_seo_' . $field, true ) ) : '';
+}
+
+/**
+ * The original SEO texts of the home page shipped with the theme
+ * (content.json site.meta, all languages), which the installer copies into
+ * the home page's fields: [ 'title' => [ … ], 'description' => [ … ] ].
+ */
+function mats_seo_shipped_home_texts(): array {
+	static $texts = null;
+	if ( null === $texts ) {
+		$texts = array(
+			'title'       => array(),
+			'description' => array(),
+		);
+		$data = function_exists( 'mats_content_data' ) ? mats_content_data() : array();
+		foreach ( $data as $lang => $copy ) {
+			foreach ( array_keys( $texts ) as $field ) {
+				$value = is_array( $copy ) ? mats_seo_clean( $copy['site']['meta'][ $field ] ?? '' ) : '';
+				if ( '' !== $value ) {
+					$texts[ $field ][ (string) $lang ] = $value;
+				}
+			}
+		}
+	}
+	return $texts;
+}
+
+/**
+ * SEO text of the home page: '' while the field still holds the original
+ * copy the installer put there, so the general texts of Ajustes de la web
+ * apply (and changing them has an effect). Anything the team wrote wins.
+ */
+function mats_seo_home_meta( int $post_id, string $field ): string {
+	$value = mats_seo_meta( $post_id, $field );
+	if ( '' !== $value && in_array( $value, mats_seo_shipped_home_texts()[ $field ] ?? array(), true ) ) {
+		return '';
+	}
+	return $value;
+}
+
+/**
+ * Does the editor of this page or article have an «Extracto» box? Landing
+ * pages (built from sections) do not (inc/modules/blog.php), so their
+ * excerpt — invisible to the team — is never used.
+ */
+function mats_seo_uses_excerpt( WP_Post $post ): bool {
+	if ( ! post_type_supports( $post->post_type, 'excerpt' ) ) {
+		return false;
+	}
+	if ( 'page' !== $post->post_type ) {
+		return true;
+	}
+	$id = (int) $post->ID;
+	if ( (int) get_option( 'page_for_posts' ) === $id || ( function_exists( 'mats_role_of' ) && 'news' === mats_role_of( $id ) ) ) {
+		return true;
+	}
+	return ! ( function_exists( 'mats_is_landing' ) && mats_is_landing( $post ) );
 }
 
 /** Is this post the home page (in any language)? */
@@ -177,13 +246,41 @@ function mats_seo_languages(): array {
 }
 
 /**
+ * Image sizes to try for the social image of an attachment, best first.
+ * Only sizes that really exist are listed: for a missing size WordPress
+ * hands back the original file, which would stop the fallback at once.
+ *   'mats-og' (1200×630 crop) → the original when it already has that shape
+ *   → 'mats-wide' (1600×900) → 'large' → the original.
+ */
+function mats_seo_image_sizes( int $attachment_id ): array {
+	$meta  = wp_get_attachment_metadata( $attachment_id );
+	$sizes = is_array( $meta ) && is_array( $meta['sizes'] ?? null ) ? $meta['sizes'] : array();
+	$out   = array();
+	if ( ! empty( $sizes['mats-og']['file'] ) ) {
+		$out[] = 'mats-og';
+	}
+	$w = is_array( $meta ) ? (int) ( $meta['width'] ?? 0 ) : 0;
+	$h = is_array( $meta ) ? (int) ( $meta['height'] ?? 0 ) : 0;
+	if ( $w && $h && abs( $w / $h - 1200 / 630 ) < 0.02 ) {
+		$out[] = 'full';
+	}
+	foreach ( array( 'mats-wide', 'large' ) as $size ) {
+		if ( ! empty( $sizes[ $size ]['file'] ) ) {
+			$out[] = $size;
+		}
+	}
+	$out[] = 'full';
+	return array_values( array_unique( $out ) );
+}
+
+/**
  * Social image of a post: its featured image (1200×630 crop when it
  * exists), else the default MatSurfer image. [ url, width, height, alt, type ].
  */
 function mats_seo_image( int $post_id = 0 ): array {
 	$thumb = $post_id ? (int) get_post_thumbnail_id( $post_id ) : 0;
 	if ( $thumb && wp_attachment_is_image( $thumb ) ) {
-		foreach ( array( 'mats-og', 'mats-wide', 'large', 'full' ) as $size ) {
+		foreach ( mats_seo_image_sizes( $thumb ) as $size ) {
 			$src = wp_get_attachment_image_src( $thumb, $size );
 			if ( $src && ! empty( $src[0] ) ) {
 				$alt = mats_seo_clean( get_post_meta( $thumb, '_wp_attachment_image_alt', true ) );
@@ -266,13 +363,16 @@ function mats_seo_context(): array {
 		$news_label = mats_seo_role_label( 'news' );
 		$news_crumb = array( '' !== $news_label ? $news_label : mats_seo_clean( get_the_title( $news_id ) ), (string) get_permalink( $news_id ) );
 	}
-	$translations = static function ( array $ids ) use ( $lang ): array {
+	/* languages with a published translation (posts) or any translation (terms),
+	   like the hreflang links Polylang prints */
+	$translations = static function ( array $ids, bool $posts = true ) use ( $lang ): array {
 		$out = array();
 		foreach ( $ids as $l => $id ) {
 			$l = mats_normalize_lang( $l );
-			if ( $l !== $lang && $id ) {
-				$out[] = $l;
+			if ( $l === $lang || ! $id || ( $posts && 'publish' !== get_post_status( (int) $id ) ) ) {
+				continue;
 			}
+			$out[] = $l;
 		}
 		return $out;
 	};
@@ -286,10 +386,10 @@ function mats_seo_context(): array {
 			$ctx['url']    = (string) wp_get_canonical_url( $post );
 			$ctx['image']  = mats_seo_image( $id );
 			$plain_title   = mats_seo_clean( $post->post_title );
-			$meta_title    = mats_seo_meta( $id, 'title' );
-			$meta_desc     = mats_seo_meta( $id, 'description' );
-			$excerpt       = post_password_required( $post ) ? '' : mats_seo_clean( $post->post_excerpt );
 			$is_front      = is_front_page() || mats_seo_is_front_post( $id );
+			$meta_title    = $is_front ? mats_seo_home_meta( $id, 'title' ) : mats_seo_meta( $id, 'title' );
+			$meta_desc     = $is_front ? mats_seo_home_meta( $id, 'description' ) : mats_seo_meta( $id, 'description' );
+			$excerpt       = post_password_required( $post ) || ! mats_seo_uses_excerpt( $post ) ? '' : mats_seo_clean( $post->post_excerpt );
 			$ctx['locales'] = function_exists( 'pll_get_post_translations' ) ? $translations( (array) pll_get_post_translations( $id ) ) : array();
 
 			if ( $is_front ) {
@@ -351,7 +451,7 @@ function mats_seo_context(): array {
 			$ctx['description'] = mats_seo_clean( $term->description );
 			$ctx['url']         = mats_seo_paged_url( $first );
 			$ctx['canonical']   = $ctx['url'];
-			$ctx['locales']     = function_exists( 'pll_get_term_translations' ) ? $translations( (array) pll_get_term_translations( $term->term_id ) ) : array();
+			$ctx['locales']     = function_exists( 'pll_get_term_translations' ) ? $translations( (array) pll_get_term_translations( $term->term_id ), false ) : array();
 			$middle             = ( $news_crumb && 0 !== strcasecmp( $news_crumb[0], $name ) ) ? $news_crumb : array(); // no "News → News"
 			$ctx['breadcrumb']  = array_values( array_filter( array( array( $home_name, $home_url ), $middle, array( $name, $first ) ) ) );
 			if ( '' === $ctx['description'] ) {
@@ -479,7 +579,7 @@ function mats_seo_head(): void {
 			$out[] = sprintf( '<meta name="twitter:image:alt" content="%s" />', esc_attr( $image['alt'] ) );
 		}
 	}
-	$sitemap = function_exists( 'get_sitemap_url' ) ? get_sitemap_url( 'index' ) : false;
+	$sitemap = mats_seo_core_sitemaps_on() ? get_sitemap_url( 'index' ) : false;
 	if ( $sitemap && get_option( 'blog_public' ) ) {
 		$out[] = sprintf( '<link rel="sitemap" type="application/xml" href="%s" />', esc_url( $sitemap ) );
 	}
@@ -709,11 +809,22 @@ add_filter(
 	2
 );
 
-/* the sitemap in robots.txt (core adds it when sitemaps are on; never twice) */
+/** Are WordPress' own sitemaps (wp-sitemap.xml) switched on? */
+function mats_seo_core_sitemaps_on(): bool {
+	if ( ! function_exists( 'wp_sitemaps_get_server' ) || ! function_exists( 'get_sitemap_url' ) ) {
+		return false;
+	}
+	$server = wp_sitemaps_get_server();
+	return $server instanceof WP_Sitemaps && $server->sitemaps_enabled();
+}
+
+/* the sitemap in robots.txt (core adds it when sitemaps are on; never twice).
+   Not when an SEO plugin is in charge: it lists its own sitemap and has
+   usually switched wp-sitemap.xml off (it would answer 404). */
 add_filter(
 	'robots_txt',
 	static function ( $output, $public ) {
-		if ( ! $public || false !== stripos( (string) $output, 'sitemap:' ) || ! function_exists( 'get_sitemap_url' ) ) {
+		if ( ! $public || ! mats_seo_active() || ! mats_seo_core_sitemaps_on() || false !== stripos( (string) $output, 'sitemap:' ) ) {
 			return $output;
 		}
 		$url = get_sitemap_url( 'index' );
@@ -820,7 +931,9 @@ add_action(
 
 /** Data for the editor panel of a post. */
 function mats_seo_editor_data( WP_Post $post ): array {
-	$lang = function_exists( 'mats_post_lang' ) ? mats_post_lang( $post->ID ) : 'en';
+	$lang     = function_exists( 'mats_post_lang' ) ? mats_post_lang( $post->ID ) : 'en';
+	$is_front = mats_seo_is_front_post( (int) $post->ID );
+	$shipped  = mats_seo_shipped_home_texts();
 	return array(
 		'keys'      => array(
 			'title'       => '_mats_seo_title',
@@ -830,14 +943,35 @@ function mats_seo_editor_data( WP_Post $post ): array {
 			'title'       => MATS_SEO_TITLE_MAX,
 			'description' => MATS_SEO_DESC_MAX,
 		),
+		'min'       => array(
+			'description' => MATS_SEO_DESC_MIN,
+		),
 		'brand'     => mats_seo_site_name(),
 		'sep'       => MATS_SEO_SEP,
 		'postType'  => $post->post_type,
-		'isFront'   => mats_seo_is_front_post( (int) $post->ID ),
+		'isFront'   => $is_front,
+		/* home page: values that are still the original copy count as empty */
+		'shipped'   => $is_front ? array(
+			'title'       => array_values( $shipped['title'] ),
+			'description' => array_values( $shipped['description'] ),
+		) : array(
+			'title'       => array(),
+			'description' => array(),
+		),
+		'excerpt'   => mats_seo_uses_excerpt( $post ),
 		'siteTitle' => mats_seo_clean( mats_setting( 'seo_title', $lang ) ),
 		'siteDesc'  => mats_seo_clean( mats_setting( 'seo_description', $lang ) ),
 		'home'      => mats_home_url( $lang ),
 	);
+}
+
+/** Value of an SEO field as the panel shows it ('' = automatic text). */
+function mats_seo_editor_value( WP_Post $post, string $field ): string {
+	$value = (string) get_post_meta( $post->ID, '_mats_seo_' . $field, true );
+	if ( mats_seo_is_front_post( (int) $post->ID ) && '' === mats_seo_home_meta( (int) $post->ID, $field ) ) {
+		return '';
+	}
+	return $value;
 }
 
 add_action(
@@ -898,8 +1032,8 @@ add_action(
 
 function mats_seo_metabox( WP_Post $post ): void {
 	$data  = mats_seo_editor_data( $post );
-	$title = (string) get_post_meta( $post->ID, '_mats_seo_title', true );
-	$desc  = (string) get_post_meta( $post->ID, '_mats_seo_description', true );
+	$title = mats_seo_editor_value( $post, 'title' );
+	$desc  = mats_seo_editor_value( $post, 'description' );
 	wp_nonce_field( 'mats_seo_save_' . $post->ID, 'mats_seo_nonce' );
 	echo '<style>' . mats_seo_admin_css() . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static CSS.
 	echo '<div class="mats-seo-box">';
@@ -916,7 +1050,7 @@ function mats_seo_metabox( WP_Post $post ): void {
 		esc_html( 'Descripción en Google' ),
 		esc_attr( 'post' === $post->post_type ? 'Vacío: se usa el extracto o el principio del texto.' : $data['siteDesc'] ),
 		esc_textarea( $desc ),
-		esc_html( sprintf( 'Recomendado: entre 50 y %d caracteres.', MATS_SEO_DESC_MAX ) )
+		esc_html( sprintf( 'Recomendado: entre %1$d y %2$d caracteres.', MATS_SEO_DESC_MIN, MATS_SEO_DESC_MAX ) )
 	);
 	echo '</div>';
 }

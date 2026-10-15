@@ -504,7 +504,7 @@ add_filter(
 		/* articles and reading pages: WordPress' candidates, checked on their visible text */
 		$type_sql = "'" . implode( "','", array_map( 'esc_sql', $types ) ) . "'";
 		$not_in   = $landing ? ' AND ' . $wpdb->posts . '.ID NOT IN (' . implode( ',', array_map( 'intval', $landing ) ) . ')' : '';
-		$limit    = 1000;
+		$limit    = max( 1, (int) apply_filters( 'mats_blog_search_check_limit', 1000 ) );
 		// $search is the WHERE fragment WordPress just prepared for this query; the rest is fixed or integers.
 		$rows = $wpdb->get_results( "SELECT {$wpdb->posts}.ID, {$wpdb->posts}.post_title, {$wpdb->posts}.post_excerpt, {$wpdb->posts}.post_content, {$wpdb->posts}.post_type FROM {$wpdb->posts} WHERE {$wpdb->posts}.post_type IN ({$type_sql}) AND {$wpdb->posts}.post_status IN ('publish','private'){$not_in} {$search} LIMIT " . ( $limit + 1 ) ); // phpcs:ignore WordPress.DB
 		if ( ! is_array( $rows ) ) {

@@ -419,7 +419,8 @@ function mats_settings_footer_line( string $lang = '' ): string {
 /**
  * Plain text, one line, capped at $max characters.
  *
- * HTML tags, comments and <script>/<style> blocks are removed. A "<" that
+ * HTML tags, comments and <script>/<style> blocks are removed (and a tag
+ * left unfinished at the end, e.g. by the length limit). A "<" that
  * does not open a tag ("films <50 nm", "T<300 K") is ordinary text and is
  * kept, and so is "%" followed by two letters or digits ("100%eficaz"):
  * sanitize_text_field() would silently cut or change those. Every output
@@ -437,6 +438,8 @@ function mats_settings_clean_text( $value, int $max, ?array &$notes = null ): st
 	$plain = (string) preg_replace( '@<!--.*?(?:-->|$)@s', '', $plain );
 	$plain = (string) preg_replace( '@<(?:br|p|div|li|tr|td|th|h[1-6])\b[^<>]*>@i', ' ', $plain );
 	$plain = (string) preg_replace( '@<(?:/?[a-zA-Z][a-zA-Z0-9-]*\b[^<>]*|![^<>]*|\?[^<>]*)>@', '', $plain );
+	/* a tag left unfinished at the end (cut by the length limit): "<img src=x onerror=…", "<script" */
+	$plain = (string) preg_replace( '@<(?:/?(?:script|style|iframe|img|svg|object|embed|link|meta|form|input)\b|/?[a-zA-Z][a-zA-Z0-9-]*\s+[a-zA-Z-]+\s*=)[^<>]*$@i', '', $plain );
 	if ( $flat( $plain ) !== $flat( $value ) ) {
 		$notes[] = 'html';
 	}

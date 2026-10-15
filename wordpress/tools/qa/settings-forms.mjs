@@ -59,10 +59,15 @@ await ed.fill('#mats-global-contact_email', 'tt@icmab.es');
 await Promise.all([ed.waitForNavigation(), ed.click('#mats_save')]);
 const after = notify();
 check(after.en[0] === 'tt@icmab.es' && after.es[0] === 'tt@icmab.es', 'WPForms notifications follow the new contact email', JSON.stringify(after));
-/* restore the section: back to the original address everywhere */
+/* the section restore never touches the email (the original address is not confirmed as a real inbox) */
 await Promise.all([ed.waitForNavigation(), ed.click('button.mats-set__restore[value="contact"]')]);
+const kept = notify();
+check(kept.en[0] === 'tt@icmab.es' && kept.es[0] === 'tt@icmab.es', 'restoring the section leaves the forms\' address as it is', JSON.stringify(kept));
+/* typing the original address back: the forms follow */
+await ed.fill('#mats-global-contact_email', 'matsurfer@icmab.es');
+await Promise.all([ed.waitForNavigation(), ed.click('#mats_save')]);
 const back = notify();
-check(back.en[0] === 'matsurfer@icmab.es' && back.es[0] === 'matsurfer@icmab.es', 'restoring the section puts the original address back in the forms', JSON.stringify(back));
+check(back.en[0] === 'matsurfer@icmab.es' && back.es[0] === 'matsurfer@icmab.es', 'typing the original address back puts it back in the forms', JSON.stringify(back));
 await ed.context().close();
 
 await browser.close();

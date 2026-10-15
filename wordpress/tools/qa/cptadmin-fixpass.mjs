@@ -13,7 +13,7 @@
  *   WP_BASE=http://localhost:8918 MATS_WP_PORT=8918 FULL_BASE=http://localhost:8950 \
  *     node wordpress/tools/qa/cptadmin-fixpass.mjs <shots-dir>
  */
-import { launch, login, BASE } from './wp-login.mjs';
+import { launch, BASE } from './wp-login.mjs';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 
@@ -37,14 +37,41 @@ const php = (arg) =>
 const html = async (base, path) => (await fetch(base + path)).text();
 const f = (name) => `[name="mats_cpta[${name}]"]`;
 
+/*
+ * Logs in straight to a list screen: the dashboard can take very long on
+ * this offline machine (WordPress tries to reach wordpress.org from there).
+ */
+async function login(browser, user, pass, base = BASE, path = '/wp-admin/edit.php?post_type=mats_team') {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const page = await context.newPage();
+  await page.goto(`${base}/wp-login.php?redirect_to=${encodeURIComponent(base + path)}`);
+  await page.fill('#user_login', user);
+  await page.fill('#user_pass', pass);
+  await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 90000 }), page.click('#wp-submit')]);
+  return page;
+}
+
 const browser = await launch();
 const jsErrors = [];
 function watch(page, who) {
   page.on('pageerror', (e) => jsErrors.push(`${who} ${page.url()} ${e.message}`));
   page.on('dialog', (d) => d.accept());
 }
+/*
+ * Saves the edit form. WordPress disables the buttons while it autosaves a
+ * new post (after the title is typed) and then rewrites the address with
+ * history.replaceState — a "navigation" for Playwright — so wait for the
+ * buttons and for the real reload after saving (…&message=N).
+ */
 async function submit(page, selector = '#publish') {
-  await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click(selector)]);
+  await page.waitForFunction((sel) => {
+    const b = document.querySelector(sel);
+    return b && !b.disabled && !b.classList.contains('disabled');
+  }, selector);
+  await Promise.all([
+    page.waitForNavigation({ url: (u) => u.searchParams.has('message'), waitUntil: 'load', timeout: 60000 }),
+    page.click(selector),
+  ]);
 }
 
 /* ═══ Editor ═══════════════════════════════════════════════════════════ */
@@ -225,16 +252,7 @@ await ed.context().close();
 
 /* ═══ Full site (read only) ═══════════════════════════════════════════ */
 if (FULL) {
-  const page = await (async () => {
-    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
-    const p = await context.newPage();
-    /* straight to the list: the dashboard of the full site can be slow (remote widgets) */
-    await p.goto(`${FULL}/wp-login.php?redirect_to=${encodeURIComponent(`${FULL}/wp-admin/edit.php?post_type=mats_expert`)}`);
-    await p.fill('#user_login', 'admin');
-    await p.fill('#user_pass', 'admin-local-pass');
-    await Promise.all([p.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 90000 }), p.click('#wp-submit')]);
-    return p;
-  })();
+  const page = await login(browser, 'admin', 'admin-local-pass', FULL, '/wp-admin/edit.php?post_type=mats_expert');
   watch(page, 'full');
   await page.goto(`${FULL}/wp-admin/edit.php?post_type=mats_expert`);
   const cells = await page.locator('#the-list .column-mats_who').allTextContents();

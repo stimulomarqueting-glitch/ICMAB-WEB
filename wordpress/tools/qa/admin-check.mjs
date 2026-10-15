@@ -5,13 +5,16 @@
  *   WP_BASE=http://localhost:8915 node wordpress/tools/qa/admin-check.mjs [outDir]
  *
  * Needs wordpress/tools/qa/admin-setup.php first (editor user + content).
- * Prints a JSON report; exits 1 when an assertion fails.
+ * The page / post ids come from admin-ids.php (they differ between
+ * databases). Prints a JSON report; exits 1 when an assertion fails.
  */
 import { execSync } from 'node:child_process';
 import { launch, login, closeWelcome, BASE } from './wp-login.mjs';
 
 const OUT = process.argv[2] || '/tmp/claude-0/-home-user-ICMAB-WEB/ae5d27f5-1af0-537f-966f-1d2257e6cfbd/scratchpad/admin/shots';
 const EDITOR = ['editora', 'editora-local-pass'];
+const PORT = new URL(BASE).port;
+const IDS = JSON.parse(execSync(`MATS_WP_PORT=${PORT} php /home/user/wpsite-cli.php ${new URL('./admin-ids.php', import.meta.url).pathname}`).toString());
 const failures = [];
 const report = {};
 
@@ -100,7 +103,7 @@ const browser = await launch();
   check(/usuario o la contraseña no son correctos/.test(report.loginError), 'generic login error');
   await p.screenshot({ path: `${OUT}/login-error.png` });
   /* comments endpoint */
-  const res = await p.request.post(`${BASE}/wp-comments-post.php`, { form: { comment_post_ID: '53', comment: 'spam', author: 'x', email: 'x@example.org' } });
+  const res = await p.request.post(`${BASE}/wp-comments-post.php`, { form: { comment_post_ID: String(IDS.post), comment: 'spam', author: 'x', email: 'x@example.org' } });
   report.commentsPostStatus = res.status();
   check(res.status() === 403, 'wp-comments-post.php answers 403');
   const xmlrpc = await p.request.post(`${BASE}/xmlrpc.php`, { data: '<?xml version="1.0"?><methodCall><methodName>pingback.ping</methodName></methodCall>', headers: { 'Content-Type': 'text/xml' } });
@@ -136,18 +139,17 @@ const browser = await launch();
   report.adminTrashLinksOnStructural = await page.$$eval('#the-list tr', (rows) => rows.filter((r) => r.querySelector('.mats-row-locked') && r.querySelector('.row-actions .trash')).length);
   check(report.adminTrashLinksOnStructural === 0, 'no trash link on structural pages (admin)');
 
-  report.adminProduct = await openEditor(page, '/wp-admin/post.php?post=37&action=edit', 'admin-editor-product');
+  report.adminProduct = await openEditor(page, `/wp-admin/post.php?post=${IDS.product}&action=edit`, 'admin-editor-product');
   check(report.adminProduct.templateLock !== 'all', 'admins can change the structure');
   check(report.adminProduct.insertable.includes('core/html'), 'admins get Custom HTML on pages');
-  report.adminPost = await openEditor(page, '/wp-admin/post.php?post=53&action=edit', 'admin-editor-post');
+  report.adminPost = await openEditor(page, `/wp-admin/post.php?post=${IDS.post}&action=edit`, 'admin-editor-post');
   await page.close();
 }
 
 /* ── editor ───────────────────────────────────────────────────────── */
 /* release the edit locks the administrator just took (no "already being edited" dialog) */
 try {
-  const port = new URL(BASE).port;
-  execSync(`MATS_WP_PORT=${port} php /home/user/wpsite-cli.php ${new URL('./admin-unlock.php', import.meta.url).pathname}`, { stdio: 'ignore' });
+  execSync(`MATS_WP_PORT=${PORT} php /home/user/wpsite-cli.php ${new URL('./admin-unlock.php', import.meta.url).pathname}`, { stdio: 'ignore' });
 } catch (e) {
   /* not critical */
 }
@@ -183,7 +185,7 @@ try {
   report.editorQuickEditOnStructural = await page.$$eval('#the-list tr', (rows) => rows.filter((r) => r.querySelector('.mats-row-locked') && r.querySelector('.row-actions .inline')).length);
   check(report.editorQuickEditOnStructural === 0, 'no quick edit on structural pages (editor)');
 
-  report.editorProduct = await openEditor(page, '/wp-admin/post.php?post=37&action=edit', 'editor-editor-product');
+  report.editorProduct = await openEditor(page, `/wp-admin/post.php?post=${IDS.product}&action=edit`, 'editor-editor-product');
   const ep = report.editorProduct;
   check(ep.templateLock === 'all', 'structure locked for editors on structural pages');
   check(ep.codeEditingEnabled === false && ep.canLockBlocks === false, 'no code editor / lock for editors');
@@ -191,14 +193,16 @@ try {
   check(!/\bSlug\b|\bParent\b/.test(ep.sidebar), 'slug and parent rows hidden');
   check(ep.allowed.every((n) => n.startsWith('matsurfer/')), 'sections pages: only MatSurfer sections');
 
-  report.editorLegal = await openEditor(page, '/wp-admin/post.php?post=49&action=edit', 'editor-editor-legal');
+  report.editorLegal = await openEditor(page, `/wp-admin/post.php?post=${IDS.legal}&action=edit`, 'editor-editor-legal');
   check(report.editorLegal.allowed.every((n) => n.startsWith('core/')) && report.editorLegal.allowed.includes('core/table'), 'legal page: core text blocks');
   check(report.editorLegal.templateLock !== 'all', 'legal page is editable text');
 
-  report.editorPost = await openEditor(page, '/wp-admin/post.php?post=53&action=edit', 'editor-editor-post');
+  report.editorPost = await openEditor(page, `/wp-admin/post.php?post=${IDS.post}&action=edit`, 'editor-editor-post');
   const po = report.editorPost;
-  check(po.allowed.includes('core/embed') && po.allowed.includes('matsurfer/page-cta') && !po.allowed.includes('core/html') && !po.allowed.includes('core/shortcode') && !po.allowed.includes('matsurfer/faq'), 'news: writing blocks + page-cta only');
+  check(po.allowed.includes('core/embed') && !po.allowed.includes('matsurfer/page-cta') && !po.allowed.some((n) => n.startsWith('matsurfer/')) && !po.allowed.includes('core/html') && !po.allowed.includes('core/shortcode'), 'news: writing blocks only (no page-cta: single.php closes every article)');
   check(po.disableCustomColors === true && po.disableCustomFontSizes === true && po.dropCap === false, 'no free colours or font sizes, no drop cap');
+  check(JSON.stringify((po.palette?.theme || []).map((c) => c.slug)) === JSON.stringify(['ink', 'coral', 'violet', 'plum', 'cream']), 'news: brand palette (theme.json) offered');
+  check(JSON.stringify((po.fontSizes?.theme || []).map((c) => c.slug)) === JSON.stringify(['small', 'normal', 'large', 'x-large']), 'news: S/M/L/XL font sizes offered');
   /* the paragraph inspector has no colour / typography / dimension panels for editors */
   report.editorParagraphInspector = await page.evaluate(() => {
     const be = wp.data.select('core/block-editor');

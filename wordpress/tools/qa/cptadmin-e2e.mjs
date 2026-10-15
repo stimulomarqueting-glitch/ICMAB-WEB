@@ -9,7 +9,7 @@
  * Run from the repo root:
  *   WP_BASE=http://localhost:8918 MATS_WP_PORT=8918 node wordpress/tools/qa/cptadmin-e2e.mjs <shots-dir>
  */
-import { launch, login, BASE } from './wp-login.mjs';
+import { launch, BASE } from './wp-login.mjs';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 
@@ -31,6 +31,20 @@ const cli = (lang = 'es') =>
   );
 const html = async (path) => (await fetch(BASE + path)).text();
 
+/*
+ * Logs in straight to a list screen: the dashboard can take very long on
+ * this offline machine (WordPress tries to reach wordpress.org from there).
+ */
+async function login(browser, user, pass, base = BASE, path = '/wp-admin/edit.php?post_type=mats_team') {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const page = await context.newPage();
+  await page.goto(`${base}/wp-login.php?redirect_to=${encodeURIComponent(base + path)}`);
+  await page.fill('#user_login', user);
+  await page.fill('#user_pass', pass);
+  await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 90000 }), page.click('#wp-submit')]);
+  return page;
+}
+
 const browser = await launch();
 const jsErrors = [];
 const dialogs = [];
@@ -43,8 +57,21 @@ function watch(page, who) {
   });
 }
 
+/*
+ * Saves the edit form. WordPress disables the buttons while it autosaves a
+ * new post (after the title is typed) and then rewrites the address with
+ * history.replaceState — a "navigation" for Playwright — so wait for the
+ * buttons and for the real reload after saving (…&message=N).
+ */
 async function submit(page, selector = '#publish') {
-  await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click(selector)]);
+  await page.waitForFunction((sel) => {
+    const b = document.querySelector(sel);
+    return b && !b.disabled && !b.classList.contains('disabled');
+  }, selector);
+  await Promise.all([
+    page.waitForNavigation({ url: (u) => u.searchParams.has('message'), waitUntil: 'load', timeout: 60000 }),
+    page.click(selector),
+  ]);
 }
 
 async function pickMedia(page, opener, id) {
@@ -259,7 +286,7 @@ pub = await html('/es/investigacion/');
 ok(pub.includes(paper) && pub.includes('Descripción en español del artículo de QA.'), 'public: /es/investigacion/ shows the publication in Spanish');
 await ed.goto(`${BASE}/wp-admin/edit.php?post_type=mats_publication`);
 {
-  const rows = await ed.locator('#the-list tr').evaluateAll((trs) => trs.map((tr) => [tr.querySelector('.row-title')?.textContent || '', Number(tr.querySelector('.column-mats_year')?.textContent || 0)]));
+  const rows = await ed.locator('#the-list tr').evaluateAll((trs) => trs.map((tr) => [tr.querySelector('.row-title')?.textContent || '', Number(tr.querySelector('.column-mats_year')?.textContent) || 0]));
   const at = rows.findIndex((r) => r[0].includes(paper));
   const years = rows.map((r) => r[1]);
   ok(at !== -1 && years.every((y, i) => i === 0 || y <= years[i - 1]), 'pubs list: newest year first (website order)');

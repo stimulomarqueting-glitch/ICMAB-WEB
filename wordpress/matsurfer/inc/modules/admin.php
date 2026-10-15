@@ -17,6 +17,9 @@
  *  - login screen with the MatSurfer logo and colours, logo → home page
  *  - media: upload advice, big images scaled to 2560 px, JPEG quality 82,
  *    no SVG, very heavy images refused with a friendly message
+ *  - news: no Tags (the theme never shows them; categories only)
+ *  - administrators: a notice when WordPress' Spanish translation is not
+ *    installed (the admin would stay half in English for the ICMAB team)
  *  (XML-RPC, login errors and lock, user enumeration, headers, comment
  *  feeds and dangerous uploads are handled by inc/modules/security.php)
  *
@@ -29,6 +32,7 @@
  *   mats_admin_tiles           the tiles of the welcome panel
  *   mats_guide_data            the guide content (inc/data/guide.php)
  *   mats_admin_max_image_mb    heaviest photo accepted (MB, default 20)
+ *   mats_admin_disable_tags    false keeps the Tags of news articles (default true)
  *
  * @package matsurfer
  */
@@ -178,14 +182,7 @@ add_action(
 
 /* comment feeds: redirected to the home page by inc/modules/security.php */
 
-/* pingbacks: no X-Pingback header (XML-RPC itself is off: inc/modules/security.php) */
-add_filter(
-	'wp_headers',
-	static function ( $headers ) {
-		unset( $headers['X-Pingback'] );
-		return $headers;
-	}
-);
+/* pingbacks: the X-Pingback header and XML-RPC are removed by inc/modules/security.php */
 /* never ping the sites a news article links to */
 add_action(
 	'pre_ping',
@@ -264,6 +261,21 @@ add_filter(
 	},
 	10,
 	2
+);
+
+/*
+ * No Tags for news articles: the theme never shows them (it uses
+ * categories), so tags typed by an editor would silently do nothing.
+ * This removes the Noticias → Tags screen and the Tags panel.
+ */
+add_action(
+	'init',
+	static function () {
+		if ( apply_filters( 'mats_admin_disable_tags', true ) ) {
+			unregister_taxonomy_for_object_type( 'post_tag', 'post' );
+		}
+	},
+	20
 );
 
 /* list screen messages ("1 noticia movida a la papelera") */
@@ -560,8 +572,8 @@ function mats_admin_tiles(): array {
 
 	/* structured content */
 	$types = array(
-		'mats_team'        => array( 'groups', 'Equipo', 'Las personas del equipo: foto, cargo y biografía en los dos idiomas.' ),
-		'mats_application' => array( 'screenoptions', 'Aplicaciones', 'Los campos de aplicación del dispositivo, con su reto, uso y beneficio.' ),
+		'mats_team'        => array( 'groups', 'Equipo', 'Las personas del equipo: retrato, recorte sin fondo, cargo y biografía en los dos idiomas.' ),
+		'mats_application' => array( 'screenoptions', 'Aplicaciones', 'Los campos de aplicación del dispositivo: la necesidad, qué permite MatSurfer y el beneficio.' ),
 		'mats_publication' => array( 'media-document', 'Publicaciones', 'Los artículos científicos que aparecen en Casos de estudio.' ),
 		'mats_expert'      => array( 'format-quote', 'Valoraciones', 'Las citas de investigadores que han probado el dispositivo.' ),
 	);
@@ -601,7 +613,7 @@ function mats_admin_tiles(): array {
 		$tiles['settings'] = array(
 			'icon'  => 'admin-settings',
 			'title' => 'Ajustes de la web',
-			'text'  => 'Menú de arriba, pie de página y el email al que llegan los contactos.',
+			'text'  => 'Menú de arriba, pie de página, textos para Google, cierre de las noticias y el email de contacto.',
 			'url'   => mats_admin_page_url( $settings ),
 		);
 	}
@@ -693,10 +705,11 @@ function mats_admin_status_label( string $status ): string {
 
 /** Dashboard widget: the latest news articles, with status, language and missing translations. */
 function mats_admin_news_widget(): void {
+	$all  = current_user_can( 'edit_others_posts' );
 	$args = array(
 		'post_type'      => 'post',
 		'post_status'    => array( 'publish', 'draft', 'pending', 'future', 'private' ),
-		'posts_per_page' => 6,
+		'posts_per_page' => $all ? 6 : 30,
 		'orderby'        => 'modified',
 		'order'          => 'DESC',
 		'no_found_rows'  => true,
@@ -705,6 +718,14 @@ function mats_admin_news_widget(): void {
 		$args['lang'] = ''; // every language
 	}
 	$posts = get_posts( $args );
+	if ( ! $all ) {
+		/* authors / contributors: published news + their own drafts, never other people's unpublished titles */
+		$posts = array_slice(
+			array_values( array_filter( $posts, static fn( $p ) => 'publish' === $p->post_status || current_user_can( 'edit_post', $p->ID ) ) ),
+			0,
+			6
+		);
+	}
 	echo '<div class="mats-newsw">';
 	if ( ! $posts ) {
 		echo '<p class="mats-newsw__empty">' . esc_html( 'Todavía no hay noticias. Cuando escribas la primera aparecerá aquí.' ) . '</p>';
@@ -755,6 +776,25 @@ function mats_admin_guide_data(): array {
 	$file = MATS_DIR . '/inc/data/guide.php';
 	$data = is_readable( $file ) ? (array) require $file : array();
 	return (array) apply_filters( 'mats_guide_data', $data );
+}
+
+/** Is WordPress' Spanish translation installed (so the admin can be in Spanish)? */
+function mats_admin_spanish_available(): bool {
+	return str_starts_with( (string) get_option( 'WPLANG' ), 'es' ) || in_array( 'es_ES', get_available_languages(), true );
+}
+
+/**
+ * Conditions a guide block can depend on ( 'when' => … ):
+ *   es_admin / no_es_admin  WordPress' Spanish translation is (not) installed
+ */
+function mats_admin_guide_when( string $condition ): bool {
+	switch ( $condition ) {
+		case 'es_admin':
+			return mats_admin_spanish_available();
+		case 'no_es_admin':
+			return ! mats_admin_spanish_available();
+	}
+	return true;
 }
 
 /** Values of the {placeholders} used in the guide. */
@@ -939,6 +979,9 @@ function mats_admin_render_guide(): void {
 				<div class="mats-guide__body">
 					<?php
 					foreach ( (array) ( $section['content'] ?? array() ) as $block ) {
+						if ( ! mats_admin_guide_when( (string) ( $block['when'] ?? '' ) ) ) {
+							continue;
+						}
 						echo mats_admin_guide_block( (array) $block ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in the formatter
 					}
 					?>
@@ -964,11 +1007,11 @@ add_action(
 		$map = array(
 			'edit-post'             => array( 'noticias', 'Noticias', 'Para escribir una noticia pulsa «Escribir una noticia». Para traducirla, usa el «+» de la columna del otro idioma.' ),
 			'edit-page'             => array( 'textos', 'Páginas', 'Abre una página para cambiar sus textos y fotos. Las páginas principales están protegidas: no se pueden borrar ni cambiar de dirección.' ),
-			'upload'                => array( 'consejos-fotos', 'Fotos y archivos', 'Sube fotos JPG de unos 2000 px de ancho y menos de 1 MB, y escribe siempre su «Texto alternativo».' ),
-			'edit-mats_team'        => array( 'fichas', 'Equipo', 'Cada persona tiene sus textos en inglés y en español en la misma ficha. Solo se ven en la web las publicadas.' ),
-			'edit-mats_application' => array( 'fichas', 'Aplicaciones', 'Cada aplicación tiene sus textos en inglés y en español en la misma ficha. El campo «Orden» decide la posición.' ),
-			'edit-mats_publication' => array( 'fichas', 'Publicaciones', 'Las publicaciones se ordenan solas: primero las más recientes.' ),
-			'edit-mats_expert'      => array( 'fichas', 'Valoraciones', 'Cada valoración tiene la cita en inglés y en español. Solo se ven en la web las publicadas.' ),
+			'upload'                => array( 'consejos-fotos', 'Fotos y archivos', 'Sube fotos JPG de unos 2000 px de ancho y menos de 1 MB (excepto el «Recorte sin fondo» del equipo: WebP o PNG con fondo transparente), y escribe siempre su «Texto alternativo».' ),
+			'edit-mats_team'        => array( 'fichas', 'Equipo', 'Cada persona tiene sus textos en inglés y en español en la misma ficha, y dos fotos: el «Retrato» y el «Recorte sin fondo». Las flechas ▲ ▼ cambian el orden. Solo se ven en la web las fichas publicadas.' ),
+			'edit-mats_application' => array( 'fichas', 'Aplicaciones', 'Cada aplicación tiene sus textos en inglés y en español en la misma ficha. Las flechas ▲ ▼ (o el recuadro «Orden en la web» de la ficha) deciden la posición.' ),
+			'edit-mats_publication' => array( 'fichas', 'Publicaciones', 'Las publicaciones se ordenan solas por año: primero las más recientes.' ),
+			'edit-mats_expert'      => array( 'fichas', 'Valoraciones', 'Cada valoración tiene la cita en inglés y en español. Se ordenan solas por fecha, y solo se ven en la web las publicadas.' ),
 		);
 		if ( ! $screen instanceof WP_Screen || ! isset( $map[ $screen->id ] ) ) {
 			return;
@@ -1002,6 +1045,46 @@ add_filter(
 	20
 );
 add_filter( 'update_footer', static fn( $text ) => mats_admin_is_admin() ? $text : '', 20 );
+
+/*
+ * Administrators: WordPress' Spanish translation is missing, so the ICMAB
+ * team would see the admin half in English (Dashboard, Pages, Media…).
+ * The setup wizard downloads it; when the server could not, this says how.
+ * "No volver a mostrar" hides it for that administrator.
+ */
+add_action(
+	'admin_notices',
+	static function () {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || ! in_array( $screen->id, array( 'dashboard', 'toplevel_page_' . MATS_GUIDE_PAGE ), true ) || ! mats_admin_is_admin() || mats_admin_spanish_available() ) {
+			return;
+		}
+		if ( get_user_meta( get_current_user_id(), 'mats_hide_es_notice', true ) ) {
+			return;
+		}
+		$hide = wp_nonce_url( admin_url( 'admin-post.php?action=mats_hide_es_notice' ), 'mats_hide_es_notice' );
+		echo '<div class="notice notice-warning mats-es-notice"><p>';
+		echo '<strong>' . esc_html( 'El panel de WordPress no está en español.' ) . '</strong> ';
+		echo esc_html( 'Falta la traducción de WordPress al español, así que el equipo del ICMAB verá parte de los menús en inglés (Dashboard, Pages, Media…). Para instalarla: Ajustes → Generales → «Idioma del sitio» → Español → Guardar cambios (WordPress la descarga en ese momento). La web pública no cambia: cada idioma usa el suyo.' );
+		echo '</p><p>';
+		echo '<a class="button button-primary" href="' . esc_url( admin_url( 'options-general.php' ) ) . '">' . esc_html( 'Ir a Ajustes → Generales' ) . '</a> ';
+		echo '<a class="button" href="' . esc_url( $hide ) . '">' . esc_html( 'No volver a mostrar' ) . '</a>';
+		echo '</p></div>';
+	}
+);
+
+add_action(
+	'admin_post_mats_hide_es_notice',
+	static function () {
+		check_admin_referer( 'mats_hide_es_notice' );
+		if ( ! mats_admin_is_admin() ) {
+			wp_die( esc_html( 'No tienes permiso para hacer esto.' ), '', array( 'response' => 403 ) );
+		}
+		update_user_meta( get_current_user_id(), 'mats_hide_es_notice', 1 );
+		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url() );
+		exit;
+	}
+);
 
 /* "Please notify the site administrator" banners are not for editors */
 add_action(
@@ -1133,7 +1216,7 @@ function mats_admin_upload_tip(): void {
 		esc_html( 'Antes de subir una foto:' ),
 		esc_html(
 			sprintf(
-				'mejor en JPG, de unos 2000 píxeles de ancho y que pese menos de 1 MB (las más grandes se reducen solas a 2560 px). Máximo por archivo: %s. No se aceptan SVG. Después de subirla escribe su «Texto alternativo»: qué se ve en la foto.',
+				'mejor en JPG, de unos 2000 píxeles de ancho y que pese menos de 1 MB (las más grandes se reducen solas a 2560 px), excepto el «Recorte sin fondo» del equipo: WebP o PNG con fondo transparente. Máximo por archivo: %s. No se aceptan SVG. Después de subirla escribe su «Texto alternativo»: qué se ve en la foto.',
 				size_format( wp_max_upload_size() )
 			)
 		)
@@ -1150,7 +1233,7 @@ add_action(
 			return;
 		}
 		echo '<div class="notice notice-info mats-media-notice"><p>';
-		echo esc_html( 'Fotos: JPG de unos 2000 px de ancho y menos de 1 MB. Escribe siempre el «Texto alternativo» (describe lo que se ve). Una foto que se usa en la web no se debe borrar: sustitúyela en la página.' );
+		echo esc_html( 'Fotos: JPG de unos 2000 px de ancho y menos de 1 MB, excepto el «Recorte sin fondo» del equipo: WebP o PNG con fondo transparente. Escribe siempre el «Texto alternativo» (describe lo que se ve). Una foto que se usa en la web no se debe borrar: sustitúyela en la página.' );
 		echo ' <a href="' . esc_url( mats_admin_guide_url( 'consejos-fotos' ) ) . '">' . esc_html( 'Más consejos en la guía' ) . '</a></p></div>';
 	}
 );

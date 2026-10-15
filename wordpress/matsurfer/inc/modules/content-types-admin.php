@@ -1654,40 +1654,23 @@ add_action(
 		// phpcs:enable
 		$sort = mats_cpta_config( $type )['sort'] ?? 'order';
 
-		$by_meta = static function ( string $field, string $dir, bool $numeric ) use ( $query ) {
-			$clause = array(
-				'key'     => mats_meta_key( $field ),
-				'compare' => 'EXISTS',
-			);
-			if ( $numeric ) {
-				$clause['type'] = 'NUMERIC';
-			}
+		/* by a stored value (year, date): see the posts_clauses filter below */
+		$by_meta = static function ( string $field, string $dir ) use ( $query ) {
+			$query->set( 'orderby', 'none' );
 			$query->set(
-				'meta_query',
+				'mats_cpta_sort',
 				array(
-					'relation'   => 'OR',
-					'mats_sort'  => $clause,
-					'mats_unset' => array(
-						'key'     => mats_meta_key( $field ),
-						'compare' => 'NOT EXISTS',
-					),
-				)
-			);
-			$query->set(
-				'orderby',
-				array(
-					'mats_sort'  => $dir,
-					'menu_order' => 'ASC',
-					'date'       => 'ASC',
+					'key' => mats_meta_key( $field ),
+					'dir' => 'DESC' === $dir ? 'DESC' : 'ASC',
 				)
 			);
 		};
 
 		if ( '' === $orderby ) {
 			if ( 'year' === $sort ) {
-				$by_meta( 'year', 'DESC', true );
+				$by_meta( 'year', 'DESC' );
 			} elseif ( 'date' === $sort ) {
-				$by_meta( 'date', 'DESC', false );
+				$by_meta( 'date', 'DESC' );
 			} else {
 				$query->set(
 					'orderby',
@@ -1698,9 +1681,9 @@ add_action(
 				);
 			}
 		} elseif ( 'mats_year' === $orderby ) {
-			$by_meta( 'year', $order, true );
+			$by_meta( 'year', $order );
 		} elseif ( 'mats_date' === $orderby ) {
-			$by_meta( 'date', $order, false );
+			$by_meta( 'date', $order );
 		} elseif ( 'menu_order' === $orderby ) {
 			$query->set(
 				'orderby',
@@ -1711,6 +1694,34 @@ add_action(
 			);
 		}
 	}
+);
+
+/*
+ * Sorting by year / date: records without the value go last (like on the
+ * website), whatever the direction. A sub-select per record instead of a
+ * meta_query: with EXISTS / NOT EXISTS the records without the value were
+ * sorted by whatever other meta row the database picked (e.g. the edit
+ * lock time), so a new draft could jump to the top. Years (4 digits) and
+ * dates (YYYY-MM) sort correctly as text, in MySQL and SQLite alike.
+ */
+add_filter(
+	'posts_clauses',
+	static function ( $clauses, $query ) {
+		$sort = $query instanceof WP_Query ? $query->get( 'mats_cpta_sort' ) : null;
+		if ( ! is_array( $sort ) || empty( $sort['key'] ) || ! is_admin() ) {
+			return $clauses;
+		}
+		global $wpdb;
+		$dir   = 'DESC' === ( $sort['dir'] ?? '' ) ? 'DESC' : 'ASC';
+		$value = $wpdb->prepare(
+			"(SELECT MAX(mats_sort.meta_value) FROM {$wpdb->postmeta} AS mats_sort WHERE mats_sort.post_id = {$wpdb->posts}.ID AND mats_sort.meta_key = %s AND mats_sort.meta_value <> '')",
+			(string) $sort['key']
+		);
+		$clauses['orderby'] = "CASE WHEN {$value} IS NULL THEN 1 ELSE 0 END ASC, {$value} {$dir}, {$wpdb->posts}.menu_order ASC, {$wpdb->posts}.post_date ASC, {$wpdb->posts}.ID ASC";
+		return $clauses;
+	},
+	10,
+	2
 );
 
 /* row links: "Ver en la web (EN / ES)"; no "Ver"/"Vista previa" */

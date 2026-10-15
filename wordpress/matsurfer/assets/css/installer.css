@@ -99,6 +99,7 @@
 	border-radius: 12px;
 	background: var(--ms-warn-tint);
 	color: var(--ms-ink);
+	scroll-margin-top: 48px; /* below the admin bar when opened at #mats-confirm */
 }
 
 .mats-setup__confirm:focus {

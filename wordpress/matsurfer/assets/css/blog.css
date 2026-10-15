@@ -82,10 +82,14 @@
   max-width: 24ch;
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.08;
+  /* a word wider than the column (chemical names…) breaks instead of being
+     clipped by its rising span; ordinary words still wrap whole */
+  overflow-wrap: anywhere;
 }
 
 .post-hero .post-hero__word {
   display: inline-block;
+  max-width: 100%;
   overflow: hidden;
   vertical-align: bottom;
   padding-bottom: 0.08em;
@@ -300,6 +304,60 @@
   }
 }
 
+/* tags under the article: chips to the tag archive */
+.post-body .post-body__main {
+  min-width: 0;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: clamp(2.25rem, 4vw, 3rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.post-tags .post-tags__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.post-tags .post-tags__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--silica);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  color: var(--text-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-base) var(--ease);
+}
+
+.post-tags .post-tags__chip::before {
+  content: '#';
+  content: '#' / '';
+  margin-right: 0.2rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.post-tags .post-tags__chip:hover {
+  border-color: var(--border-coral-soft);
+  background: linear-gradient(120deg, var(--coral-tint) 0%, var(--bg-panel) 70%);
+  color: var(--coral-dark);
+}
+
 /* ── previous / next article ────────────────────────────────────────── */
 .post-nav {
   padding-block: clamp(2rem, 4vw, 3rem);
@@ -372,6 +430,7 @@
   line-height: 1.28;
   letter-spacing: -0.015em;
   text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .post-nav .post-nav__date {
@@ -438,11 +497,11 @@
   margin-top: 0.85rem;
 }
 
-:is(.mats-prose, .editor-styles-wrapper .is-root-container) > :is(figure, .wp-block-gallery, .wp-block-pullquote, .wp-block-table, .wp-block-embed, .wp-block-video, .wp-block-code, .wp-block-columns) {
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) > :is(figure, .wp-block-gallery, .wp-block-pullquote, .wp-block-table, .wp-block-embed, .wp-block-video, .wp-block-code, .wp-block-columns, .wp-block-file) {
   margin-top: 2.25rem;
 }
 
-:is(.mats-prose, .editor-styles-wrapper .is-root-container) > :is(figure, .wp-block-gallery, .wp-block-pullquote, .wp-block-table, .wp-block-embed, .wp-block-video, .wp-block-code, .wp-block-columns) + * {
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) > :is(figure, .wp-block-gallery, .wp-block-pullquote, .wp-block-table, .wp-block-embed, .wp-block-video, .wp-block-code, .wp-block-columns, .wp-block-file) + * {
   margin-top: 2.25rem;
 }
 
@@ -776,6 +835,105 @@
   max-width: 100%;
 }
 
+/* audio: the player on a white plate, full column width */
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-audio {
+  margin-inline: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-audio audio {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-audio > figcaption {
+  margin-inline: 0.4rem;
+}
+
+/* file download: a panel with the file name and a coral pill button
+   (site: name link + button link; editor: the same inside a wrapper) */
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-file,
+.editor-styles-wrapper .is-root-container .wp-block-file .wp-block-file__content-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-file {
+  margin-inline: 0;
+  padding: 1rem 1rem 1rem 1.35rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.94rem;
+  line-height: 1.4;
+}
+
+.editor-styles-wrapper .is-root-container .wp-block-file .wp-block-file__content-wrapper {
+  flex: 1 1 100%;
+}
+
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-file :is(.wp-block-file__embed, .wp-block-file__preview) {
+  flex: 1 1 100%;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-file a:where(:not(.wp-block-file__button)) {
+  flex: 1 1 12rem;
+  min-width: 0;
+  padding-left: 1.9rem;
+  background: var(--grad-vapor-line) no-repeat 0 0.62em / 1.25rem 2px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+:is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-file .wp-block-file__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 0 auto;
+  padding: 0.7rem 1.15rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+
+.mats-prose .wp-block-file .wp-block-file__button:is(:hover, :focus-visible) {
+  background: linear-gradient(100deg, var(--coral) 0%, var(--magenta) 100%);
+  color: #fff;
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(38, 36, 31, 0.14);
+}
+
+@media (max-width: 40rem) {
+  .mats-prose .wp-block-file .wp-block-file__button {
+    flex: 1 1 100%;
+    margin: 0;
+  }
+}
+
 /* tables: mono header on violet mist, hairline rows, scroll on phones */
 :is(.mats-prose, .editor-styles-wrapper .is-root-container) .wp-block-table {
   margin-inline: 0;
@@ -1015,6 +1173,17 @@
 }
 
 /* ── list chrome: News page, archives, search ───────────────────────── */
+/* the PageHero headers of these views can carry visitors' words (a long
+   search query) or long names: a word wider than the column breaks instead
+   of being clipped by its rising span */
+:is(.mats-blog, .mats-blog--404, .mats-prose-page) .phero .phero__title {
+  overflow-wrap: anywhere;
+}
+
+:is(.mats-blog, .mats-blog--404, .mats-prose-page) .phero .phero__word {
+  max-width: 100%;
+}
+
 .blog-list {
   padding-block: clamp(2rem, 4vw, 3rem) clamp(2.75rem, 5.5vw, 4.25rem);
 }

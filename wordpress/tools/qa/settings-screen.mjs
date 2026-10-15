@@ -6,8 +6,9 @@
  *  - saving changes the header / footer in both languages; only values that
  *    differ from the originals are stored; HTML is stripped, lengths capped
  *  - email validation, patent code synced into the footer's last line
- *  - "Restaurar valores originales" per section (other edits kept),
- *    "Volver al original", Enter saves (never restores)
+ *  - "Restaurar valores originales" per section (other edits kept; the
+ *    contact email is never reset), "Volver al original", Enter saves
+ *    (never restores)
  *  - security: no nonce → refused; author with a forged request → 403
  * Needs settings-setup.php (pages + users editora / autora). Exit 1 on failure.
  */
@@ -78,6 +79,8 @@ const browser = await launch();
   for (const section of ['header', 'footer', 'seo', 'blog', 'contact']) {
     await Promise.all([admin.waitForNavigation(), admin.click(`button.mats-set__restore[value="${section}"]`)]);
   }
+  /* the section restore never touches the contact email: start from "not confirmed yet" */
+  php("$s = get_option( 'mats_settings' ); unset( $s['global']['contact_email'] ); update_option( 'mats_settings', $s );");
   await admin.context().close();
 }
 
@@ -258,9 +261,11 @@ php("mats_update_setting( 'form_en', 99 ); mats_update_setting( 'qa_custom', 'ke
   }
   const en = await chrome(browser, `${WP}/`);
   const es = await chrome(browser, `${WP}/es/`);
-  check(en.bottom === 'EP 4483 979 B1 · Surfaces for all.' && es.bottom === 'EP 4483 979 B1 · Superficies para todos.' && en.mail === 'mailto:matsurfer@icmab.es' && en.cols[1] === 'Explore', 'all sections restored', JSON.stringify({ b: en.bottom, m: en.mail, c: en.cols[1] }));
+  check(en.bottom === 'EP 4483 979 B1 · Surfaces for all.' && es.bottom === 'EP 4483 979 B1 · Superficies para todos.' && en.cols[1] === 'Explore', 'all sections restored', JSON.stringify({ b: en.bottom, c: en.cols[1] }));
+  check(en.mail === 'mailto:transfer@icmab.es', 'the section restore keeps the contact email', en.mail);
   await admin.context().close();
 }
+php("$s = get_option( 'mats_settings' ); unset( $s['global']['contact_email'] ); update_option( 'mats_settings', $s );");
 
 php(`$s = get_option( 'mats_settings' ); unset( $s['global']['form_en'], $s['en']['qa_custom'] ); $f = json_decode( '${formEnBefore}', true ); if ( null !== $f ) { $s['global']['form_en'] = $f; } update_option( 'mats_settings', $s );`);
 await browser.close();

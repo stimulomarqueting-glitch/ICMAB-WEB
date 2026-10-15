@@ -70,7 +70,8 @@ while ( have_posts() ) :
 							<?php the_content(); ?>
 						</div>
 						<?php
-						$mats_tags = get_the_tags();
+						/* only while articles have the Tags box (the admin module removes it by default): an editor must be able to remove what is shown */
+						$mats_tags = is_object_in_taxonomy( 'post', 'post_tag' ) ? get_the_tags() : false;
 						if ( $mats_tags && ! is_wp_error( $mats_tags ) ) :
 							?>
 							<nav class="post-tags" aria-label="<?php echo esc_attr( mats_t( 'tag' ) ); ?>">

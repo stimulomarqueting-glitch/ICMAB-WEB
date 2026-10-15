@@ -79,9 +79,17 @@
     var editPost = useDispatch('core/editor').editPost;
 
     var keys = cfg.keys;
-    var seoTitle = post.meta[keys.title] || '';
-    var seoDesc = post.meta[keys.description] || '';
+    var shipped = cfg.shipped || {};
+    /* home page: a field that still holds the original copy (put there by the
+       installer) counts as empty, exactly like on the site (seo.php) */
+    function stored(field) {
+      var value = post.meta[keys[field]] || '';
+      return (shipped[field] || []).indexOf(plain(value)) !== -1 ? '' : value;
+    }
+    var seoTitle = stored('title');
+    var seoDesc = stored('description');
     var isPost = cfg.postType === 'post';
+    var hasExcerpt = cfg.excerpt !== false;
 
     function setMeta(key, value) {
       var patch = {};
@@ -96,7 +104,7 @@
       : docTitle && docTitle !== cfg.brand
         ? docTitle + cfg.sep + cfg.brand
         : cfg.brand;
-    var excerpt = plain(post.excerpt);
+    var excerpt = hasExcerpt ? plain(post.excerpt) : '';
     var autoDesc = cfg.isFront ? cfg.siteDesc : excerpt || (isPost ? '' : cfg.siteDesc);
 
     var shownTitle = plain(seoTitle) || autoTitle;
@@ -115,11 +123,17 @@
         : el('p', { className: 'mats-seo__pdesc is-auto' }, 'Se usará el principio del texto de la noticia.')
     );
 
+    var general = '(Ajustes de la web → Textos por defecto para Google)';
+    var titleHelp = cfg.isFront
+      ? 'Si lo dejas vacío se usa el título general de la web ' + general + '.'
+      : 'Si lo dejas vacío se usa el de la vista previa.';
     var descHelp = cfg.isFront
-      ? 'Si lo dejas vacío se usa la descripción general de la web.'
+      ? 'Si lo dejas vacío se usa la descripción general de la web ' + general + '.'
       : isPost
         ? 'Si lo dejas vacío se usa el «Extracto» de la noticia o, si no hay, el principio del texto.'
-        : 'Si lo dejas vacío se usa el «Extracto» de la página o la descripción general de la web.';
+        : hasExcerpt
+          ? 'Si lo dejas vacío se usa el «Extracto» de la página o la descripción general de la web ' + general + '.'
+          : 'Si lo dejas vacío se usa la descripción general de la web ' + general + '.';
 
     return el(
       Panel,
@@ -138,7 +152,7 @@
         el(c.TextControl, Object.assign({}, common, {
           __next40pxDefaultSize: true,
           label: 'Título en Google',
-          help: 'El título azul de Google y el de la pestaña del navegador. Si lo dejas vacío se usa el de la vista previa.',
+          help: 'El título azul de Google y el de la pestaña del navegador. ' + titleHelp,
           placeholder: autoTitle,
           value: seoTitle,
           onChange: function (value) {
@@ -160,7 +174,7 @@
             setMeta(keys.description, value.replace(/\s*\n+\s*/g, ' '));
           },
         })),
-        el(Counter, { value: seoDesc, max: cfg.max.description, min: 50 })
+        el(Counter, { value: seoDesc, max: cfg.max.description, min: (cfg.min && cfg.min.description) || 120 })
       ),
       el(
         'p',

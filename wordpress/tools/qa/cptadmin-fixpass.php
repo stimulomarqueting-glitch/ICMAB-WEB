@@ -380,7 +380,38 @@ $box = (string) ob_get_clean();
 $check( '«Contenido»: heading without .hndle', str_contains( $box, 'class="hndle"' ), false );
 $check( '«Contenido»: plain heading present', str_contains( $box, '<h2 class="mats-cpta-box__title">Contenido</h2>' ), true );
 
-/* ── 8. page cache: one process per case ───────────────────────────── */
+/* ── 8. list sorted by year / date: records without it go last ─────── */
+$no_year = (int) wp_insert_post(
+	array(
+		'post_type'   => 'mats_publication',
+		'post_title'  => 'Fixpass no year',
+		'post_status' => 'draft',
+	)
+);
+update_post_meta( $no_year, '_edit_lock', time() . ':1' ); // the row that used to decide its place
+update_post_meta( $no_year, '_mats_year', '' );
+foreach ( array( 'DESC', 'ASC' ) as $dir ) {
+	$q   = new WP_Query(
+		array(
+			'post_type'      => 'mats_publication',
+			'post_status'    => array( 'publish', 'future', 'draft', 'pending', 'private' ),
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'orderby'        => 'none',
+			'mats_cpta_sort' => array( 'key' => '_mats_year', 'dir' => $dir ),
+		)
+	);
+	$ids   = array_map( 'intval', $q->posts );
+	$years = array_values( array_filter( array_map( static fn( $id ) => (int) get_post_meta( $id, '_mats_year', true ), $ids ) ) );
+	$sorted = $years;
+	'DESC' === $dir ? rsort( $sorted ) : sort( $sorted );
+	$check( "list by year $dir: years in order", $years, $sorted );
+	$tail = array_slice( $ids, count( $years ) );
+	$check( "list by year $dir: records without year last", in_array( $no_year, $tail, true ) && ! array_filter( $tail, static fn( $id ) => '' !== get_post_meta( $id, '_mats_year', true ) ), true );
+}
+wp_delete_post( $no_year, true );
+
+/* ── 9. page cache: one process per case ───────────────────────────── */
 foreach ( array( 'draft-save', 'draft-photo', 'publish', 'update', 'unpublish', 'trash', 'photo', 'move-down', 'move-up' ) as $case ) {
 	$out = array();
 	$code = 0;

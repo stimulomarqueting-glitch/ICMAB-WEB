@@ -12,13 +12,30 @@
  *   overwrite-cancel tick "Sobrescribir…", click step 3, CANCEL the dialog (nothing runs)
  *   overwrite        tick "Sobrescribir…", click step 3, ACCEPT the dialog
  *   notice-gone      the reminder notice is no longer shown on the dashboard
+ *   notice-shown     the reminder notice IS shown on the dashboard (site not ready yet)
+ *   nojs-overwrite-cancel  JS off: tick "Sobrescribir…", click step 3 → the server-rendered
+ *                    confirmation appears and NOTHING has run; "No, volver" → still nothing
+ *   nojs-overwrite   JS off: tick, click step 3, "Sí, sobrescribir los textos" → texts restored
+ *   nojs-overwrite-all  JS off: tick, "Hacerlo todo", confirm → all steps + texts restored
+ *   ajax-noconfirm   AJAX step 3 with overwrite=1 but without confirm=1 → refused (400), nothing ran
  *   mobile           screenshot at phone width
  *   editor-denied    as the Editor "qa-editor" / "qa-editor-pass" (create it first):
  *                    no menu entry, the screen and the AJAX/admin-post handlers refuse
  * Prints every card's ✓/✗ state and messages after each action.
  */
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { BASE, launch, login } from './wp-login.mjs';
+
+const PORT = new URL(BASE).port;
+/** The wizard's saved state (installer-state.php): notice, step times, status. */
+function wizardState() {
+  const out = execFileSync('php', ['/home/user/wpsite-cli.php', new URL('./installer-state.php', import.meta.url).pathname], {
+    env: { ...process.env, MATS_WP_PORT: PORT },
+    encoding: 'utf8',
+  });
+  return JSON.parse(out.slice(out.indexOf('{')));
+}
 
 const args = process.argv.slice(2);
 const shotsArg = args.find((a) => a.startsWith('--shots='));
@@ -132,10 +149,65 @@ for (const action of actions) {
       console.log('  ran after cancel:', busy === 'true' ? 'YES (wrong)' : 'no');
     }
     await report();
+  } else if (action === 'notice-shown') {
+    await page.goto(`${BASE}/wp-admin/index.php`);
+    const notice = await page.$('.mats-setup-notice');
+    console.log('  reminder notice on the dashboard:', notice ? 'shown' : 'NOT SHOWN (wrong)', '| state:', JSON.stringify(wizardState()));
+    if (!notice) failures++;
+  } else if (action.startsWith('nojs-overwrite')) {
+    const all = action === 'nojs-overwrite-all';
+    const accept = action !== 'nojs-overwrite-cancel';
+    const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 1000 }, storageState: await page.context().storageState() });
+    const p = await ctx.newPage();
+    await p.goto(WIZARD);
+    const before = wizardState().times.content || 0;
+    await p.check('.mats-setup__overwrite');
+    await Promise.all([p.waitForNavigation({ timeout: 120000 }), p.click(`button[name="step"][value="${all ? 'all' : 'content'}"]`)]);
+    const box = await p.$('#mats-confirm');
+    const boxText = box ? (await box.textContent()).replace(/\s+/g, ' ').trim() : '';
+    const ranEarly = (wizardState().times.content || 0) !== before;
+    console.log('  after the click:', p.url().replace(BASE, ''));
+    console.log('  confirmation box:', box ? 'shown — ' + boxText.slice(0, 200) : 'NOT SHOWN (wrong)');
+    console.log('  step 3 ran before confirming:', ranEarly ? 'YES (wrong)' : 'no');
+    if (!box || ranEarly) failures++;
+    await snap(`nojs-confirm-${all ? 'all' : 'content'}`, p);
+    if (box) {
+      if (accept) {
+        const t0 = Date.now();
+        await Promise.all([p.waitForNavigation({ timeout: 600000, url: /page=mats-setup/ }), p.click('#mats-confirm button[type="submit"]')]);
+        const after = wizardState();
+        const msgs = await p.$$eval('#mats-step-content .mats-step__messages li', (els) => els.map((li) => li.textContent.trim()));
+        const restored = msgs.some((m) => m.includes('Textos originales restaurados'));
+        console.log(`  confirmed: ${((Date.now() - t0) / 1000).toFixed(1)} s → ${p.url().replace(BASE, '')}`);
+        console.log('  step 3 ran:', after.times.content !== before ? 'yes' : 'NO (wrong)', '| texts restored message:', restored ? 'yes' : 'NO (wrong)');
+        if (after.times.content === before || !restored) failures++;
+        if (all) console.log('  status after:', JSON.stringify(after.status));
+        await snap(`nojs-confirmed-${all ? 'all' : 'content'}`, p);
+      } else {
+        await Promise.all([p.waitForNavigation(), p.click('#mats-confirm a.button')]);
+        const still = (wizardState().times.content || 0) === before;
+        const boxAgain = await p.$('#mats-confirm');
+        console.log('  "No, volver":', p.url().replace(BASE, ''), '| nothing ran:', still ? 'yes' : 'NO (wrong)', '| box gone:', boxAgain ? 'NO (wrong)' : 'yes');
+        if (!still || boxAgain) failures++;
+      }
+    }
+    await ctx.close();
+  } else if (action === 'ajax-noconfirm') {
+    await page.goto(WIZARD);
+    const before = wizardState().times.content || 0;
+    const res = await page.evaluate(async () => {
+      const body = new URLSearchParams({ action: 'mats_installer_step', step: 'content', overwrite: '1', _ajax_nonce: window.matsInstaller.nonce });
+      const r = await fetch(window.matsInstaller.ajaxUrl, { method: 'POST', credentials: 'same-origin', body });
+      return r.status + ' ' + (await r.text()).slice(0, 200);
+    });
+    const ran = (wizardState().times.content || 0) !== before;
+    console.log('  AJAX overwrite without confirm:', res);
+    console.log('  step 3 ran:', ran ? 'YES (wrong)' : 'no');
+    if (!res.startsWith('400') || ran) failures++;
   } else if (action === 'notice-gone') {
     await page.goto(`${BASE}/wp-admin/index.php`);
     const notice = await page.$('.mats-setup-notice');
-    console.log('  reminder notice on the dashboard:', notice ? 'STILL SHOWN' : 'gone');
+    console.log('  reminder notice on the dashboard:', notice ? 'STILL SHOWN' : 'gone', '| state:', JSON.stringify(wizardState()));
     if (notice) failures++;
   } else if (action === 'mobile') {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, storageState: await page.context().storageState() });

@@ -222,6 +222,14 @@ add_filter(
 );
 
 /* ── start clean ──────────────────────────────────────────────────────── */
+/* changing WPLANG makes WordPress forget its update checks (core hook
+   update_option_WPLANG → wp_clean_update_cache), so the next admin page
+   checks wordpress.org again: fine on a real host, a logged warning in this
+   offline sandbox. They are put back at the end. */
+$mats_update_cache = array();
+foreach ( array( 'update_core', 'update_plugins', 'update_themes' ) as $mats_t ) {
+	$mats_update_cache[ $mats_t ] = get_site_transient( $mats_t );
+}
 delete_option( 'WPLANG' );
 delete_site_transient( 'available_translations' );
 $mats_log      = '/home/user/wpsite-data/debug-' . $mats_port . '.log';
@@ -282,12 +290,14 @@ if ( $mats_offline ) {
 	/* WordPress only accepts an installed language in WPLANG: fake a Catalan pack */
 	copy( WP_LANG_DIR . '/es_ES.mo', WP_LANG_DIR . '/ca.mo' );
 	copy( WP_LANG_DIR . '/es_ES.po', WP_LANG_DIR . '/ca.po' );
+	wp_cache_delete( md5( rtrim( WP_LANG_DIR, '/' ) . '/' ), 'translation_files' );
 	update_option( 'WPLANG', 'ca' );
 	$mats_r3 = mats_installer_run_step( 'languages', array() );
 	mats_qa( 'ca' === get_option( 'WPLANG' ) && mats_qa_has( mats_qa_texts( $mats_r3 ), 'porque alguien lo eligió así' ), 'WPLANG=ca (chosen by hand) kept, explained: ' . get_option( 'WPLANG' ) );
 	update_option( 'WPLANG', 'es_ES' );
 	unlink( WP_LANG_DIR . '/ca.mo' );
 	unlink( WP_LANG_DIR . '/ca.po' );
+	wp_cache_delete( md5( rtrim( WP_LANG_DIR, '/' ) . '/' ), 'translation_files' );
 
 	echo "\n== new PHP process: the admin speaks Spanish\n";
 	$mats_cmd   = escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( __FILE__ ) . ' --child=admin';
@@ -321,6 +331,12 @@ if ( ! in_array( '--keep', $mats_args, true ) ) {
 	delete_option( 'WPLANG' );
 	delete_site_transient( 'available_translations' );
 	echo "(WPLANG restored to '' — the server's shared language folder has no es_ES)\n";
+}
+foreach ( $mats_update_cache as $mats_t => $mats_v ) {
+	if ( is_object( $mats_v ) && false === get_site_transient( $mats_t ) ) {
+		$mats_v->last_checked = time();
+		set_site_transient( $mats_t, $mats_v );
+	}
 }
 echo $mats_fail ? "\n$mats_fail FAILED\n" : "\nALL PASS\n";
 exit( $mats_fail ? 1 : 0 );

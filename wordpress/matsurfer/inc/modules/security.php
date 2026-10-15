@@ -26,7 +26,9 @@
  *                   exists; 5 failed attempts for one user from one IP (or
  *                   20 from one IP in total) lock the access for 15
  *                   minutes with a friendly Spanish message; a successful
- *                   login clears the counter. No application passwords.
+ *                   login clears the counter and a new password (reset or
+ *                   profile) lifts the account lock. No application
+ *                   passwords.
  *  HEADERS          X-Content-Type-Options, Referrer-Policy,
  *                   X-Frame-Options and Permissions-Policy on the site, the
  *                   admin and the login screen. No Content-Security-Policy:
@@ -243,6 +245,16 @@ add_filter(
 	20
 );
 
+/* … and not the "Web" of that user's profile either (Atom <author><uri>:
+   empty → WordPress leaves the line out) */
+add_filter(
+	'get_the_author_url',
+	static function ( $url ) {
+		return is_feed() ? '' : $url;
+	},
+	20
+);
+
 /* no users sitemap (wp-sitemap-users-1.xml) */
 add_filter(
 	'wp_sitemaps_add_provider',
@@ -290,18 +302,31 @@ add_filter(
 /*
  * "¿Has olvidado la contraseña?": an unknown user or e-mail gets exactly the
  * same answer as a real one ("check your e-mail"), so the form cannot be
- * used to find out which accounts exist.
+ * used to find out which accounts exist. The redirect is a copy of the one
+ * wp-login.php sends for a real account (same relative Location header,
+ * same use of redirect_to), so not even the raw HTTP answer differs.
  */
 add_action(
 	'lostpassword_post',
 	static function ( $errors, $user_data = false ) {
-		if ( $user_data || ! did_action( 'login_init' ) ) {
+		if ( ! did_action( 'login_init' ) ) {
 			return;
+		}
+		/* a redirect_to that is not text would break core's redirect for real
+		   accounts only: ignore it for every account */
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- core's lost-password form has no nonce; read-only type check.
+		if ( isset( $_REQUEST['redirect_to'] ) && ! is_string( $_REQUEST['redirect_to'] ) ) {
+			unset( $_REQUEST['redirect_to'] );
+		}
+		if ( $user_data ) {
+			return; // a real account: WordPress sends the e-mail and redirects
 		}
 		if ( $errors instanceof WP_Error && array_diff( $errors->get_error_codes(), array( 'invalid_email', 'invalidcombo' ) ) ) {
 			return; // e.g. the field was empty: WordPress explains it
 		}
-		wp_safe_redirect( add_query_arg( 'checkemail', 'confirm', wp_login_url() ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- same as wp-login.php; wp_safe_redirect() validates it.
+		$to = ! empty( $_REQUEST['redirect_to'] ) ? wp_unslash( $_REQUEST['redirect_to'] ) : 'wp-login.php?checkemail=confirm';
+		wp_safe_redirect( $to );
 		exit;
 	},
 	99,
@@ -342,8 +367,8 @@ function mats_sec_client_ip(): string {
  */
 function mats_sec_login_keys( string $username ): array {
 	$who  = strtolower( trim( $username ) );
-	$user = is_email( $who ) ? get_user_by( 'email', $who ) : get_user_by( 'login', $who );
-	$who  = $user ? 'id:' . $user->ID : 'name:' . $who;
+	$id   = mats_sec_login_user_id( $who );
+	$who  = $id ? 'id:' . $id : 'name:' . $who;
 	$ip   = mats_sec_client_ip();
 	return array(
 		'user' => 'mats_login_' . md5( $ip . '|' . $who ),
@@ -351,17 +376,81 @@ function mats_sec_login_keys( string $username ): array {
 	);
 }
 
-/** Unix time until which this attempt is locked (0 = not locked). */
-function mats_sec_login_locked_until( string $username ): int {
-	$now   = time();
-	$until = 0;
-	foreach ( mats_sec_login_keys( $username ) as $key ) {
+/** ID of the account a user name or e-mail belongs to (0 = no such account). */
+function mats_sec_login_user_id( string $username ): int {
+	$who = strtolower( trim( $username ) );
+	if ( '' === $who ) {
+		return 0;
+	}
+	$user = is_email( $who ) ? get_user_by( 'email', $who ) : get_user_by( 'login', $who );
+	return $user instanceof WP_User ? (int) $user->ID : 0;
+}
+
+/**
+ * Current lock of a login attempt: [ 'until' => unix time (0 = not locked),
+ * 'kind' => 'user' (that account from this IP) | 'ip' (this IP) | '' ].
+ */
+function mats_sec_login_lock( string $username ): array {
+	$now  = time();
+	$lock = array(
+		'until' => 0,
+		'kind'  => '',
+	);
+	foreach ( mats_sec_login_keys( $username ) as $kind => $key ) {
 		$data = get_transient( $key );
-		if ( is_array( $data ) && ! empty( $data['until'] ) && (int) $data['until'] > $now ) {
-			$until = max( $until, (int) $data['until'] );
+		if ( is_array( $data ) && ! empty( $data['until'] ) && (int) $data['until'] > max( $now, $lock['until'] ) ) {
+			$lock = array(
+				'until' => (int) $data['until'],
+				'kind'  => (string) $kind,
+			);
 		}
 	}
-	return $until;
+	return $lock;
+}
+
+/** Unix time until which this attempt is locked (0 = not locked). */
+function mats_sec_login_locked_until( string $username ): int {
+	return mats_sec_login_lock( $username )['until'];
+}
+
+/**
+ * Transient name that remembers every account counter of a user (one per IP
+ * it was attacked from), so that changing the password can clear them all.
+ */
+function mats_sec_login_index_key( int $user_id ): string {
+	return 'mats_login_idx_' . $user_id;
+}
+
+/** Remembers an account counter of a user (at most 50, the newest). */
+function mats_sec_login_index_add( int $user_id, string $key, int $ends ): void {
+	if ( $user_id <= 0 ) {
+		return;
+	}
+	$now   = time();
+	$index = get_transient( mats_sec_login_index_key( $user_id ) );
+	$index = is_array( $index ) ? $index : array();
+	$index = array_filter( $index, static fn( $until ) => (int) $until > $now );
+	unset( $index[ $key ] );
+	$index[ $key ] = $ends;
+	$index         = array_slice( $index, -50, null, true );
+	set_transient( mats_sec_login_index_key( $user_id ), $index, max( 1, max( $index ) - $now ) );
+}
+
+/**
+ * Lifts the lock of an account on every IP (its password has just been
+ * changed: the old guesses no longer matter). The per-IP counters stay.
+ */
+function mats_sec_login_unlock_user( int $user_id ): void {
+	if ( $user_id <= 0 ) {
+		return;
+	}
+	$index = get_transient( mats_sec_login_index_key( $user_id ) );
+	foreach ( is_array( $index ) ? array_keys( $index ) : array() as $key ) {
+		if ( is_string( $key ) && 0 === strpos( $key, 'mats_login_' ) ) {
+			delete_transient( $key );
+		}
+	}
+	delete_transient( mats_sec_login_index_key( $user_id ) );
 }
 
 /**
@@ -370,8 +459,9 @@ function mats_sec_login_locked_until( string $username ): int {
  * `lock` seconds later, so occasional typos never add up over a day.
  */
 function mats_sec_login_register_failure( string $username ): void {
-	$limits = mats_sec_login_limits();
-	$now    = time();
+	$limits  = mats_sec_login_limits();
+	$now     = time();
+	$user_id = mats_sec_login_user_id( $username );
 	foreach ( mats_sec_login_keys( $username ) as $kind => $key ) {
 		$data = get_transient( $key );
 		$data = is_array( $data ) ? $data : array();
@@ -398,15 +488,29 @@ function mats_sec_login_register_failure( string $username ): void {
 			);
 		}
 		set_transient( $key, $data, max( 1, $ends - $now ) );
+		if ( 'user' === $kind && $user_id ) {
+			mats_sec_login_index_add( $user_id, $key, $ends );
+		}
 	}
 }
 
-/** Friendly message for a locked login. */
-function mats_sec_lock_message( int $until ): string {
+/**
+ * Friendly message for a locked login. An account lock is lifted by
+ * changing the password («¿Has olvidado la contraseña?»); a lock of the
+ * whole connection (too many failures with several names) only by waiting.
+ */
+function mats_sec_lock_message( int $until, string $kind = 'user' ): string {
 	$minutes = max( 1, (int) ceil( ( $until - time() ) / MINUTE_IN_SECONDS ) );
+	$wait    = 1 === $minutes ? '1 minuto' : $minutes . ' minutos';
+	if ( 'ip' === $kind ) {
+		return sprintf(
+			'<strong>Acceso bloqueado un rato por seguridad.</strong> Desde esta conexión se han hecho demasiados intentos fallidos. Vuelve a intentarlo dentro de %s.',
+			$wait
+		);
+	}
 	return sprintf(
-		'<strong>Acceso bloqueado un rato por seguridad.</strong> Se ha escrito mal la contraseña demasiadas veces. Vuelve a intentarlo dentro de %1$s. Si no recuerdas la contraseña, usa <a href="%2$s">¿Has olvidado la contraseña?</a>',
-		1 === $minutes ? '1 minuto' : $minutes . ' minutos',
+		'<strong>Acceso bloqueado un rato por seguridad.</strong> Se ha escrito mal la contraseña demasiadas veces. Vuelve a intentarlo dentro de %1$s. Si no recuerdas la contraseña, pide una nueva en <a href="%2$s">¿Has olvidado la contraseña?</a>: en cuanto la cambies podrás entrar.',
+		$wait,
 		esc_url( wp_lostpassword_url() )
 	);
 }
@@ -419,9 +523,9 @@ add_filter(
 		if ( '' === trim( $username ) ) {
 			return $user;
 		}
-		$until = mats_sec_login_locked_until( $username );
-		if ( $until ) {
-			return new WP_Error( 'mats_login_locked', mats_sec_lock_message( $until ) );
+		$lock = mats_sec_login_lock( $username );
+		if ( $lock['until'] ) {
+			return new WP_Error( 'mats_login_locked', mats_sec_lock_message( $lock['until'], $lock['kind'] ) );
 		}
 		return $user;
 	},
@@ -450,6 +554,31 @@ add_action(
 	},
 	10,
 	1
+);
+
+/* a new password («¿Has olvidado la contraseña?», or set in the profile)
+   lifts the lock of that account at once, from every IP */
+add_action(
+	'after_password_reset',
+	static function ( $user ) {
+		if ( $user instanceof WP_User ) {
+			mats_sec_login_unlock_user( (int) $user->ID );
+		}
+	},
+	10,
+	1
+);
+/* (not 'wp_set_password': WordPress also fires it when it re-encrypts the
+   password during a login, which would let a locked attempt through) */
+add_action(
+	'profile_update',
+	static function ( $user_id, $old_user_data = null, $userdata = array() ) {
+		if ( $old_user_data instanceof WP_User && is_array( $userdata ) && ! empty( $userdata['user_pass'] ) && $userdata['user_pass'] !== $old_user_data->user_pass ) {
+			mats_sec_login_unlock_user( (int) $user_id );
+		}
+	},
+	10,
+	3
 );
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -592,32 +721,67 @@ add_filter(
 	999
 );
 
-/** Extensions a web server may run even in the middle of a name ("photo.php.jpg"). */
+/**
+ * Extensions a web server may run even in the middle of a name
+ * ("photo.php.jpg": PHP handlers, server-side includes, CGI). Not .pl / .py:
+ * servers do not run them from uploads, and names such as "informe.pl.png"
+ * (Polish version) or "figura.py.png" are normal.
+ */
 function mats_sec_server_extensions(): array {
-	return array( 'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'pht', 'phar', 'phps', 'cgi', 'pl', 'py', 'asp', 'aspx', 'jsp', 'shtml' );
+	return array( 'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'pht', 'phar', 'phps', 'cgi', 'asp', 'aspx', 'jsp', 'shtml' );
 }
 
 /**
- * Is this file name dangerous? A blocked final extension, a server-run
- * extension anywhere after the first dot, or a hidden file (".htaccess").
+ * Why a file name is refused: '' (accepted), 'hidden' (".htaccess"),
+ * 'svg', 'type' (blocked final extension) or 'middle:<ext>' (a server-run
+ * extension after the first dot, "photo.php.jpg").
  */
-function mats_sec_is_dangerous_filename( string $name ): bool {
+function mats_sec_filename_problem( string $name ): string {
 	$name = strtolower( trim( wp_basename( $name ) ) );
 	if ( '' === $name ) {
-		return false;
+		return '';
 	}
 	if ( '.' === $name[0] ) {
-		return true;
+		return 'hidden';
 	}
 	$parts = explode( '.', $name );
 	array_shift( $parts );
 	if ( ! $parts ) {
-		return false;
+		return '';
 	}
-	if ( in_array( (string) end( $parts ), mats_sec_blocked_extensions(), true ) ) {
-		return true;
+	$last = (string) end( $parts );
+	if ( in_array( $last, mats_sec_blocked_extensions(), true ) ) {
+		return in_array( $last, array( 'svg', 'svgz' ), true ) ? 'svg' : 'type';
 	}
-	return (bool) array_intersect( $parts, mats_sec_server_extensions() );
+	$middle = array_values( array_intersect( $parts, mats_sec_server_extensions() ) );
+	return $middle ? 'middle:' . $middle[0] : '';
+}
+
+/** Is this file name dangerous? (see mats_sec_filename_problem()) */
+function mats_sec_is_dangerous_filename( string $name ): bool {
+	return '' !== mats_sec_filename_problem( $name );
+}
+
+/** Spanish message for a refused file name. */
+function mats_sec_filename_message( string $name, string $problem ): string {
+	if ( 'svg' === $problem ) {
+		return 'Por seguridad no se pueden subir imágenes SVG. Usa una foto JPG o PNG.';
+	}
+	if ( 0 === strpos( $problem, 'middle:' ) ) {
+		$ext  = substr( $problem, 7 );
+		$safe = (string) preg_replace_callback(
+			'/\.(' . implode( '|', array_map( static fn( $e ) => preg_quote( $e, '/' ), mats_sec_server_extensions() ) ) . ')(?=\.)/i',
+			static fn( $m ) => '-' . $m[1],
+			wp_basename( $name )
+		);
+		$safe = sanitize_file_name( $safe );
+		return sprintf(
+			'El nombre del archivo lleva «.%1$s.» en medio y, por seguridad, no se acepta. Cámbiale el nombre (por ejemplo, «%2$s») y vuelve a subirlo.',
+			$ext,
+			$safe
+		);
+	}
+	return 'Por seguridad no se puede subir este tipo de archivo. Sube fotos (JPG, PNG o WebP), vídeos MP4 o documentos PDF.';
 }
 
 /** wp_handle_upload / wp_handle_sideload prefilter. */
@@ -630,10 +794,9 @@ function mats_sec_upload_prefilter( $file ) {
 	if ( preg_match( '/\.zip$/i', $name ) && ( current_user_can( 'install_plugins' ) || current_user_can( 'install_themes' ) ) ) {
 		return $file;
 	}
-	if ( mats_sec_is_dangerous_filename( $name ) ) {
-		$file['error'] = preg_match( '/\.svgz?$/i', $name )
-			? 'Por seguridad no se pueden subir imágenes SVG. Usa una foto JPG o PNG.'
-			: 'Por seguridad no se puede subir este tipo de archivo. Sube fotos (JPG, PNG o WebP), vídeos MP4 o documentos PDF.';
+	$problem = mats_sec_filename_problem( $name );
+	if ( '' !== $problem ) {
+		$file['error'] = mats_sec_filename_message( $name, $problem );
 	}
 	return $file;
 }

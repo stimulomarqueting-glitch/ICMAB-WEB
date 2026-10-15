@@ -168,6 +168,8 @@
   line-height: 1.25;
   letter-spacing: -0.015em;
   text-wrap: pretty;
+  /* a word wider than the card (chemical names…) breaks instead of running out */
+  overflow-wrap: anywhere;
 }
 
 .post-card .post-card__link {

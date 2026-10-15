@@ -90,6 +90,11 @@ ok(cats.some((c) => c.name === 'News' && c.lang === 'en') && cats.some((c) => c.
 for (const [type, counts] of Object.entries(state.cpts)) ok(Number(counts.publish || 0) > 0, `${type}: nothing published`);
 for (const [id, s] of Object.entries(state.samples)) if (s && /hello-world|sample-page/.test(s)) fail(`sample content still there: ${id} ${s}`);
 notes.push(`attachments: ${state.attachments}, comments: ${state.comments}, forms: ${JSON.stringify(state.forms)}`);
+/* admin language: es_ES when its pack is installed, otherwise WPLANG left as it was (WordPress refuses a missing language) */
+const wpLangs = state.wp_languages || [];
+if (wpLangs.includes('es_ES')) ok(o.WPLANG === 'es_ES' || !['', 'en_US', false].includes(o.WPLANG), `WPLANG ${JSON.stringify(o.WPLANG)} although es_ES is installed`);
+else ok(['', 'en_US', false].includes(o.WPLANG), `WPLANG ${JSON.stringify(o.WPLANG)} without the es_ES pack`);
+notes.push(`admin language: WPLANG=${JSON.stringify(o.WPLANG)}, installed: ${JSON.stringify(wpLangs)}, reminder notice: ${state.installer_state && state.installer_state.notice}`);
 
 /* ── HTTP ─────────────────────────────────────────────────────────── */
 const logBefore = fs.existsSync(LOG) ? fs.statSync(LOG).size : 0;
