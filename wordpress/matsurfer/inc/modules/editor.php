@@ -7,7 +7,10 @@
  *   news articles   core writing blocks (paragraph, heading, lists, quote,
  *                   pullquote, image, gallery, embed, video, audio, file,
  *                   table, separator, spacer, buttons, columns, group,
- *                   details) + the closing call to action matsurfer/page-cta
+ *                   details) + only the MatSurfer sections whose block.json
+ *                   says "matsurfer": { "scope": "post" | "any" } (none
+ *                   today: single.php already closes every article with
+ *                   the call to action band)
  *   pages           sections pages (built from MatSurfer sections): the
  *                   matsurfer/* sections; reading pages (legal texts and
  *                   any new page): paragraph, heading, list, quote,
@@ -22,13 +25,20 @@
  *   code editor and block locking only for administrators; no Openverse,
  *   no block directory, no remote/core patterns, no font library; colours,
  *   font sizes, spacing and borders come from the theme only (theme.json
- *   layer); MatSurfer sections cannot get CSS classes, anchors, HTML
- *   editing, renaming, hiding or locking options.
+ *   of the theme: brand palette + S/M/L/XL sizes; this file only adds the
+ *   few locks theme.json does not set); MatSurfer sections cannot get CSS
+ *   classes, anchors or HTML editing, and — for editors — no renaming,
+ *   hiding or lock options (administrators can unlock, move and remove
+ *   sections).
  *
  * STRUCTURAL PAGES (pages with a role: _mats_role, see inc/links.php)
  *   - nobody can delete them (map_meta_cap → do_not_allow), the list says why
  *   - editors cannot change their slug, parent, status or password (server
- *     side + the rows are hidden in the editor) nor their language
+ *     side + the rows are hidden in the editor) nor their language or
+ *     translations (Polylang: editor box, quick edit, bulk edit — the
+ *     request values are replaced by the stored ones before Polylang
+ *     reads them); in the Pages list they have no checkbox, and a bulk
+ *     action never touches them
  *   - editors cannot add, move or remove sections (templateLock 'all')
  *   - a notice at the top of the editor explains what can be changed
  *   - editors may edit the Privacy Policy page and its translation (core
@@ -118,9 +128,10 @@ function mats_editor_post_blocks(): array {
 }
 
 /**
- * MatSurfer sections. $where = 'page' (all of them) or 'post' (only the
- * closing call to action and sections whose block.json says
- * "matsurfer": { "scope": "post" | "any" }).
+ * MatSurfer sections. $where = 'page' (all of them) or 'post' (only those
+ * whose block.json says "matsurfer": { "scope": "post" | "any" }). The
+ * closing call to action is not offered in news articles: single.php
+ * already ends every article with it.
  */
 function mats_editor_section_blocks( string $where = 'page' ): array {
 	$registry = function_exists( 'mats_blocks' ) ? mats_blocks() : array();
@@ -136,7 +147,7 @@ function mats_editor_section_blocks( string $where = 'page' ): array {
 	}
 	$out = array();
 	foreach ( $registry as $name => $def ) {
-		if ( 'matsurfer/page-cta' === $name || in_array( $def['scope'] ?? 'page', array( 'post', 'any' ), true ) ) {
+		if ( in_array( $def['scope'] ?? 'page', array( 'post', 'any' ), true ) ) {
 			$out[] = $name;
 		}
 	}
@@ -256,9 +267,13 @@ add_filter(
 );
 
 /*
- * Design tokens: colours, font sizes, spacing and borders are decided by
- * the theme. The theme layer of theme.json switches off every free-form
- * design control (and the core palettes/presets) in the block editor.
+ * Design tokens: the theme's theme.json (blog module) already switches off
+ * free colours, gradients, duotone, font sizes, spacing, borders and
+ * shadows, and defines the brand palette (Tinta, Coral, Violeta, Ciruela,
+ * Crema) and the S/M/L/XL font sizes. This layer only adds the locks
+ * theme.json does not set, and never touches the palette, the font sizes,
+ * text/background colour or blockGap (blockGap false would print 24px
+ * margins between blocks).
  */
 add_filter(
 	'wp_theme_json_data_theme',
@@ -276,69 +291,10 @@ add_filter(
 			array(
 				'version'  => 3,
 				'settings' => array(
-					'appearanceTools' => false,
-					'border'          => $border_off,
-					'background'      => array(
-						'backgroundImage' => false,
-						'backgroundSize'  => false,
-						'gradient'        => false,
-					),
-					'color'           => array(
-						'background'       => false,
-						'button'           => false,
-						'caption'          => false,
-						'custom'           => false,
-						'customDuotone'    => false,
-						'customGradient'   => false,
-						'defaultDuotone'   => false,
-						'defaultGradients' => false,
-						'defaultPalette'   => false,
-						'duotone'          => array(),
-						'gradients'        => array(),
-						'heading'          => false,
-						'link'             => false,
-						'palette'          => array(),
-						'text'             => false,
-					),
-					'dimensions'      => array(
-						'aspectRatio' => false,
-						'minHeight'   => false,
-					),
-					'position'        => array( 'sticky' => false ),
-					'shadow'          => array(
-						'defaultPresets' => false,
-						'presets'        => array(),
-					),
-					'spacing'         => array(
-						'blockGap'            => false,
-						'customSpacingSize'   => false,
-						'defaultSpacingSizes' => false,
-						'margin'              => false,
-						'padding'             => false,
-						'spacingSizes'        => array(),
-					),
-					'typography'      => array(
-						'customFontSize'   => false,
-						'defaultFontSizes' => false,
-						'dropCap'          => false,
-						'fontFamilies'     => array(),
-						'fontSizes'        => array(),
-						'fontStyle'        => false,
-						'fontWeight'       => false,
-						'letterSpacing'    => false,
-						'lineHeight'       => false,
-						'textColumns'      => false,
-						'textDecoration'   => false,
-						'textTransform'    => false,
-						'writingMode'      => false,
-					),
-					'blocks'          => array(
-						'core/button'    => array(
-							'border'     => $border_off,
-							'dimensions' => array( 'width' => false ),
-						),
-						'core/pullquote' => array( 'border' => $border_off ),
-						'core/image'     => array( 'border' => $border_off ),
+					'dimensions' => array( 'aspectRatio' => false ),
+					'blocks'     => array(
+						'core/button' => array( 'border' => $border_off ),
+						'core/image'  => array( 'border' => $border_off ),
 					),
 				),
 			)
@@ -346,26 +302,32 @@ add_filter(
 	}
 );
 
-/* MatSurfer sections: no CSS class, anchor, HTML editing, renaming, hiding or lock options. */
+/*
+ * MatSurfer sections: no CSS class, anchor or HTML editing for anyone.
+ * Editors also get no renaming, hiding or lock options; administrators
+ * keep "Desbloquear" (⋮ menu) to move or remove a section. For editors
+ * canLockBlocks is false as well (block_editor_settings_all above) and
+ * admin.js removes renaming / hiding from the core blocks.
+ */
 add_filter(
 	'register_block_type_args',
 	static function ( $args, $name ) {
 		if ( ! is_string( $name ) || ! str_starts_with( $name, 'matsurfer/' ) ) {
 			return $args;
 		}
-		$args['supports'] = array_merge(
-			is_array( $args['supports'] ?? null ) ? $args['supports'] : array(),
-			array(
-				'html'            => false,
-				'className'       => false,
-				'customClassName' => false,
-				'anchor'          => false,
-				'reusable'        => false,
-				'renaming'        => false,
-				'lock'            => false,
-				'visibility'      => false,
-			)
+		$off = array(
+			'html'            => false,
+			'className'       => false,
+			'customClassName' => false,
+			'anchor'          => false,
+			'reusable'        => false,
 		);
+		if ( ! mats_editor_is_admin() ) {
+			$off['renaming']   = false;
+			$off['lock']       = false;
+			$off['visibility'] = false;
+		}
+		$args['supports'] = array_merge( is_array( $args['supports'] ?? null ) ? $args['supports'] : array(), $off );
 		return $args;
 	},
 	10,

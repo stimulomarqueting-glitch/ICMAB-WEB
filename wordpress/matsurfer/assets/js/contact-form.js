@@ -13,6 +13,11 @@
  *    WPForms' validation), browser autofill hints
  *  - lead:track events like the original form: form_start,
  *    form_submit_attempt, form_submit_success, form_submit_error
+ *  - when sending fails (network or server error, or a refusal without
+ *    field errors) the original message is shown under the button, in the
+ *    page's language, with the contact email (.lf__status, role="alert")
+ *  - the placeholder of the optional "Area of interest" select can be
+ *    chosen again (WPForms renders it disabled; the original did not)
  *
  * Config: data-lf-config on .lf__card (inc/modules/wpforms.php →
  * mats_wpforms_client_config). Plain ES2017, no dependencies; jQuery is used
@@ -164,6 +169,49 @@
     };
   }
 
+  /** The optional select (field 6) can go back to "Select…", like the original. */
+  function freeAreaPlaceholder(form) {
+    var select = fieldInput(form, 6);
+    if (!select || select.required || select.hasAttribute('required')) return;
+    Array.prototype.forEach.call(select.options, function (o) {
+      if (o.value === '' && o.disabled) o.disabled = false;
+    });
+  }
+
+  /** Failure message under the button: errorText + mailto link (built as DOM, no HTML). */
+  function showStatus(form, cfg) {
+    if (!cfg.errorText) return;
+    var box = form.querySelector('.lf__status');
+    if (!box) {
+      box = document.createElement('p');
+      box.className = 'lf__status';
+      box.setAttribute('data-status', 'error');
+      box.setAttribute('role', 'alert');
+      box.appendChild(document.createTextNode(cfg.errorText + ' '));
+      if (cfg.email) {
+        var link = document.createElement('a');
+        link.href = 'mailto:' + cfg.email;
+        link.textContent = cfg.email;
+        box.appendChild(link);
+        box.appendChild(document.createTextNode('.'));
+      }
+      form.appendChild(box);
+    }
+    box.hidden = false;
+  }
+
+  function hideStatus(form) {
+    var box = form.querySelector('.lf__status');
+    if (box) box.hidden = true;
+  }
+
+  /** WPForms answered "not sent" with errors on fields (shown by WPForms itself)? */
+  function hasFieldErrors(json) {
+    var errors = json && json.data && json.data.errors;
+    var field = errors && errors.field;
+    return !!(field && typeof field === 'object' && Object.keys(field).length);
+  }
+
   function focusConfirmation(card) {
     var box = card.querySelector('.wpforms-confirmation-container-full, [id^="wpforms-confirmation"]');
     if (!box) return;
@@ -191,6 +239,7 @@
       return;
     }
 
+    freeAreaPlaceholder(form);
     var slug = preselect(form, cfg);
     fillMeta(form, cfg, slug);
     messages(form, cfg);
@@ -209,6 +258,7 @@
     form.addEventListener(
       'submit',
       function () {
+        hideStatus(form);
         fillMeta(form, cfg, slug);
         props = eventProps(form, slug, cfg);
         track('form_submit_attempt', {});
@@ -225,8 +275,14 @@
       }, 60);
     }
 
-    function failure() {
+    /* wpformsAjaxSubmitError: no answer (network, server error).
+       wpformsAjaxSubmitFailed: WPForms refused the submission; with field
+       errors WPForms marks the fields itself, otherwise (anti-spam check,
+       expired token…) the visitor also gets the email to write to. */
+    function failure(e, json) {
       track('form_submit_error', props);
+      if (e && e.type === 'wpformsAjaxSubmitFailed' && hasFieldErrors(json)) return;
+      showStatus(form, cfg);
     }
 
     if (window.jQuery) {

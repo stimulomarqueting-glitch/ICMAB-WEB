@@ -61,7 +61,7 @@ function mats_installer_step_forms( array $opts ): array {
 		mats_installer_add( $result, 'error', 'No se han podido crear los formularios. Comprueba que WPForms está activo y vuelve a intentarlo.' );
 	}
 	if ( $result['ok'] ) {
-		mats_installer_add( $result, 'info', sprintf( 'Los mensajes llegarán a %s y se guardan también en el menú «Contactos». Si debe ser otra dirección, cámbiala en Ajustes de la web → Email de contacto.', mats_contact_email() ) );
+		mats_installer_add( $result, 'info', sprintf( 'Los mensajes llegarán a %s y se guardan también en el menú «Contactos». Si debe ser otra dirección, cámbiala en «Ajustes de la web», en el menú de la izquierda (apartado «Email de contacto»).', mats_contact_email() ) );
 	}
 	$result['data'] = $report;
 	return $result;

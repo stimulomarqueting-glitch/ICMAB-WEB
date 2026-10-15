@@ -24,8 +24,8 @@ if ( ! $mats_links ) {
 	return;
 }
 ?>
-<nav class="blog-links reveal" aria-label="<?php echo esc_attr( mats_blog_t( 'useful_links' ) ); ?>">
-	<p class="eyebrow"><?php echo esc_html( mats_blog_t( 'useful_links' ) ); ?></p>
+<nav class="blog-links reveal" aria-label="<?php echo esc_attr( mats_t( 'useful_links' ) ); ?>">
+	<p class="eyebrow"><?php echo esc_html( mats_t( 'useful_links' ) ); ?></p>
 	<ul class="blog-links__list" role="list">
 		<?php foreach ( $mats_links as $mats_link ) : ?>
 			<li><a class="blog-links__chip" href="<?php echo esc_url( $mats_link[1] ); ?>"><?php echo esc_html( $mats_link[0] ); ?> <span aria-hidden="true">→</span></a></li>

@@ -389,3 +389,14 @@ html:has(> body.admin-bar) {
   }
 }
 
+
+/* Scroll reveal without JavaScript (disabled, blocked, or delayed by a
+   cache/optimisation plugin): base.css hides .reveal sections until site.js
+   shows them, so that hidden state only applies once the inline script of
+   header.php has marked <html class="mats-js"> (it unmarks it again if
+   site.js never starts). With JavaScript running nothing changes. */
+html:not(.mats-js) .reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}

@@ -15,11 +15,11 @@ $mats_title  = '';
 $mats_lead   = '';
 if ( is_category() || is_tag() ) {
 	$mats_term   = get_queried_object();
-	$mats_kicker = is_category() ? mats_t( 'category' ) : mats_blog_t( 'tag' );
+	$mats_kicker = is_category() ? mats_t( 'category' ) : mats_t( 'tag' );
 	$mats_title  = $mats_term instanceof WP_Term ? $mats_term->name : '';
 	$mats_lead   = $mats_term instanceof WP_Term ? wp_strip_all_tags( term_description( $mats_term ) ) : '';
 } elseif ( is_date() ) {
-	$mats_kicker = mats_blog_t( 'archive' );
+	$mats_kicker = mats_t( 'archive' );
 	$mats_year   = (int) get_query_var( 'year' );
 	$mats_month  = (int) get_query_var( 'monthnum' );
 	$mats_day    = (int) get_query_var( 'day' );
@@ -43,7 +43,7 @@ $mats_paged = max( 1, (int) get_query_var( 'paged' ) );
 	echo mats_blog_hero( // phpcs:ignore WordPress.Security.EscapeOutput -- rendered section
 		array(
 			'kicker'     => $mats_kicker,
-			'kickerNote' => $mats_paged > 1 ? sprintf( mats_blog_t( 'page_of' ), $mats_paged, max( $mats_paged, (int) $GLOBALS['wp_query']->max_num_pages ) ) : '',
+			'kickerNote' => $mats_paged > 1 ? sprintf( mats_t( 'page_of' ), $mats_paged, max( $mats_paged, (int) $GLOBALS['wp_query']->max_num_pages ) ) : '',
 			'title'      => $mats_title,
 			'lead'       => $mats_lead,
 		)

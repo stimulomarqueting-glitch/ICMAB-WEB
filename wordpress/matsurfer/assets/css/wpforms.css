@@ -367,6 +367,30 @@
   text-decoration: underline;
 }
 
+/* sending failed: the original .lf__status line under the button
+   (added by assets/js/contact-form.js: errorText + contact email) */
+.contact .lf__card .wpforms-container .wpforms-form p.lf__status {
+  display: block;
+  margin: 1rem 0 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--valve-red-90);
+  background: none;
+  border: 0;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form p.lf__status[hidden] {
+  display: none;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form p.lf__status a {
+  color: var(--valve-red-90);
+  text-decoration: underline;
+}
+
 /* ── submit: the coral pill .btn, full width ─────────────────────────── */
 .contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container {
   display: flex;

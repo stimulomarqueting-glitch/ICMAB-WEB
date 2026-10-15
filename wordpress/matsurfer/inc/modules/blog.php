@@ -27,99 +27,6 @@ defined( 'ABSPATH' ) || exit;
    first page of the News page shows one more: the newest article, wide. */
 const MATS_BLOG_PER_PAGE = 9;
 
-/**
- * Fixed UI words of the news templates. Uses mats_t() (inc/i18n.php) and
- * falls back to the local copy for keys that core does not know yet.
- */
-function mats_blog_t( string $key, string $lang = '' ): string {
-	$value = mats_t( $key, $lang );
-	if ( $value !== $key ) {
-		return $value;
-	}
-	static $local = array(
-		'no_news'          => array(
-			'en' => 'There are no news articles yet. Check back soon.',
-			'es' => 'Todavía no hay noticias. Vuelve pronto.',
-		),
-		'no_news_title'    => array(
-			'en' => 'Nothing published yet',
-			'es' => 'Aún no hay nada publicado',
-		),
-		'previous_article' => array(
-			'en' => 'Previous article',
-			'es' => 'Artículo anterior',
-		),
-		'next_article'     => array(
-			'en' => 'Next article',
-			'es' => 'Artículo siguiente',
-		),
-		'page_of'          => array(
-			'en' => 'Page %1$d of %2$d',
-			'es' => 'Página %1$d de %2$d',
-		),
-		'results_count'    => array(
-			'en' => '%d results',
-			'es' => '%d resultados',
-		),
-		'result_one'       => array(
-			'en' => '1 result',
-			'es' => '1 resultado',
-		),
-		'search_label'     => array(
-			'en' => 'Search the site',
-			'es' => 'Buscar en la web',
-		),
-		'search_ph'        => array(
-			'en' => 'Search news and pages…',
-			'es' => 'Buscar noticias y páginas…',
-		),
-		'search_lead'      => array(
-			'en' => 'Type a few words to find news articles and pages.',
-			'es' => 'Escribe unas palabras para encontrar noticias y páginas.',
-		),
-		'tag'              => array(
-			'en' => 'Topic',
-			'es' => 'Tema',
-		),
-		'archive'          => array(
-			'en' => 'Archive',
-			'es' => 'Archivo',
-		),
-		'updated_on'       => array(
-			'en' => 'Updated on',
-			'es' => 'Actualizado el',
-		),
-		'on_this_page'     => array(
-			'en' => 'On this page',
-			'es' => 'En esta página',
-		),
-		'share_linkedin'   => array(
-			'en' => 'Share on LinkedIn',
-			'es' => 'Compartir en LinkedIn',
-		),
-		'share_email'      => array(
-			'en' => 'Send by email',
-			'es' => 'Enviar por email',
-		),
-		'useful_links'     => array(
-			'en' => 'You may be looking for',
-			'es' => 'Quizá buscabas',
-		),
-		'blog_pagination'  => array(
-			'en' => 'More news',
-			'es' => 'Más noticias',
-		),
-		'article_nav'      => array(
-			'en' => 'More articles',
-			'es' => 'Más artículos',
-		),
-	);
-	if ( isset( $local[ $key ] ) ) {
-		return (string) mats_pick( $local[ $key ], $lang ? $lang : mats_lang() );
-	}
-	return $key;
-}
-
 /** Is this request one of the news / reading views styled by blog.css? */
 function mats_blog_is_view(): bool {
 	if ( is_home() || is_singular( 'post' ) || is_archive() || is_search() || is_404() ) {
@@ -255,7 +162,12 @@ function mats_blog_hero( array $args ): string {
 	return $out . '</div></section>';
 }
 
-/** Closing CTA band of the news views (Ajustes de la web → Noticias, else the home's closing copy). */
+/**
+ * Closing CTA band of the News page, the archives, search and every article.
+ * Copy: Ajustes de la web → «Cierre de las noticias» (blog_cta_title,
+ * blog_cta_text, blog_cta_button, per language); an emptied field falls back
+ * to the home's closing copy. The button always goes to Contact.
+ */
 function mats_blog_cta( string $source = 'news-final' ): string {
 	$lang  = mats_lang();
 	$final = mats_content_data()[ $lang ]['home']['finalCta'] ?? array();
@@ -309,13 +221,13 @@ function mats_blog_pagination( ?WP_Query $query = null ): string {
 
 	ob_start();
 	?>
-	<nav class="blog-pager" aria-label="<?php echo esc_attr( mats_blog_t( 'blog_pagination' ) ); ?>">
+	<nav class="blog-pager" aria-label="<?php echo esc_attr( mats_t( 'blog_pagination' ) ); ?>">
 		<?php if ( $prev ) : ?>
 			<a class="blog-pager__link blog-pager__link--prev" href="<?php echo esc_url( $prev ); ?>" rel="prev"><span aria-hidden="true">←</span> <?php echo esc_html( mats_t( 'newer' ) ); ?></a>
 		<?php else : ?>
 			<span class="blog-pager__link is-disabled" aria-hidden="true"><span>←</span> <?php echo esc_html( mats_t( 'newer' ) ); ?></span>
 		<?php endif; ?>
-		<p class="blog-pager__status mono"><?php echo esc_html( sprintf( mats_blog_t( 'page_of' ), $paged, $total ) ); ?></p>
+		<p class="blog-pager__status mono"><?php echo esc_html( sprintf( mats_t( 'page_of' ), $paged, $total ) ); ?></p>
 		<?php if ( $next ) : ?>
 			<a class="blog-pager__link blog-pager__link--next" href="<?php echo esc_url( $next ); ?>" rel="next"><?php echo esc_html( mats_t( 'older' ) ); ?> <span aria-hidden="true">→</span></a>
 		<?php else : ?>
@@ -422,6 +334,205 @@ add_action(
 			$wp_query->max_num_pages = (int) ceil( $found / MATS_BLOG_PER_PAGE );
 		}
 	}
+);
+
+/* ── search: match what visitors can read, not the page's markup ──────── */
+
+/*
+ * WordPress compares the search words with the raw post_content. For pages
+ * built from sections that is mostly block-attribute JSON ("kicker",
+ * "label", "page", image file names…), and for articles it includes block
+ * comments and HTML ("wp:paragraph", "class", "size-large"…), so common
+ * words returned every page. Here:
+ *   - articles and reading pages: WordPress' own SQL finds the candidates,
+ *     then each one is checked again against its visible text;
+ *   - pages built from sections: matched on their title, excerpt,
+ *     search-engine description and the texts typed in their sections.
+ * Only the site's main search is affected (not the admin, not the REST API).
+ */
+
+/** Visible words of a post: title, excerpt, the text of its blocks and the texts typed in MatSurfer sections. */
+function mats_blog_search_text( WP_Post $post ): string {
+	$content = (string) $post->post_content;
+	$parts   = array( (string) $post->post_title, (string) $post->post_excerpt );
+	if ( false !== strpos( $content, '<!-- wp:matsurfer/' ) ) {
+		mats_blog_section_texts( parse_blocks( $content ), $parts );
+	}
+	/* block comments (and the attributes inside them), tags and their attribute values are not read by visitors */
+	$parts[] = wp_strip_all_tags( (string) preg_replace( '/<!--.*?-->/s', ' ', strip_shortcodes( $content ) ) );
+	if ( 'page' === $post->post_type ) {
+		$parts[] = (string) get_post_meta( $post->ID, '_mats_seo_description', true );
+	}
+	return implode( ' ', $parts );
+}
+
+/** Collects the texts typed in MatSurfer sections (their field schema says which attributes are copy). */
+function mats_blog_section_texts( array $blocks, array &$parts ): void {
+	$registry = mats_blocks();
+	foreach ( $blocks as $block ) {
+		$name = (string) ( $block['blockName'] ?? '' );
+		if ( isset( $registry[ $name ] ) ) {
+			mats_blog_field_texts( (array) ( $registry[ $name ]['fields'] ?? array() ), (array) ( $block['attrs'] ?? array() ), $parts );
+		}
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			mats_blog_section_texts( (array) $block['innerBlocks'], $parts );
+		}
+	}
+}
+
+/** Texts of one set of field values (recurses into repeaters). */
+function mats_blog_field_texts( array $fields, array $values, array &$parts ): void {
+	foreach ( $fields as $field ) {
+		$key = (string) ( $field['key'] ?? '' );
+		if ( '' === $key || ! array_key_exists( $key, $values ) ) {
+			continue;
+		}
+		$value = $values[ $key ];
+		switch ( $field['type'] ?? 'text' ) {
+			case 'text':
+			case 'textarea':
+				if ( is_scalar( $value ) ) {
+					$parts[] = (string) $value;
+				}
+				break;
+			case 'list':
+				foreach ( (array) $value as $item ) {
+					if ( is_scalar( $item ) ) {
+						$parts[] = (string) $item;
+					}
+				}
+				break;
+			case 'link':
+				if ( empty( $field['noLabel'] ) && is_array( $value ) && isset( $value['label'] ) && is_scalar( $value['label'] ) ) {
+					$parts[] = (string) $value['label'];
+				}
+				break;
+			case 'repeater':
+				foreach ( (array) $value as $item ) {
+					if ( is_array( $item ) ) {
+						mats_blog_field_texts( (array) ( $field['fields'] ?? array() ), $item, $parts );
+					}
+				}
+				break;
+		}
+	}
+}
+
+/** Lower case, no accents, entities decoded, single spaces: how words are compared. */
+function mats_blog_search_normalize( string $text ): string {
+	$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	$text = remove_accents( $text );
+	$text = function_exists( 'mb_strtolower' ) ? mb_strtolower( $text, 'UTF-8' ) : strtolower( $text );
+	return trim( (string) preg_replace( '/\s+/u', ' ', $text ) );
+}
+
+/** Does this visible text contain every search word (and none of the "-excluded" ones)? */
+function mats_blog_search_matches( string $text, array $terms ): bool {
+	$haystack = mats_blog_search_normalize( $text );
+	$prefix   = (string) apply_filters( 'wp_query_search_exclusion_prefix', '-' );
+	foreach ( $terms as $term ) {
+		$term    = (string) $term;
+		$exclude = '' !== $prefix && str_starts_with( $term, $prefix );
+		$needle  = mats_blog_search_normalize( $exclude ? substr( $term, strlen( $prefix ) ) : $term );
+		if ( '' === $needle ) {
+			continue;
+		}
+		if ( str_contains( $haystack, $needle ) === $exclude ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/** IDs of the pages built from sections (every language), once per request. */
+function mats_blog_landing_ids(): array {
+	static $ids = null;
+	if ( null === $ids ) {
+		$ids   = array();
+		$pages = get_posts(
+			array(
+				'post_type'        => 'page',
+				'post_status'      => array( 'publish', 'private' ),
+				'posts_per_page'   => -1,
+				'no_found_rows'    => true,
+				'suppress_filters' => true,
+				'lang'             => '',
+			)
+		);
+		foreach ( $pages as $page ) {
+			if ( mats_is_landing( $page ) ) {
+				$ids[] = (int) $page->ID;
+			}
+		}
+	}
+	return $ids;
+}
+
+add_filter(
+	'posts_search',
+	static function ( $search, $query ) {
+		global $wpdb;
+		if ( '' === trim( (string) $search ) || is_admin() || ! $query instanceof WP_Query || ! $query->is_main_query() || ! $query->is_search() || $query->get( 'exact' ) ) {
+			return $search;
+		}
+		$terms = array_filter( array_map( 'strval', (array) $query->get( 'search_terms' ) ), 'strlen' );
+		if ( ! $terms ) {
+			return $search;
+		}
+		$types   = array_values( array_intersect( (array) $query->get( 'post_type' ), array( 'post', 'page' ) ) );
+		$types   = $types ? $types : array( 'post', 'page' );
+		$landing = mats_blog_landing_ids();
+		$lang    = function_exists( 'pll_get_post_language' ) ? mats_lang() : '';
+		$ids     = array();
+
+		/* pages built from sections: their visible copy, in the language being viewed */
+		if ( in_array( 'page', $types, true ) ) {
+			foreach ( $landing as $id ) {
+				$page = get_post( $id );
+				if ( ! $page || ( $lang && pll_get_post_language( $id ) !== $lang ) ) {
+					continue;
+				}
+				if ( ! is_user_logged_in() && '' !== $page->post_password ) {
+					continue;
+				}
+				if ( mats_blog_search_matches( mats_blog_search_text( $page ), $terms ) ) {
+					$ids[] = $id;
+				}
+			}
+		}
+
+		/* articles and reading pages: WordPress' candidates, checked on their visible text */
+		$type_sql = "'" . implode( "','", array_map( 'esc_sql', $types ) ) . "'";
+		$not_in   = $landing ? ' AND ' . $wpdb->posts . '.ID NOT IN (' . implode( ',', array_map( 'intval', $landing ) ) . ')' : '';
+		$limit    = 1000;
+		// $search is the WHERE fragment WordPress just prepared for this query; the rest is fixed or integers.
+		$rows = $wpdb->get_results( "SELECT {$wpdb->posts}.ID, {$wpdb->posts}.post_title, {$wpdb->posts}.post_excerpt, {$wpdb->posts}.post_content, {$wpdb->posts}.post_type FROM {$wpdb->posts} WHERE {$wpdb->posts}.post_type IN ({$type_sql}) AND {$wpdb->posts}.post_status IN ('publish','private'){$not_in} {$search} LIMIT " . ( $limit + 1 ) ); // phpcs:ignore WordPress.DB
+		if ( ! is_array( $rows ) ) {
+			return $search;
+		}
+		if ( count( $rows ) > $limit ) {
+			/* too many to check one by one: keep WordPress' match for articles, ours for section pages */
+			$core = (string) preg_replace( '/^\s*AND\s+/i', '', (string) $search );
+			$own  = $ids ? " OR {$wpdb->posts}.ID IN (" . implode( ',', $ids ) . ')' : '';
+			return " AND ( ( 1 = 1{$not_in} AND {$core} ){$own} )";
+		}
+		foreach ( $rows as $row ) {
+			$post = new WP_Post( $row );
+			if ( mats_blog_search_matches( mats_blog_search_text( $post ), $terms ) ) {
+				$ids[] = (int) $row->ID;
+			}
+		}
+		if ( ! $ids ) {
+			return ' AND 1 = 0';
+		}
+		$out = " AND {$wpdb->posts}.ID IN (" . implode( ',', array_unique( $ids ) ) . ')';
+		if ( ! is_user_logged_in() ) {
+			$out .= " AND ({$wpdb->posts}.post_password = '')";
+		}
+		return $out;
+	},
+	10,
+	2
 );
 
 /* ── assets ─────────────────────────────────────────────────────────── */

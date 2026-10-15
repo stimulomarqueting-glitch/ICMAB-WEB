@@ -26,7 +26,7 @@ function mats_installer_review_items(): array {
 	$explicit = is_array( $saved ) && ! empty( $saved['global']['contact_email'] );
 	$items[]  = mats_installer_check(
 		$explicit ? true : null,
-		sprintf( 'Email de contacto: los mensajes del formulario llegan a %s. Si debe ser otra dirección, cámbiala en MatSurfer → Ajustes de la web.', mats_contact_email() ),
+		sprintf( 'Email de contacto: los mensajes del formulario llegan a %s. Si debe ser otra dirección, cámbiala en «Ajustes de la web», en el menú de la izquierda (apartado «Email de contacto»).', mats_contact_email() ),
 		$settings,
 		'Abrir Ajustes de la web'
 	);
@@ -98,7 +98,7 @@ function mats_installer_review_items(): array {
 	/* guide */
 	$items[] = mats_installer_check(
 		null,
-		'Guía de uso: explica cómo publicar noticias, cambiar textos y fotos y gestionar equipo, aplicaciones, publicaciones y valoraciones. Compártela con el equipo del ICMAB.' . ( $guide ? '' : ' (La encontrarás en el menú MatSurfer.)' ),
+		'Guía de uso: explica cómo publicar noticias, cambiar textos y fotos y gestionar equipo, aplicaciones, publicaciones y valoraciones. Compártela con el equipo del ICMAB.' . ( $guide ? '' : ' (La encontrarás en el menú de la izquierda, «Guía de uso».)' ),
 		$guide,
 		'Abrir la guía'
 	);
@@ -111,7 +111,7 @@ function mats_installer_step_review( array $opts ): array {
 	$state['done']  = time();
 	$state['notice'] = 'hide';
 	mats_installer_save_state( $state );
-	mats_installer_add( $result, 'ok', 'Puesta en marcha terminada. Puedes volver a esta pantalla cuando quieras desde MatSurfer → Puesta en marcha: repetir los pasos nunca duplica nada.' );
+	mats_installer_add( $result, 'ok', 'Puesta en marcha terminada. Puedes volver a esta pantalla cuando quieras desde el menú «MatSurfer» de la izquierda: repetir los pasos nunca duplica nada.' );
 	if ( ! mats_installer_all_done() ) {
 		mats_installer_add( $result, 'warn', 'Ojo: todavía hay pasos marcados como pendientes. La web funciona, pero revísalos cuando puedas.' );
 	}

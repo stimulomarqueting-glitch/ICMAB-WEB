@@ -64,9 +64,9 @@
       },
       {
         "type": "notice",
-        "text": "Los campos del formulario se editan en WPForms (menú WPForms → Todos los formularios). Los contactos recibidos llegan por email y quedan guardados en «Contactos».",
-        "admin": "admin.php?page=wpforms-overview",
-        "linkLabel": "Abrir WPForms"
+        "text": "El formulario (campos, botón, mensaje de gracias y email que recibe los avisos) es de WPForms y solo lo puede cambiar la persona que administra la web, en WPForms → Todos los formularios. Los mensajes que envían los visitantes llegan por email y se guardan en «Contactos».",
+        "admin": "admin.php?page=mats-leads",
+        "linkLabel": "Ver los contactos"
       }
     ]
   }

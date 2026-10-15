@@ -437,14 +437,24 @@ function mats_wpforms_data_lang( $form_data ): string {
 /* ── create / update ─────────────────────────────────────────────────── */
 
 /**
- * Saves a form definition. $form_id = 0 creates it. Uses WPForms' own
- * handler when available, otherwise writes the post directly.
+ * Saves a form definition. $form_id = 0 creates it.
+ *
+ * WPForms' own handler (add() / update()) is used only when the current
+ * user may save HTML: update() strips every tag for users without
+ * 'unfiltered_html' (here: everybody but administrators, and administrators
+ * too when the host sets DISALLOW_UNFILTERED_HTML), which would turn the
+ * thank-you title and the privacy link into plain text for good. In that
+ * case, when $direct is true, when the handler is missing or fails, or when
+ * what it stored lost any of the HTML it was given, the post is written
+ * directly. The data saved here is always the theme's own definition (or a
+ * stored form with only the notification address changed), never visitor
+ * or editor input, so writing it without kses is safe.
  *
  * @return int Form ID, 0 on failure.
  */
-function mats_wpforms_save( int $form_id, array $data ): int {
+function mats_wpforms_save( int $form_id, array $data, bool $direct = false ): int {
 	$title   = (string) ( $data['settings']['form_title'] ?? 'Contacto MatSurfer' );
-	$handler = mats_wpforms_handler();
+	$handler = ( $direct || ! current_user_can( 'unfiltered_html' ) ) ? null : mats_wpforms_handler();
 
 	/* WPForms' path: add() creates the post, update() writes the full data */
 	if ( $handler && method_exists( $handler, 'update' ) && ( $form_id || method_exists( $handler, 'add' ) ) ) {
@@ -455,7 +465,7 @@ function mats_wpforms_save( int $form_id, array $data ): int {
 			if ( $form_id ) {
 				$data['id'] = (string) $form_id;
 				$saved      = $handler->update( $form_id, $data, array( 'cap' => false ) );
-				if ( $saved && mats_wpforms_stored_ok( $form_id ) ) {
+				if ( $saved && mats_wpforms_stored_ok( $form_id, $data ) ) {
 					return $form_id;
 				}
 			}
@@ -464,55 +474,92 @@ function mats_wpforms_save( int $form_id, array $data ): int {
 		}
 	}
 
-	/* fallback: the post itself (post type 'wpforms', JSON in post_content) */
-	$filters_off = static function () {
-		remove_filter( 'content_save_pre', 'balanceTags', 50 );
-		remove_filter( 'content_save_pre', 'wp_filter_post_kses' );
-		add_filter( 'wp_targeted_link_rel', '__return_empty_string', 50 );
-	};
-	$filters_on = static function () {
-		remove_filter( 'wp_targeted_link_rel', '__return_empty_string', 50 );
-		if ( ! current_user_can( 'unfiltered_html' ) ) {
-			add_filter( 'content_save_pre', 'wp_filter_post_kses' );
-		}
-	};
-
-	$filters_off();
-	if ( ! $form_id ) {
-		$form_id = absint(
-			wp_insert_post(
-				array(
-					'post_type'    => 'wpforms',
-					'post_status'  => 'publish',
-					'post_title'   => $title,
-					'post_content' => '{}',
-				),
-				false
-			)
-		);
-	}
-	if ( $form_id ) {
-		$data['id'] = (string) $form_id;
-		wp_update_post(
-			array(
-				'ID'           => $form_id,
-				'post_title'   => esc_html( $title ),
-				'post_excerpt' => (string) ( $data['settings']['form_desc'] ?? '' ),
-				'post_status'  => 'publish',
-				'post_content' => mats_wpforms_encode( $data ),
-			)
-		);
-	}
-	$filters_on();
-
-	return $form_id && mats_wpforms_stored_ok( $form_id ) ? $form_id : 0;
+	return mats_wpforms_write_post( $form_id, $data, $title );
 }
 
-/** The stored post_content decodes to a form with our 8 fields. */
-function mats_wpforms_stored_ok( int $form_id ): bool {
+/**
+ * Writes the form post itself (post type 'wpforms', JSON in post_content),
+ * with kses, balanceTags and the automatic link rel switched off for this
+ * one write, and restored exactly as they were afterwards.
+ *
+ * @return int Form ID, 0 on failure.
+ */
+function mats_wpforms_write_post( int $form_id, array $data, string $title ): int {
+	$kses    = has_filter( 'content_save_pre', 'wp_filter_post_kses' );
+	$balance = has_filter( 'content_save_pre', 'balanceTags' );
+	if ( false !== $kses ) {
+		remove_filter( 'content_save_pre', 'wp_filter_post_kses', $kses );
+	}
+	if ( false !== $balance ) {
+		remove_filter( 'content_save_pre', 'balanceTags', $balance );
+	}
+	add_filter( 'wp_targeted_link_rel', '__return_empty_string', 50 );
+
+	try {
+		if ( ! $form_id ) {
+			$form_id = absint(
+				wp_insert_post(
+					array(
+						'post_type'    => 'wpforms',
+						'post_status'  => 'publish',
+						'post_title'   => esc_html( $title ),
+						'post_content' => '{}',
+					),
+					false
+				)
+			);
+		}
+		if ( $form_id ) {
+			$data['id'] = (string) $form_id;
+			wp_update_post(
+				array(
+					'ID'           => $form_id,
+					'post_title'   => esc_html( $title ),
+					'post_excerpt' => (string) ( $data['settings']['form_desc'] ?? '' ),
+					'post_status'  => 'publish',
+					'post_content' => mats_wpforms_encode( $data ),
+				)
+			);
+		}
+	} finally {
+		remove_filter( 'wp_targeted_link_rel', '__return_empty_string', 50 );
+		if ( false !== $kses ) {
+			add_filter( 'content_save_pre', 'wp_filter_post_kses', $kses );
+		}
+		if ( false !== $balance ) {
+			add_filter( 'content_save_pre', 'balanceTags', $balance );
+		}
+	}
+
+	return $form_id && mats_wpforms_stored_ok( $form_id, $data ) ? $form_id : 0;
+}
+
+/**
+ * The stored post_content decodes to a form with our fields 1 and 8, and
+ * every text of $expected holding HTML (or a backslash) was stored exactly
+ * as given: WPForms' handler strips tags for some users and unslashes
+ * what it receives.
+ */
+function mats_wpforms_stored_ok( int $form_id, array $expected = array() ): bool {
 	clean_post_cache( $form_id );
 	$data = mats_wpforms_decode( (string) get_post_field( 'post_content', $form_id, 'raw' ) );
-	return isset( $data['fields']['1'], $data['fields']['8'], $data['settings'] );
+	return isset( $data['fields']['1'], $data['fields']['8'], $data['settings'] ) && mats_wpforms_markup_kept( $expected, $data );
+}
+
+/** Every string of $given that contains '<' or '\' is identical in $stored. */
+function mats_wpforms_markup_kept( array $given, array $stored ): bool {
+	foreach ( $given as $key => $value ) {
+		if ( is_array( $value ) ) {
+			if ( ! mats_wpforms_markup_kept( $value, is_array( $stored[ $key ] ?? null ) ? $stored[ $key ] : array() ) ) {
+				return false;
+			}
+		} elseif ( is_string( $value ) && ( false !== strpos( $value, '<' ) || false !== strpos( $value, '\\' ) ) ) {
+			if ( ! isset( $stored[ $key ] ) || $stored[ $key ] !== $value ) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 /**
@@ -646,6 +693,9 @@ function mats_wpforms_client_config( string $lang, int $form_id ): array {
 		'interest'     => mats_wpforms_options( $lang, 'interest' ),
 		'area'         => mats_wpforms_options( $lang, 'areaOfInterest' ),
 		'messages'     => $messages,
+		/* sending failed (network / server): original text + the contact email */
+		'errorText'    => (string) ( $f['errorText'] ?? '' ),
+		'email'        => mats_contact_email(),
 		'autocomplete' => array(
 			'1' => 'name',
 			'2' => 'email',
@@ -1041,35 +1091,65 @@ add_filter(
 
 /* ── keep the notification address in sync with Ajustes de la web ───── */
 
+/** Contact email stored in a mats_settings value (default when empty). */
+function mats_wpforms_settings_email( $settings ): string {
+	$defaults = mats_settings_defaults();
+	$fallback = sanitize_email( (string) ( $defaults['global']['contact_email'] ?? '' ) );
+	$email    = sanitize_email( (string) ( is_array( $settings ) && is_array( $settings['global'] ?? null ) ? ( $settings['global']['contact_email'] ?? '' ) : '' ) );
+	return $email ? $email : $fallback;
+}
+
+/**
+ * The contact email changed from $before to $after: the notifications of
+ * our forms that still send to $before now send to $after (an address
+ * typed by hand in WPForms is kept). Only that address changes, and the
+ * post is written directly: WPForms' handler would strip the HTML of the
+ * thank-you message and of the consent label for users without
+ * 'unfiltered_html' (Editors can save Ajustes de la web).
+ *
+ * @return int[] IDs of the forms that were updated.
+ */
+function mats_wpforms_sync_notification_email( string $before, string $after ): array {
+	$updated = array();
+	if ( ! $before || ! $after || strtolower( $before ) === strtolower( $after ) ) {
+		return $updated;
+	}
+	foreach ( mats_langs() as $lang ) {
+		/* by the stored ID, or (settings saved for the first time / reset) by the form's own mark */
+		$id = mats_wpforms_form_id( $lang );
+		$id = $id ? $id : mats_wpforms_find_form( $lang );
+		if ( ! $id ) {
+			continue;
+		}
+		$data    = mats_wpforms_decode( (string) get_post_field( 'post_content', $id, 'raw' ) );
+		$changed = false;
+		foreach ( (array) ( $data['settings']['notifications'] ?? array() ) as $key => $notification ) {
+			if ( is_array( $notification ) && strtolower( trim( (string) ( $notification['email'] ?? '' ) ) ) === strtolower( $before ) ) {
+				$data['settings']['notifications'][ $key ]['email'] = $after;
+				$changed = true;
+			}
+		}
+		if ( $changed && mats_wpforms_save( $id, $data, true ) ) {
+			$updated[] = $id;
+		}
+	}
+	return $updated;
+}
+
 add_action(
 	'update_option_mats_settings',
 	static function ( $old, $new ) {
-		$defaults = mats_settings_defaults();
-		$fallback = sanitize_email( (string) ( $defaults['global']['contact_email'] ?? '' ) );
-		$before   = sanitize_email( (string) ( is_array( $old ) ? ( $old['global']['contact_email'] ?? '' ) : '' ) );
-		$after    = sanitize_email( (string) ( is_array( $new ) ? ( $new['global']['contact_email'] ?? '' ) : '' ) );
-		$before   = $before ? $before : $fallback;
-		$after    = $after ? $after : $fallback;
-		if ( ! $after || strtolower( $before ) === strtolower( $after ) ) {
-			return;
-		}
-		foreach ( mats_langs() as $lang ) {
-			$id = mats_wpforms_form_id( $lang );
-			if ( ! $id ) {
-				continue;
-			}
-			$data    = mats_wpforms_decode( (string) get_post_field( 'post_content', $id, 'raw' ) );
-			$changed = false;
-			foreach ( (array) ( $data['settings']['notifications'] ?? array() ) as $key => $notification ) {
-				if ( is_array( $notification ) && strtolower( trim( (string) ( $notification['email'] ?? '' ) ) ) === strtolower( $before ) ) {
-					$data['settings']['notifications'][ $key ]['email'] = $after;
-					$changed = true;
-				}
-			}
-			if ( $changed ) {
-				mats_wpforms_save( $id, $data );
-			}
-		}
+		mats_wpforms_sync_notification_email( mats_wpforms_settings_email( $old ), mats_wpforms_settings_email( $new ) );
+	},
+	10,
+	2
+);
+
+/* first save of the settings (the option did not exist yet): the forms were made with the default address */
+add_action(
+	'add_option_mats_settings',
+	static function ( $option, $value ) {
+		mats_wpforms_sync_notification_email( mats_wpforms_settings_email( array() ), mats_wpforms_settings_email( $value ) );
 	},
 	10,
 	2
@@ -1085,7 +1165,10 @@ add_action(
 		}
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		$id     = $screen ? (string) $screen->id : '';
-		$where  = in_array( $id, array( 'dashboard', 'edit-page', 'page', 'plugins', 'themes' ), true ) || false !== strpos( $id, 'wpforms' ) || false !== strpos( $id, 'mats' ) || false !== strpos( $id, 'matsurfer' );
+		if ( false !== strpos( $id, 'mats-setup' ) ) {
+			return; // the setup wizard has its own forms step
+		}
+		$where = in_array( $id, array( 'dashboard', 'edit-page', 'page', 'plugins', 'themes' ), true ) || false !== strpos( $id, 'wpforms' ) || false !== strpos( $id, 'mats' ) || false !== strpos( $id, 'matsurfer' );
 
 		/* result of the button below */
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display only

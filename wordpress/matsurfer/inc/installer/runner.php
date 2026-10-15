@@ -212,24 +212,96 @@ function mats_installer_prepare(): void {
 }
 
 /**
+ * Runs a WordPress function that reports network problems as PHP warnings
+ * too (plugins_api, translations_api…): the step explains the problem in
+ * its own words, so those warnings are kept out of the error log.
+ *
+ * @param callable $fn    What to run.
+ * @param array    $notes Receives the warning texts.
+ * @return mixed What $fn returned.
+ */
+function mats_installer_quietly( callable $fn, array &$notes = array() ) {
+	set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+		static function ( $errno, $errstr ) use ( &$notes ) {
+			$notes[] = wp_strip_all_tags( (string) $errstr );
+			return true;
+		},
+		E_USER_WARNING | E_USER_NOTICE
+	);
+	try {
+		return $fn();
+	} finally {
+		restore_error_handler();
+	}
+}
+
+/** The lock row is written with SQL: whatever an object cache remembers about it is stale. */
+function mats_installer_lock_forget_cache(): void {
+	wp_cache_delete( 'mats_installer_lock', 'options' );
+	$missing = wp_cache_get( 'notoptions', 'options' );
+	if ( is_array( $missing ) && isset( $missing['mats_installer_lock'] ) ) {
+		unset( $missing['mats_installer_lock'] );
+		wp_cache_set( 'notoptions', $missing, 'options' );
+	}
+}
+
+/**
  * Only one run at a time (two tabs or two admins at once could otherwise
- * both create the same pages). add_option() fails when the row exists, so
- * taking the lock is atomic; a lock older than 5 minutes is stale.
+ * both create the same pages). The lock is the row 'mats_installer_lock' in
+ * the options table, taken with ONE SQL statement whose affected-row count
+ * decides who got it (add_option() is not enough: it checks first and then
+ * writes with INSERT … ON DUPLICATE KEY UPDATE, so two requests at the same
+ * moment could both "win"). A lock older than 5 minutes is stale and is
+ * taken over with a compare-and-swap UPDATE, again decided by the database.
  */
 function mats_installer_lock(): bool {
-	if ( add_option( 'mats_installer_lock', time(), '', false ) ) {
-		return true;
-	}
-	$since = (int) get_option( 'mats_installer_lock' );
-	if ( ! $since || time() - $since > 5 * MINUTE_IN_SECONDS ) {
-		update_option( 'mats_installer_lock', time(), false );
-		return true;
+	global $wpdb;
+	$name = 'mats_installer_lock';
+
+	for ( $attempt = 0; $attempt < 2; $attempt++ ) {
+		$now = (string) time();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- the lock must bypass the option cache.
+		$inserted = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, %s)", $name, $now, 'off' ) );
+		if ( false === $inserted ) {
+			/* the database refused the statement (very unusual): fall back to the WordPress API */
+			mats_installer_lock_forget_cache();
+			if ( add_option( $name, $now, '', false ) ) {
+				return true;
+			}
+			$since = (int) get_option( $name );
+			if ( ! $since || time() - $since > 5 * MINUTE_IN_SECONDS ) {
+				update_option( $name, $now, false );
+				return true;
+			}
+			return false;
+		}
+		mats_installer_lock_forget_cache();
+		if ( 1 === (int) $inserted ) {
+			return true;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$since = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $name ) );
+		if ( null === $since ) {
+			continue; // released in between: try again
+		}
+		if ( (int) $since && time() - (int) $since <= 5 * MINUTE_IN_SECONDS ) {
+			return false; // somebody else is running it right now
+		}
+		/* stale: take it over only if nobody else did in the meantime */
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$swapped = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s", $now, $name, (string) $since ) );
+		mats_installer_lock_forget_cache();
+		return 1 === (int) $swapped;
 	}
 	return false;
 }
 
 function mats_installer_unlock(): void {
-	delete_option( 'mats_installer_lock' );
+	global $wpdb;
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	$wpdb->delete( $wpdb->options, array( 'option_name' => 'mats_installer_lock' ) );
+	mats_installer_lock_forget_cache();
 }
 
 /** Runs one step and remembers its result. */
@@ -324,6 +396,9 @@ function mats_installer_run_all( array $opts = array() ): array {
 			break;
 		}
 	}
+	if ( ! $out['reload'] ) {
+		mats_installer_maybe_hide_notice();
+	}
 	return $out;
 }
 
@@ -391,6 +466,28 @@ function mats_installer_all_done(): bool {
 			return false;
 		}
 	}
+	return true;
+}
+
+/**
+ * The reminder shown after activating the theme ("…abre la puesta en
+ * marcha") is hidden for good as soon as every automatic step is done: the
+ * site is ready, so the reminder would say the opposite of the wizard.
+ * Returns true when the reminder is (now) hidden.
+ *
+ * @param bool|null $all_done Already known result of mats_installer_all_done().
+ */
+function mats_installer_maybe_hide_notice( ?bool $all_done = null ): bool {
+	$state = mats_installer_state();
+	if ( 'show' !== $state['notice'] ) {
+		return true;
+	}
+	if ( ! ( null === $all_done ? mats_installer_all_done() : $all_done ) ) {
+		return false;
+	}
+	$state           = mats_installer_state(); // the status checks may have saved something meanwhile
+	$state['notice'] = 'hide';
+	mats_installer_save_state( $state );
 	return true;
 }
 

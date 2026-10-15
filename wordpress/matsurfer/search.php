@@ -16,9 +16,9 @@ $mats_query = trim( get_search_query( false ) );
 $mats_count = (int) $wp_query->found_posts;
 $mats_title = '' !== $mats_query ? mats_t( 'search_for' ) . ' “' . $mats_query . '”' : mats_t( 'search' );
 if ( 1 === $mats_count ) {
-	$mats_lead = mats_blog_t( 'result_one' );
+	$mats_lead = mats_t( 'result_one' );
 } else {
-	$mats_lead = sprintf( mats_blog_t( 'results_count' ), $mats_count );
+	$mats_lead = sprintf( mats_t( 'results_count' ), $mats_count );
 }
 ?>
 <main id="main" class="blog-main">
@@ -63,7 +63,7 @@ if ( 1 === $mats_count ) {
 					null,
 					array(
 						'title' => mats_t( 'no_results' ),
-						'text'  => mats_blog_t( 'search_lead' ),
+						'text'  => mats_t( 'search_lead' ),
 					)
 				);
 				?>

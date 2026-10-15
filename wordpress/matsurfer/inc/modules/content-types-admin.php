@@ -24,7 +24,12 @@
  *     is "Retrato" / "Figura" / "Foto" with size advice
  *   - a warning while a text exists in one language only (the Spanish site
  *     falls back to English) or an important field is empty
- *   - saving: nonce + edit_post capability + sanitising per kind of field
+ *   - saving: nonce + edit_post capability + sanitising per kind of field;
+ *     a field that became translatable (the expert's name) shows its old
+ *     language-neutral value in the boxes until it is saved per language
+ *   - any change visible on the website (also ▲▼) empties the page cache
+ *     (LiteSpeed Cache on Hostinger), since these records show on pages
+ *     the cache plugin does not relate to them
  *
  * LIST SCREEN
  *   - columns: photo, key data, both-languages indicator ✓/!, order
@@ -292,13 +297,13 @@ function mats_cpta_config( string $type = '' ): array {
 				'sort'              => 'date',
 				'arrows'            => false,
 				'order_help'        => 'Las valoraciones se ordenan solas por fecha, de la más reciente a la más antigua. Este número solo decide el orden entre valoraciones del mismo mes (el 1 va primero).',
-				'intro'             => 'Escribe cada texto en inglés (columna EN) y en español (columna ES). Si dejas vacío un texto en español, la web en español mostrará el inglés. El nombre, la institución, el enlace y la fecha se escriben una sola vez.',
+				'intro'             => 'Escribe cada texto en inglés (columna EN) y en español (columna ES). Si dejas vacío un texto en español, la web en español mostrará el inglés. El nombre también va en las dos columnas, porque el tratamiento puede cambiar (por ejemplo, «Dr» en inglés y «Dr.» en español); si la columna ES se queda vacía, se usa el de inglés. La institución, el enlace y la fecha se escriben una sola vez.',
 				'list_intro'        => 'Las citas de investigadores que han probado el dispositivo, en la página Casos de estudio. Solo las «Visibles» se ven en la web; se ordenan solas por fecha, de la más reciente a la más antigua (esta lista sigue el mismo orden).',
 				'fields'            => array(
 					'name'        => array(
 						'kind'  => 'text',
 						'label' => 'Nombre de la persona',
-						'help'  => 'Si lo dejas vacío, la cita se publica sin firma (por ejemplo, mientras la persona confirma cómo quiere aparecer). Sin nombre tampoco se muestran el cargo ni la institución.',
+						'help'  => 'Con su tratamiento en cada idioma (por ejemplo, «Dr» en inglés y «Dr.» en español). Si dejas vacías las dos columnas, la cita se publica sin firma (por ejemplo, mientras la persona confirma cómo quiere aparecer). Sin nombre tampoco se muestran el cargo ni la institución.',
 						'max'   => 40,
 					),
 					'role'        => array(
@@ -343,7 +348,7 @@ function mats_cpta_config( string $type = '' ): array {
 					'date'        => array(
 						'kind'     => 'month',
 						'label'    => 'Fecha (año y mes)',
-						'help'     => 'Cuándo se hizo la valoración. Ordena la lista: la más reciente primero.',
+						'help'     => 'Cuándo se hizo la valoración, con el formato año-mes (por ejemplo, 2026-09). Ordena la lista: la más reciente primero.',
 						'required' => true,
 					),
 				),
@@ -383,6 +388,31 @@ function mats_cpta_fields( string $type ): array {
 /** Stored value (raw, no language fallback). */
 function mats_cpta_value( int $post_id, string $field, string $lang = '' ): string {
 	return (string) get_post_meta( $post_id, mats_meta_key( $field, $lang ), true );
+}
+
+/**
+ * Stored values of a translatable field, [ lang => value ], as the boxes of
+ * the form should show them. A record saved before the field had one box
+ * per language (the expert's name) keeps its old language-neutral value,
+ * which the website still shows (mats_field() falls back to it): it fills
+ * the English box, and every box while no language has its own value.
+ */
+function mats_cpta_i18n_values( int $post_id, string $field ): array {
+	$values = array();
+	foreach ( mats_langs() as $lang ) {
+		$values[ $lang ] = mats_cpta_value( $post_id, $field, $lang );
+	}
+	$legacy = mats_cpta_value( $post_id, $field );
+	if ( '' === trim( $legacy ) || '' !== trim( (string) ( $values['en'] ?? '' ) ) ) {
+		return $values;
+	}
+	$none = '' === trim( implode( '', $values ) );
+	foreach ( array_keys( $values ) as $lang ) {
+		if ( 'en' === $lang || $none ) {
+			$values[ $lang ] = $legacy;
+		}
+	}
+	return $values;
 }
 
 /** The current admin screen, when it is one of ours: [ base, post_type ]. */
@@ -428,9 +458,10 @@ function mats_cpta_missing( WP_Post $post ): array {
 	foreach ( mats_cpta_fields( $type ) as $field => $i18n ) {
 		$def = mats_cpta_field_def( $type, $field );
 		if ( $i18n ) {
-			$en = trim( mats_cpta_value( $post->ID, $field, 'en' ) );
-			$es = trim( mats_cpta_value( $post->ID, $field, 'es' ) );
-			if ( $def['shown'] && '' !== $en && '' === $es ) {
+			$values = mats_cpta_i18n_values( $post->ID, $field );
+			$en     = trim( (string) ( $values['en'] ?? '' ) );
+			$es     = trim( (string) ( $values['es'] ?? '' ) );
+			if ( $def['shown']&& '' !== $en && '' === $es ) {
 				$out['es'][] = $def['label'];
 			} elseif ( $def['shown'] && '' === $en && '' !== $es ) {
 				$out['en'][] = $def['label'];
@@ -652,6 +683,8 @@ add_action(
  * The "Contenido" box sits right under the title, where the text editor of
  * a news article would be: on phones and tablets it comes before the side
  * boxes, and it cannot be collapsed, hidden or dragged away by mistake.
+ * It looks like a box but its heading is not a ".hndle": WordPress's
+ * postbox.js turns every ".postbox .hndle" into a hide/show toggle.
  */
 add_action(
 	'edit_form_after_title',
@@ -660,7 +693,7 @@ add_action(
 			return;
 		}
 		echo '<div id="mats-cpta-content" class="postbox mats-cpta-box">';
-		echo '<div class="postbox-header"><h2 class="hndle">Contenido</h2></div>';
+		echo '<div class="postbox-header"><h2 class="mats-cpta-box__title">Contenido</h2></div>';
 		echo '<div class="inside">';
 		mats_cpta_render_content_box( $post );
 		echo '</div></div>';
@@ -767,8 +800,9 @@ function mats_cpta_render_row( WP_Post $post, string $field, bool $i18n ): void 
 	}
 
 	if ( $i18n ) {
-		$en = mats_cpta_value( $post->ID, $field, 'en' );
-		$es = mats_cpta_value( $post->ID, $field, 'es' );
+		$values = mats_cpta_i18n_values( $post->ID, $field );
+		$en     = (string) ( $values['en'] ?? '' );
+		$es     = (string) ( $values['es'] ?? '' );
 		echo '<div class="mats-cpta__cols">';
 		foreach ( array(
 			'en' => array( 'Inglés', $en, '' ),
@@ -825,7 +859,7 @@ function mats_cpta_render_input( array $def, string $name, string $id, string $v
 			break;
 		case 'year':
 			$attrs['type']        = 'number';
-			$attrs['min']         = '1950';
+			$attrs['min']         = '1900'; // same limits as mats_cpta_sanitize()
 			$attrs['max']         = (string) ( (int) gmdate( 'Y' ) + 1 );
 			$attrs['step']        = '1';
 			$attrs['inputmode']   = 'numeric';
@@ -833,8 +867,14 @@ function mats_cpta_render_input( array $def, string $name, string $id, string $v
 			$attrs['placeholder'] = (string) gmdate( 'Y' );
 			break;
 		case 'month':
+			/*
+			 * Browsers without a month picker (desktop Firefox and Safari) show
+			 * a plain text box: the pattern then accepts what the server
+			 * accepts (2026-09, 2026-9, 09/2026…) and the title explains it.
+			 */
 			$attrs['type']        = 'month';
-			$attrs['pattern']     = '[0-9]{4}-[0-9]{2}';
+			$attrs['pattern']     = '\s*([0-9]{4}[\-\/.][0-9]{1,2}|[0-9]{1,2}[\-\/.][0-9]{4})\s*';
+			$attrs['title']       = 'Año y mes, por ejemplo 2026-09';
 			$attrs['placeholder'] = 'AAAA-MM';
 			$attrs['class']      .= ' mats-cpta__input--short';
 			break;
@@ -1094,6 +1134,7 @@ function mats_cpta_save( int $post_id, WP_Post $post ): void {
 			continue; // below
 		}
 		$names = $i18n ? array_combine( mats_langs(), array_map( static fn( $l ) => $field . '_' . $l, mats_langs() ) ) : array( '' => $field );
+		$saved = 0;
 		foreach ( $names as $lang => $name ) {
 			if ( ! array_key_exists( $name, $input ) ) {
 				continue; // not in the form: untouched
@@ -1121,6 +1162,16 @@ function mats_cpta_save( int $post_id, WP_Post $post ): void {
 				continue;
 			}
 			update_post_meta( $post_id, mats_meta_key( $field, (string) $lang ), wp_slash( $clean ) );
+			++$saved;
+		}
+		/*
+		 * A translatable field saved in every language replaces its old
+		 * language-neutral value (the expert's name of older records, shown in
+		 * the boxes by mats_cpta_i18n_values()); otherwise the website would
+		 * keep showing it when both boxes are emptied.
+		 */
+		if ( $i18n && count( $names ) === $saved && metadata_exists( 'post', $post_id, mats_meta_key( $field ) ) ) {
+			delete_post_meta( $post_id, mats_meta_key( $field ) );
 		}
 	}
 
@@ -1164,6 +1215,44 @@ add_action(
 	3
 );
 
+/**
+ * Empties the page cache (LiteSpeed Cache on Hostinger…) once per request.
+ * These records show on ordinary pages (Equipo, Aplicaciones, Casos de
+ * estudio, the home page) that a cache plugin does not relate to them, so
+ * without this the website could keep the old version after a change.
+ * Does nothing when no such plugin is active.
+ */
+function mats_cpta_purge_page_cache(): void {
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+	do_action( 'litespeed_purge_all' );
+}
+
+/* a visible record changed: published, updated (also Quick Edit), hidden or trashed */
+add_action(
+	'transition_post_status',
+	static function ( $new_status, $old_status, $post ) {
+		if ( $post instanceof WP_Post && mats_cpta_is_type( $post->post_type ) && ( 'publish' === $new_status || 'publish' === $old_status ) ) {
+			mats_cpta_purge_page_cache();
+		}
+	},
+	10,
+	3
+);
+
+/** The photo box saves on its own (no "Actualizar"): portrait / figure of a visible record. */
+function mats_cpta_thumbnail_changed( $meta_id, $post_id, $meta_key ): void {
+	if ( '_thumbnail_id' === $meta_key && 'publish' === get_post_status( (int) $post_id ) && mats_cpta_is_type( get_post_type( (int) $post_id ) ) ) {
+		mats_cpta_purge_page_cache();
+	}
+}
+add_action( 'added_post_meta', 'mats_cpta_thumbnail_changed', 10, 3 );
+add_action( 'updated_post_meta', 'mats_cpta_thumbnail_changed', 10, 3 );
+add_action( 'deleted_post_meta', 'mats_cpta_thumbnail_changed', 10, 3 );
+
 /*
  * Before the post is written: an empty internal name is filled from the
  * texts (applications, evaluations) and no record is ever password
@@ -1188,7 +1277,8 @@ add_filter(
 		} else {
 			$field = (string) mats_cpta_sanitize( 'text', $input['field_en'] ?? '' );
 			$field = '' !== $field ? $field : (string) mats_cpta_sanitize( 'text', $input['field_es'] ?? '' );
-			$name  = (string) mats_cpta_sanitize( 'text', $input['name'] ?? '' );
+			$name  = (string) mats_cpta_sanitize( 'text', $input['name_en'] ?? '' );
+			$name  = '' !== $name ? $name : (string) mats_cpta_sanitize( 'text', $input['name_es'] ?? '' );
 			$title = trim( $field . ( '' !== $field && '' !== $name ? ' — ' : '' ) . $name );
 		}
 		if ( '' !== $title ) {
@@ -1353,15 +1443,33 @@ add_filter(
 	}
 );
 
-/** Is the list showing everything in the website order (▲▼ make sense)? */
+/**
+ * Is the list showing EVERY record in the website order (▲▼ make sense)?
+ * Not in "Mías", a status view, a search or any other filter: there the
+ * rows side by side on screen are not neighbours on the website.
+ */
 function mats_cpta_list_is_default_view(): bool {
+	static $cache = array();
 	// phpcs:disable WordPress.Security.NonceVerification -- read-only list filters
 	$status  = isset( $_GET['post_status'] ) ? sanitize_key( wp_unslash( $_GET['post_status'] ) ) : '';
 	$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';
 	$order   = isset( $_GET['order'] ) ? strtolower( sanitize_key( wp_unslash( $_GET['order'] ) ) ) : 'asc';
 	$search  = isset( $_GET['s'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ) : '';
+	$author  = isset( $_GET['author'] ) || isset( $_GET['author_name'] ) || ! empty( $_GET['m'] );
 	// phpcs:enable
-	return ( '' === $status || 'all' === $status ) && '' === $search && ( '' === $orderby || ( 'menu_order' === $orderby && 'asc' === $order ) );
+	if ( $author || ( '' !== $status && 'all' !== $status ) || '' !== $search || ( '' !== $orderby && ( 'menu_order' !== $orderby || 'asc' !== $order ) ) ) {
+		return false;
+	}
+	/* whatever else filters the list (another plugin…): it must hold all the records */
+	global $wp_query;
+	$type = $wp_query instanceof WP_Query ? (string) $wp_query->get( 'post_type' ) : '';
+	if ( ! mats_cpta_is_type( $type ) ) {
+		return false;
+	}
+	if ( ! isset( $cache[ $type ] ) ) {
+		$cache[ $type ] = (int) $wp_query->found_posts === count( mats_cpta_ordered_ids( $type ) );
+	}
+	return $cache[ $type ];
 }
 
 /** IDs of a type in display order (every status but trash). */
@@ -1392,9 +1500,10 @@ function mats_cpta_ordered_ids( string $type ): array {
 
 /** Two short lines: EN value and ES value. */
 function mats_cpta_bilingual_cell( int $post_id, string $field ): string {
-	$out = '';
+	$out    = '';
+	$values = mats_cpta_i18n_values( $post_id, $field );
 	foreach ( mats_langs() as $lang ) {
-		$value = trim( mats_cpta_value( $post_id, $field, $lang ) );
+		$value = trim( (string) ( $values[ $lang ] ?? '' ) );
 		$out  .= '<span class="mats-cpta-cell__line' . ( 'en' === $lang ? '' : ' is-secondary' ) . '"><span class="mats-cpta__pill mats-cpta__pill--small">' . esc_html( strtoupper( $lang ) ) . '</span> ' . ( '' !== $value ? esc_html( $value ) : '<span class="mats-cpta-cell__empty">' . esc_html( 'es' === $lang ? 'sin traducir' : 'vacío' ) . '</span>' ) . '</span>';
 	}
 	return $out;
@@ -1455,8 +1564,11 @@ function mats_cpta_render_column( $column, $post_id ): void {
 			break;
 
 		case 'mats_who':
-			$name = mats_cpta_value( $post->ID, 'name' );
-			$inst = mats_cpta_value( $post->ID, 'institution' );
+			/* the name as the English site shows it (or the Spanish one when only that exists) */
+			$names = mats_cpta_i18n_values( $post->ID, 'name' );
+			$name  = trim( (string) ( $names['en'] ?? '' ) );
+			$name  = '' !== $name ? $name : trim( (string) ( $names['es'] ?? '' ) );
+			$inst  = mats_cpta_value( $post->ID, 'institution' );
 			echo '' !== $name ? '<strong>' . esc_html( $name ) . '</strong>' : '<span class="mats-cpta-cell__empty">Sin firma</span>';
 			if ( '' !== $inst ) {
 				echo '<span class="mats-cpta-cell__line is-secondary">' . esc_html( $inst ) . '</span>';
@@ -1652,10 +1764,13 @@ add_action(
 			global $wpdb;
 			foreach ( $ids as $n => $id ) {
 				if ( (int) get_post_field( 'menu_order', $id ) !== $n + 1 ) {
+					/* only the number changes: no new revision nor "last modified" date */
 					$wpdb->update( $wpdb->posts, array( 'menu_order' => $n + 1 ), array( 'ID' => $id ), array( '%d' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 					clean_post_cache( $id );
 				}
 			}
+			/* those direct writes run no save hook: tell the page cache */
+			mats_cpta_purge_page_cache();
 		}
 		$back = wp_get_referer();
 		$back = $back ? $back : admin_url( 'edit.php?post_type=' . $post->post_type );

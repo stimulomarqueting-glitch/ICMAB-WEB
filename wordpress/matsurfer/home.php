@@ -24,7 +24,7 @@ $mats_paged = max( 1, (int) get_query_var( 'paged' ) );
 	echo mats_blog_hero( // phpcs:ignore WordPress.Security.EscapeOutput -- rendered section
 		array(
 			'kicker'     => mats_t( 'news' ),
-			'kickerNote' => $mats_paged > 1 ? sprintf( mats_blog_t( 'page_of' ), $mats_paged, max( $mats_paged, (int) $GLOBALS['wp_query']->max_num_pages ) ) : '',
+			'kickerNote' => $mats_paged > 1 ? sprintf( mats_t( 'page_of' ), $mats_paged, max( $mats_paged, (int) $GLOBALS['wp_query']->max_num_pages ) ) : '',
 			'title'      => $mats_title,
 			'lead'       => $mats_lead,
 			'photo'      => $mats_page ? mats_blog_thumb( $mats_page ) : array(),

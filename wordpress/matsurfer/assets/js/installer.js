@@ -138,7 +138,8 @@
 			p.textContent = cfg.text.working;
 			result.appendChild(p);
 		}
-		return post({ action: 'mats_installer_step', step: step, overwrite: overwrite ? '1' : '0' })
+		/* overwrite is only sent once the person has accepted the confirmation dialog */
+		return post({ action: 'mats_installer_step', step: step, overwrite: overwrite ? '1' : '0', confirm: overwrite ? '1' : '0' })
 			.then(function (data) {
 				setHtml(result, data.html || '');
 				return data;
@@ -203,9 +204,10 @@
 		if (running) {
 			return;
 		}
-		var overwrite = !!(overwriteBox && overwriteBox.checked);
 		var steps = step === 'all' ? cfg.steps.slice() : [step];
-		if (overwrite && steps.indexOf('content') !== -1 && !window.confirm(cfg.text.confirm)) {
+		/* only step 3 (also inside "Hacerlo todo") can overwrite the page texts */
+		var overwrite = !!(overwriteBox && overwriteBox.checked) && steps.indexOf('content') !== -1;
+		if (overwrite && !window.confirm(cfg.text.confirm)) {
 			return;
 		}
 
@@ -215,7 +217,7 @@
 		var chain = Promise.resolve();
 		steps.forEach(function (s) {
 			chain = chain.then(function () {
-				return runStep(s, overwrite).then(function (data) {
+				return runStep(s, overwrite && s === 'content').then(function (data) {
 					if (!data || !data.ok) {
 						allOk = false;
 					}

@@ -348,6 +348,48 @@
   color: #9a5b00;
 }
 
+/* contact email nobody has confirmed yet */
+.mats-set__confirm {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid #dba617;
+  border-radius: 0 8px 8px 0;
+  background: #fcf9e8;
+}
+
+.mats-set__confirmnote {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--set-ink);
+}
+
+.mats-set__confirmnote .dashicons {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  color: #996800;
+}
+
+.mats-set__confirmlabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--set-ink);
+  cursor: pointer;
+}
+
+.mats-set .mats-set__confirmlabel input[type="checkbox"] {
+  flex: none;
+  margin: 1px 0 0;
+}
+
 .mats-set__orig {
   margin: 6px 0 0;
   font-size: 12px;

@@ -299,6 +299,237 @@ function mats_installer_flush_rewrites(): void {
 	delete_option( 'rewrite_rules' );
 }
 
+/** Does this .htaccess file contain WordPress's rewrite rules? */
+function mats_installer_htaccess_has_rules( string $file ): bool {
+	if ( ! is_readable( $file ) || ! function_exists( 'extract_from_markers' ) ) {
+		return false;
+	}
+	foreach ( (array) extract_from_markers( $file, 'WordPress' ) as $line ) {
+		if ( false !== stripos( (string) $line, 'RewriteRule' ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * On Apache / LiteSpeed (Hostinger) clean addresses need WordPress's rules
+ * in the .htaccess file; when WordPress cannot write it, every page but the
+ * home page answers "not found". Returns the file path when the rules are
+ * missing, '' when all is well (or the server does not use .htaccess).
+ */
+function mats_installer_htaccess_problem(): string {
+	global $is_apache;
+	if ( empty( $is_apache ) || is_multisite() || '' === (string) get_option( 'permalink_structure' ) ) {
+		return '';
+	}
+	if ( ! function_exists( 'get_home_path' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+	}
+	if ( ! function_exists( 'extract_from_markers' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+	}
+	$file = get_home_path() . '.htaccess';
+	return mats_installer_htaccess_has_rules( $file ) ? '' : $file;
+}
+
+/* ── WordPress admin in Spanish ──────────────────────────────────────── */
+
+/** Locale of the WordPress admin the staff will use. */
+function mats_installer_admin_locale(): string {
+	return 'es_ES';
+}
+
+/** wordpress.org plugins whose Spanish translations are installed (by key of mats_installer_plugin_specs()). */
+function mats_installer_translated_plugins(): array {
+	return array( 'polylang', 'wpforms', 'smtp' );
+}
+
+/**
+ * Is the site language a WordPress default (English, nobody chose it)? Only
+ * then is it changed to Spanish: a language somebody picked is respected.
+ */
+function mats_installer_site_language_is_default(): bool {
+	return in_array( (string) get_option( 'WPLANG' ), array( '', 'en_US' ), true );
+}
+
+/** Why the Spanish pack could not be downloaded, as a sentence for the message. */
+function mats_installer_langpack_reason( string $why ): string {
+	$reasons = array(
+		'config'  => 'esta instalación de WordPress no permite descargar archivos desde el escritorio (está bloqueado en su configuración)',
+		'folder'  => 'el servidor no deja que WordPress escriba en la carpeta de idiomas (wp-content/languages)',
+		'blocked' => 'este servidor tiene bloqueadas las conexiones con wordpress.org',
+		'network' => 'no se ha podido conectar con wordpress.org (puede ser un corte momentáneo o que el servidor no tenga salida a internet)',
+	);
+	return $reasons[ $why ] ?? $reasons['network'];
+}
+
+/**
+ * Spanish translations of the plugins the site uses (Polylang, WPForms
+ * Lite, WP Mail SMTP when installed), straight from wordpress.org.
+ * Returns the names of the plugins whose translation was installed now.
+ */
+function mats_installer_install_plugin_translations( array &$result, string $locale ): array {
+	require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+	$installed    = wp_get_installed_translations( 'plugins' );
+	$plugins      = get_plugins();
+	$updates      = array();
+	$names        = array();
+	$already      = array();
+	$failed       = array();
+	foreach ( mats_installer_translated_plugins() as $key ) {
+		$spec = mats_installer_plugin_specs()[ $key ] ?? null;
+		$file = $spec ? mats_installer_plugin_state( $key )['file'] : '';
+		/* only the wordpress.org version (folder = its slug); Pro versions bring their own translations */
+		if ( ! $file || dirname( $file ) !== $spec['slug'] ) {
+			continue;
+		}
+		if ( isset( $installed[ $spec['slug'] ][ $locale ] ) ) {
+			$already[] = $spec['name'];
+			continue;
+		}
+		$version = (string) ( $plugins[ $file ]['Version'] ?? '' );
+		$api     = mats_installer_quietly(
+			static fn() => translations_api(
+				'plugins',
+				array(
+					'slug'    => $spec['slug'],
+					'version' => $version,
+				)
+			)
+		);
+		$found = null;
+		if ( ! is_wp_error( $api ) ) {
+			foreach ( (array) ( $api['translations'] ?? array() ) as $translation ) {
+				if ( $locale === ( $translation['language'] ?? '' ) && ! empty( $translation['package'] ) ) {
+					$found = $translation;
+					break;
+				}
+			}
+		}
+		if ( ! $found ) {
+			$failed[] = $spec['name'];
+			continue;
+		}
+		$updates[]               = (object) array(
+			'type'       => 'plugin',
+			'slug'       => $spec['slug'],
+			'language'   => $locale,
+			'version'    => (string) ( $found['version'] ?? $version ),
+			'updated'    => (string) ( $found['updated'] ?? '' ),
+			'package'    => (string) $found['package'],
+			'autoupdate' => true,
+		);
+		$names[ $spec['slug'] ] = $spec['name'];
+	}
+
+	$done = array();
+	if ( $updates ) {
+		$upgrader = new Language_Pack_Upgrader( new Automatic_Upgrader_Skin() );
+		ob_start();
+		$results = mats_installer_quietly( static fn() => $upgrader->bulk_upgrade( $updates, array( 'clear_update_cache' => false ) ) );
+		ob_end_clean();
+		foreach ( $updates as $i => $update ) {
+			$one = is_array( $results ) ? ( $results[ $i ] ?? false ) : false;
+			if ( $one && ! is_wp_error( $one ) ) {
+				$done[] = $names[ $update->slug ];
+			} else {
+				$failed[] = $names[ $update->slug ];
+			}
+		}
+	}
+
+	if ( $done ) {
+		mats_installer_add( $result, 'ok', sprintf( 'Traducción al español de %s instalada: sus pantallas también salen en español.', implode( ', ', $done ) ) );
+	}
+	if ( $already ) {
+		mats_installer_add( $result, 'ok', sprintf( '%s ya tenía su traducción al español.', implode( ', ', $already ) ) );
+	}
+	if ( $failed ) {
+		mats_installer_add( $result, 'info', sprintf( 'No se ha podido descargar ahora la traducción al español de %s. No pasa nada: WordPress la ofrecerá en Escritorio → Actualizaciones («Actualizar traducciones»).', implode( ', ', $failed ) ), admin_url( 'update-core.php' ), 'Ir a Actualizaciones' );
+	}
+	return $done;
+}
+
+/**
+ * The WordPress admin in Spanish for the ICMAB staff: downloads WordPress's
+ * Spanish language pack and the plugins' Spanish translations from
+ * wordpress.org, then makes Spanish the site language (WPLANG). The public
+ * site is not affected: Polylang shows each page in its own language
+ * (en_GB at the root, es_ES under /es/). Never an error: without internet
+ * it only explains how to do it by hand.
+ */
+function mats_installer_setup_admin_language( array &$result ): void {
+	require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+	$locale = mats_installer_admin_locale();
+	$have   = in_array( $locale, get_available_languages(), true );
+	$why    = '';
+
+	if ( ! $have ) {
+		if ( ! wp_is_file_mod_allowed( 'download_language_pack' ) ) {
+			$why = 'config';
+		} elseif ( ! wp_can_install_language_pack() ) {
+			$why = 'folder';
+		} else {
+			ob_start();
+			$got = mats_installer_quietly( static fn() => wp_download_language_pack( $locale ) );
+			ob_end_clean();
+			$have = $locale === $got && in_array( $locale, get_available_languages(), true );
+			if ( $have ) {
+				mats_installer_add( $result, 'ok', 'Traducción al español de WordPress descargada de wordpress.org.' );
+			} else {
+				$http = function_exists( '_wp_http_get_object' ) ? _wp_http_get_object() : null;
+				$why  = $http && $http->block_request( 'https://api.wordpress.org/translations/core/1.0/' ) ? 'blocked' : 'network';
+			}
+		}
+	}
+
+	if ( ! $have ) {
+		mats_installer_add(
+			$result,
+			'info',
+			sprintf(
+				'El escritorio de WordPress sigue en inglés: no se ha podido descargar su traducción al español porque %s. No afecta a la web pública, que ya sale en inglés y en español. Para tener los menús en español, ve a Ajustes → Generales, elige «Español» en «Idioma del sitio» y pulsa «Guardar cambios» (WordPress descarga la traducción en ese momento); después repite este paso para traducir también los plugins. Si «Español» no aparece en esa lista, el servidor no puede conectar con wordpress.org: pide a Stimulo que lo revise.',
+				mats_installer_langpack_reason( $why )
+			),
+			admin_url( 'options-general.php' ),
+			'Ir a Ajustes → Generales'
+		);
+		return;
+	}
+
+	if ( (string) get_option( 'WPLANG' ) === $locale ) {
+		mats_installer_add( $result, 'ok', 'El escritorio de WordPress ya estaba en español.' );
+	} elseif ( mats_installer_site_language_is_default() ) {
+		update_option( 'WPLANG', $locale );
+		mats_installer_add( $result, 'ok', 'El escritorio de WordPress queda en español (menús, botones y fechas). La web pública no cambia: sigue en inglés en la raíz y en español en /es/. Cada persona puede elegir otro idioma en su perfil.' );
+	} else {
+		mats_installer_add( $result, 'info', sprintf( 'El idioma del escritorio de WordPress es «%s» porque alguien lo eligió así: no se cambia. Se puede cambiar en Ajustes → Generales → Idioma del sitio, y cada persona puede elegir el suyo en su perfil.', (string) get_option( 'WPLANG' ) ), admin_url( 'options-general.php' ), 'Ir a Ajustes → Generales' );
+	}
+
+	mats_installer_install_plugin_translations( $result, $locale );
+}
+
+/** ✓ when the admin is in Spanish; optional (•) otherwise: the site works the same. */
+function mats_installer_admin_language_check(): array {
+	$locale = mats_installer_admin_locale();
+	$have   = in_array( $locale, get_available_languages(), true );
+	$site   = (string) get_option( 'WPLANG' );
+	if ( $have && $site === $locale ) {
+		return mats_installer_check( true, 'El escritorio de WordPress está en español.' );
+	}
+	return mats_installer_check(
+		null,
+		$have
+			? 'El escritorio de WordPress no está en español (opcional): se cambia en Ajustes → Generales → Idioma del sitio.'
+			: 'El escritorio de WordPress está en inglés (opcional): para ponerlo en español, elige «Español» en Ajustes → Generales → Idioma del sitio y repite este paso.',
+		admin_url( 'options-general.php' ),
+		'Ajustes generales'
+	);
+}
+
 function mats_installer_step_languages( array $opts ): array {
 	$result = mats_installer_result( 'languages' );
 
@@ -329,6 +560,18 @@ function mats_installer_step_languages( array $opts ): array {
 		mats_installer_refresh_polylang(); // home URLs of each language are cached by Polylang
 	}
 	mats_installer_flush_rewrites();
+	$htaccess = mats_installer_htaccess_problem();
+	if ( $htaccess ) {
+		mats_installer_add(
+			$result,
+			'warn',
+			'WordPress no ha podido escribir el archivo .htaccess del servidor, así que las direcciones limpias (/product/, /es/producto/) pueden dar «página no encontrada». Abre Ajustes → Enlaces permanentes y pulsa «Guardar cambios»: si sigue sin poder, WordPress te mostrará abajo las líneas que hay que pegar en ese archivo. También puedes pedir al proveedor del hosting que permita a WordPress escribir el archivo .htaccess.',
+			admin_url( 'options-permalink.php' ),
+			'Abrir Enlaces permanentes'
+		);
+	}
+
+	mats_installer_setup_admin_language( $result );
 
 	if ( $result['ok'] ) {
 		mats_installer_add( $result, 'ok', 'Idiomas listos: inglés en la raíz de la web y español en /es/.' );
@@ -357,7 +600,12 @@ function mats_installer_status_languages(): array {
 	}
 
 	$permalinks = '/%postname%/' === get_option( 'permalink_structure' );
-	$checks[]   = mats_installer_check( $permalinks, $permalinks ? 'Direcciones limpias (/product/, /es/producto/).' : 'Las direcciones de las páginas todavía no son las limpias.', admin_url( 'options-permalink.php' ), 'Enlaces permanentes' );
+	$htaccess   = $permalinks ? mats_installer_htaccess_problem() : '';
+	if ( $htaccess ) {
+		$checks[] = mats_installer_check( false, 'Direcciones limpias elegidas, pero falta escribirlas en el archivo .htaccess del servidor: las páginas pueden dar «página no encontrada». Abre Enlaces permanentes y pulsa «Guardar cambios».', admin_url( 'options-permalink.php' ), 'Enlaces permanentes' );
+	} else {
+		$checks[] = mats_installer_check( $permalinks, $permalinks ? 'Direcciones limpias (/product/, /es/producto/).' : 'Las direcciones de las páginas todavía no son las limpias.', admin_url( 'options-permalink.php' ), 'Enlaces permanentes' );
+	}
 	$basics     = true;
 	foreach ( mats_installer_wp_options() as $name => $value ) {
 		if ( (string) get_option( $name ) !== (string) $value ) {
@@ -365,5 +613,6 @@ function mats_installer_status_languages(): array {
 		}
 	}
 	$checks[] = mats_installer_check( $basics, $basics ? 'Zona horaria de Madrid, formato de fecha y comentarios cerrados.' : 'Faltan ajustes básicos (zona horaria, fecha o comentarios).', admin_url( 'options-general.php' ), 'Ajustes generales' );
+	$checks[] = mats_installer_admin_language_check();
 	return mats_installer_status_from( $checks );
 }

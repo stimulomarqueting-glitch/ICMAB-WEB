@@ -27,6 +27,9 @@
  *   mats_lead_set_status( int $id, string $status ): bool
  *   do_action( 'mats_lead_saved', $id, $lead )  after a lead is stored
  *
+ *   Values are stored as plain text (tags stripped, no HTML entities):
+ *   escape them on output.
+ *
  *   Tracking posted with the form: $_POST['matsurfer_meta'][ cta_source |
  *   utm (JSON string) | application | language | source_page ].
  *   WPForms field IDs: 1 name, 2 email, 3 organisation, 4 role,
@@ -48,6 +51,7 @@ defined( 'MATS_LEAD_TYPE' ) || define( 'MATS_LEAD_TYPE', 'mats_lead' );
 defined( 'MATS_LEAD_CAP' ) || define( 'MATS_LEAD_CAP', 'mats_manage_leads' );
 defined( 'MATS_LEADS_PAGE' ) || define( 'MATS_LEADS_PAGE', 'mats-leads' );
 defined( 'MATS_LEADS_CAPS_VERSION' ) || define( 'MATS_LEADS_CAPS_VERSION', '1' );
+defined( 'MATS_LEADS_PER_PAGE' ) || define( 'MATS_LEADS_PER_PAGE', 20 ); // rows per page of the list
 
 /* ═══════════════════════════════════════════════════════════════════════
  * Data model
@@ -166,15 +170,26 @@ add_filter( 'wpseo_sitemap_exclude_post_type', static fn( $exclude, $type = '' )
 /**
  * Grants 'mats_manage_leads' to administrator + editor and removes it from
  * every other role. Runs on theme activation and once per version later
- * (lazily, for sites where the theme was already active). Administrators
- * are always given it back if it goes missing.
+ * (lazily, for sites where the theme was already active). On every other
+ * admin request it is given back when it goes missing (a role reset, a
+ * restored roles option, a migration…): always to administrators, and to
+ * editors unless a role-editor plugin explicitly denies it (cap = false).
  */
 function mats_leads_ensure_caps( bool $force = false ): void {
 	$roles = wp_roles();
 	if ( ! $force && MATS_LEADS_CAPS_VERSION === get_option( 'mats_leads_caps_version' ) ) {
-		$admin = $roles->get_role( 'administrator' );
+		$changed = false;
+		$admin   = $roles->get_role( 'administrator' );
 		if ( $admin && ! $admin->has_cap( MATS_LEAD_CAP ) ) {
 			$admin->add_cap( MATS_LEAD_CAP );
+			$changed = true;
+		}
+		$editor = $roles->get_role( 'editor' );
+		if ( $editor && ! array_key_exists( MATS_LEAD_CAP, (array) $editor->capabilities ) ) {
+			$editor->add_cap( MATS_LEAD_CAP );
+			$changed = true;
+		}
+		if ( $changed ) {
 			mats_leads_refresh_user_caps();
 		}
 		return;
@@ -229,10 +244,25 @@ function mats_lead_truthy( $value ): bool {
 	return ! in_array( $value, array( '', '0', 'no', 'false', 'off' ), true );
 }
 
-/** Plain, single-line, length-limited text. */
+/**
+ * Plain, single-line, length-limited text.
+ *
+ * Leads are stored as PLAIN TEXT (every screen escapes on output). The
+ * WordPress sanitisers, used by WPForms and here, turn the rest of a text
+ * after a lone '<' into HTML entities ('Tc < 300 K "x"' → 'Tc &lt; 300 K
+ * &quot;x&quot;'); decoding them afterwards keeps the CSV, the reply email
+ * and the privacy export readable and makes search match. Tags themselves
+ * were already stripped by the sanitiser.
+ */
 function mats_lead_clean_text( $value, int $max = 200 ): string {
 	$value = is_scalar( $value ) ? (string) $value : '';
-	return mb_substr( trim( sanitize_text_field( $value ) ), 0, $max );
+	return mb_substr( trim( wp_specialchars_decode( sanitize_text_field( $value ), ENT_QUOTES ) ), 0, $max );
+}
+
+/** Plain, multi-line, length-limited text (same rules as mats_lead_clean_text()). */
+function mats_lead_clean_textarea( $value, int $max = 10000 ): string {
+	$value = is_scalar( $value ) ? (string) $value : '';
+	return mb_substr( trim( wp_specialchars_decode( sanitize_textarea_field( $value ), ENT_QUOTES ) ), 0, $max );
 }
 
 /** UTM parameters from a JSON string or an array → [ source, medium, campaign, content, term ] (only the filled ones). */
@@ -285,7 +315,7 @@ function mats_lead_normalize( array $data ): array {
 		'role'         => mats_lead_clean_text( $data['role'] ?? '', 150 ),
 		'interest'     => mats_lead_clean_text( $data['interest'] ?? '', 200 ),
 		'area'         => mats_lead_clean_text( $data['area'] ?? '', 200 ),
-		'message'      => mb_substr( trim( sanitize_textarea_field( is_scalar( $data['message'] ?? '' ) ? (string) ( $data['message'] ?? '' ) : '' ) ), 0, 10000 ),
+		'message'      => mats_lead_clean_textarea( $data['message'] ?? '', 10000 ),
 		'consent'      => mats_lead_truthy( $data['consent'] ?? false ) ? 'yes' : 'no',
 		'consent_date' => '',
 		'language'     => in_array( $data['language'] ?? '', mats_langs(), true ) ? (string) $data['language'] : 'en',
@@ -305,7 +335,7 @@ function mats_lead_normalize( array $data ): array {
 			continue;
 		}
 		$label = mats_lead_clean_text( $item['label'] ?? '', 100 );
-		$value = mb_substr( trim( sanitize_textarea_field( is_scalar( $item['value'] ?? '' ) ? (string) ( $item['value'] ?? '' ) : '' ) ), 0, 2000 );
+		$value = mats_lead_clean_textarea( $item['value'] ?? '', 2000 );
 		if ( '' !== $value ) {
 			$lead['extra'][] = array(
 				'label' => '' !== $label ? $label : 'Campo',
@@ -724,7 +754,13 @@ function mats_lead_choice_label( string $group, string $value ): string {
 	return $maps[ $group ][ strtolower( $value ) ] ?? $value;
 }
 
-/** Spanish description of the button that brought the visitor to the form. */
+/**
+ * Spanish description of the button that brought the visitor to the form
+ * (its data-cta-source; '' when unknown). Covers every source the theme
+ * prints: the Astro ones (header, footer, hero*, home-*, <page>-final,
+ * applications-<slug>) and the WordPress-only ones (news templates, the
+ * "Últimas noticias" section, the 404 page).
+ */
 function mats_lead_cta_label( string $source ): string {
 	$fixed = array(
 		'direct'             => 'Ninguno: llegó directamente al formulario',
@@ -742,6 +778,12 @@ function mats_lead_cta_label( string $source ): string {
 		'applications-final' => 'Aplicaciones: llamada final',
 		'research-final'     => 'Casos de estudio: llamada final',
 		'team-final'         => 'Equipo: llamada final',
+		'latest-news'        => 'Sección «Últimas noticias»: su botón (normalmente, ver todas las noticias)',
+		'news-empty'         => 'Noticias: botón de contacto (cuando todavía no hay noticias)',
+		'news-final'         => 'Noticias: llamada final (lista de noticias o de una categoría)',
+		'news-article-final' => 'Noticia: llamada final (al pie de un artículo)',
+		'search-final'       => 'Búsqueda: llamada final (página de resultados)',
+		'404-home'           => 'Página no encontrada (error 404): botón para volver a la portada',
 	);
 	if ( isset( $fixed[ $source ] ) ) {
 		return $fixed[ $source ];
@@ -749,6 +791,21 @@ function mats_lead_cta_label( string $source ): string {
 	if ( str_starts_with( $source, 'applications-' ) ) {
 		$title = mats_lead_application_title( substr( $source, 13 ) );
 		return $title ? 'Aplicaciones: botón de «' . $title . '»' : '';
+	}
+	/* closing band of any other page ("<page role>-final") */
+	$pages = array(
+		'home'         => 'Portada',
+		'product'      => 'Producto',
+		'applications' => 'Aplicaciones',
+		'research'     => 'Casos de estudio',
+		'team'         => 'Equipo',
+		'contact'      => 'Contacto',
+		'news'         => 'Noticias',
+		'privacy'      => 'Política de privacidad',
+		'legal'        => 'Aviso legal',
+	);
+	if ( str_ends_with( $source, '-final' ) && isset( $pages[ substr( $source, 0, -6 ) ] ) ) {
+		return $pages[ substr( $source, 0, -6 ) ] . ': llamada final';
 	}
 	return '';
 }
@@ -848,7 +905,7 @@ function mats_leads_request_filters(): array {
 	$filters = array(
 		'status'  => isset( mats_lead_statuses()[ $status ] ) ? $status : '',
 		'lang'    => in_array( $lang, mats_langs(), true ) ? $lang : '',
-		's'       => mb_substr( trim( $get( 's' ) ), 0, 100 ),
+		's'       => mb_substr( trim( wp_specialchars_decode( $get( 's' ), ENT_QUOTES ) ), 0, 100 ), // plain text, like the stored leads
 		'orderby' => 'name' === $get( 'orderby' ) ? 'name' : 'date',
 		'order'   => '',
 		'from'    => $date( $get( 'lead_from' ) ),
@@ -1006,6 +1063,18 @@ function mats_leads_apply( string $action, array $ids ): int {
 	return $n;
 }
 
+/** Last page of the list for a set of filters (1 when it is empty). */
+function mats_leads_last_page( array $filters ): int {
+	$args                           = mats_leads_query_args( $filters );
+	$args['posts_per_page']         = 1;
+	$args['paged']                  = 1;
+	$args['fields']                 = 'ids';
+	$args['update_post_meta_cache'] = false;
+	$args['update_post_term_cache'] = false;
+	$total                          = (int) ( new WP_Query( $args ) )->found_posts;
+	return max( 1, (int) ceil( $total / MATS_LEADS_PER_PAGE ) );
+}
+
 /** Current URL without action parameters (to come back after an action). */
 function mats_leads_clean_request_url(): string {
 	$uri  = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
@@ -1013,7 +1082,7 @@ function mats_leads_clean_request_url(): string {
 	wp_parse_str( (string) wp_parse_url( $uri, PHP_URL_QUERY ), $query );
 	foreach ( array( 'lead_status', 'lead_lang', 's', 'orderby', 'order', 'paged' ) as $key ) {
 		if ( isset( $query[ $key ] ) && is_scalar( $query[ $key ] ) && '' !== (string) $query[ $key ] && ! ( 'paged' === $key && (int) $query[ $key ] < 2 ) ) {
-			$keep[ $key ] = rawurlencode( sanitize_text_field( (string) $query[ $key ] ) );
+			$keep[ $key ] = rawurlencode( wp_specialchars_decode( sanitize_text_field( (string) $query[ $key ] ), ENT_QUOTES ) );
 		}
 	}
 	return mats_leads_url( $keep );
@@ -1076,6 +1145,31 @@ function mats_leads_load(): void {
 	if ( ! empty( $_GET['_wp_http_referer'] ) || '-1' === $action ) {
 		wp_safe_redirect( mats_leads_clean_request_url() );
 		exit;
+	}
+
+	/*
+	 * A page past the end of the list (the last rows of the last page were
+	 * just deleted or changed status out of the current view, or an old
+	 * link): go to the last page that still has contacts, keeping the
+	 * filters and the "done" message. Done here because the list itself is
+	 * drawn after the admin header, too late for WP_List_Table's redirect.
+	 */
+	$paged = isset( $_GET['paged'] ) && is_scalar( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 0;
+	if ( $paged > 1 && ! mats_leads_current_lead_id() ) {
+		$last = mats_leads_last_page( mats_leads_request_filters() );
+		if ( $paged > $last ) {
+			$notice = array();
+			if ( isset( $_GET['mats_done'] ) && is_scalar( $_GET['mats_done'] ) ) {
+				$notice['mats_done'] = sanitize_key( wp_unslash( $_GET['mats_done'] ) );
+				$notice['mats_n']    = isset( $_GET['mats_n'] ) && is_scalar( $_GET['mats_n'] ) ? absint( $_GET['mats_n'] ) : 0;
+			}
+			$url = remove_query_arg( 'paged', mats_leads_clean_request_url() );
+			if ( $last > 1 ) {
+				$notice['paged'] = $last;
+			}
+			wp_safe_redirect( add_query_arg( $notice, $url ) );
+			exit;
+		}
 	}
 	// phpcs:enable
 
@@ -1180,7 +1274,7 @@ add_action(
 
 /** Column headers of the CSV file. */
 function mats_leads_csv_header(): array {
-	return array( 'Fecha', 'Estado', 'Nombre', 'Email', 'Organización', 'Cargo', 'Le interesa', 'Área de interés', 'Mensaje', 'Acepta la privacidad', 'Fecha de aceptación', 'Idioma', 'Botón de origen', 'Página de origen', 'Aplicación', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'Otros campos', 'Atendido el', 'Referencia' );
+	return array( 'Fecha', 'Estado', 'Nombre', 'Email', 'Organización', 'Cargo', 'Le interesa', 'Área de interés', 'Mensaje', 'Acepta la privacidad', 'Fecha de aceptación', 'Idioma', 'Botón de origen', 'Botón de origen (qué es)', 'Página de origen', 'Aplicación', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'Otros campos', 'Atendido el', 'Referencia' );
 }
 
 function mats_leads_csv_row( array $lead ): array {
@@ -1203,6 +1297,7 @@ function mats_leads_csv_row( array $lead ): array {
 		$consent_ts ? wp_date( 'd/m/Y H:i', $consent_ts ) : '',
 		mats_lead_languages()[ $lead['language'] ],
 		$lead['cta_source'],
+		'' !== $lead['cta_source'] ? mats_lead_cta_label( $lead['cta_source'] ) : '',
 		$lead['source_page'],
 		$lead['application'],
 		$lead['utm']['source'] ?? '',
@@ -1412,7 +1507,8 @@ function mats_leads_privacy_export( $email, $page = 1 ): array {
 			if ( '' !== (string) $value ) {
 				$data[] = array(
 					'name'  => $name,
-					'value' => (string) $value,
+					/* WordPress treats exported values as HTML (wp_kses in the report): escape the plain text so 'Tc < 300 K' is not cut */
+					'value' => esc_html( (string) $value ),
 				);
 			}
 		}
@@ -1665,7 +1761,7 @@ function mats_leads_declare_table(): void {
 
 		public function prepare_items() {
 			$this->filters          = mats_leads_request_filters();
-			$per_page               = 20;
+			$per_page               = MATS_LEADS_PER_PAGE;
 			$args                   = mats_leads_query_args( $this->filters );
 			$args['posts_per_page'] = $per_page;
 			$args['paged']          = $this->get_pagenum();

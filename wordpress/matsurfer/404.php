@@ -32,7 +32,7 @@ get_header();
 		<div class="container blog-404__grid">
 			<div class="panel blog-404__search reveal">
 				<h2 class="blog-404__title"><?php echo esc_html( mats_t( 'search' ) ); ?></h2>
-				<p class="blog-404__text"><?php echo esc_html( mats_blog_t( 'search_lead' ) ); ?></p>
+				<p class="blog-404__text"><?php echo esc_html( mats_t( 'search_lead' ) ); ?></p>
 				<?php get_search_form(); ?>
 			</div>
 			<?php get_template_part( 'template-parts/blog-links' ); ?>

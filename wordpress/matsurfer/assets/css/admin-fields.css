@@ -146,8 +146,18 @@
 .mats-cpta-edit #mats-cpta-content {
   margin-top: 0;
 }
-.mats-cpta-edit #mats-cpta-content .hndle {
+/* a plain heading (not ".hndle"): postbox.js must not make it a hide/show toggle */
+.mats-cpta-edit #mats-cpta-content .mats-cpta-box__title {
+  flex-grow: 1;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.4;
   cursor: default;
+}
+/* never left closed, whatever marks it */
+.mats-cpta-edit #mats-cpta-content.closed .inside {
+  display: block;
 }
 .mats-cpta {
   color: var(--mats-cpta-text);

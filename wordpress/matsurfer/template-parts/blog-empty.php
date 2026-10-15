@@ -9,8 +9,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$mats_empty_title = (string) ( $args['title'] ?? mats_blog_t( 'no_news_title' ) );
-$mats_empty_text  = (string) ( $args['text'] ?? mats_blog_t( 'no_news' ) );
+$mats_empty_title = (string) ( $args['title'] ?? mats_t( 'no_news_title' ) );
+$mats_empty_text  = (string) ( $args['text'] ?? mats_t( 'no_news' ) );
 $mats_empty_cta   = $args['cta'] ?? false;
 $mats_cta_label   = (string) mats_setting( 'header_cta' );
 ?>

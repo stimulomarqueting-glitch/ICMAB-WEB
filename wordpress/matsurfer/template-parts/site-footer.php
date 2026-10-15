@@ -73,6 +73,9 @@ foreach ( $mats_columns as $mats_i => $mats_col ) {
 $mats_columns = array_values( array_filter( $mats_columns, static fn( $col ) => (bool) $col['links'] ) );
 
 $mats_cta_url = mats_page_id( 'contact' ) ? mats_page_url( 'contact' ) : 'mailto:' . mats_contact_email();
+
+/* the last line carries the patent code: when it was not changed by hand, the original line with the current code */
+$mats_bottom = function_exists( 'mats_settings_footer_line' ) ? mats_settings_footer_line() : $mats_s( 'footer_bottom' );
 ?>
 <footer class="footer">
 	<div class="container">
@@ -99,7 +102,7 @@ $mats_cta_url = mats_page_id( 'contact' ) ? mats_page_url( 'contact' ) : 'mailto
 
 		<div class="footer__bottom">
 			<span><?php echo esc_html( $mats_s( 'footer_copyright' ) ); ?></span>
-			<span class="mono"><?php echo esc_html( $mats_s( 'footer_bottom' ) ); ?></span>
+			<span class="mono"><?php echo esc_html( $mats_bottom ); ?></span>
 		</div>
 	</div>
 </footer>

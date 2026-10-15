@@ -1,19 +1,28 @@
 <?php
 /**
- * Category chips above the news grid: "All news" + every category of the
- * current language that has articles. Hidden when there is only one.
+ * Category chips above the news grid: "All news" + the categories of the
+ * current language that have articles. The default category ("News" /
+ * "Noticias", where articles without a category land) is left out: next to
+ * "All news" it would read as the same thing. Hidden unless at least two
+ * real categories remain.
  *
  * @package matsurfer
  */
 
 defined( 'ABSPATH' ) || exit;
 
+$mats_default = (int) get_option( 'default_category' );
+$mats_skip    = $mats_default ? array( $mats_default ) : array();
+if ( $mats_default && function_exists( 'pll_get_term' ) ) {
+	$mats_skip[] = (int) pll_get_term( $mats_default, mats_lang() );
+}
 $mats_cats = get_categories(
 	array(
 		'hide_empty' => true,
 		'orderby'    => 'count',
 		'order'      => 'DESC',
-		'number'     => 8,
+		'number'     => 9,
+		'exclude'    => array_values( array_filter( array_unique( $mats_skip ) ) ),
 	)
 );
 if ( count( $mats_cats ) < 2 ) {

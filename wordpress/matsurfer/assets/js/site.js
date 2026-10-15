@@ -16,8 +16,12 @@
  *  2. Scroll reveal (port of BaseLayout.astro): .reveal elements get
  *     .is-visible when they enter the viewport (threshold 0.12, root margin
  *     0 0 -40px 0); everything is shown at once with prefers-reduced-motion
- *     or without IntersectionObserver. Content never depends on this
- *     script: the hidden state only exists in CSS for motion-safe users.
+ *     or without IntersectionObserver. base.css hides .reveal (motion-safe
+ *     users) only while <html> has the class 'mats-js', which the inline
+ *     script of header.php adds before the styles load and removes again
+ *     after 3 s unless this script has marked <html class="mats-ready">
+ *     (done in init(), below). So without JavaScript, or when this file
+ *     is blocked or fails, the sections are simply visible (chrome.css).
  *  3. Header menu (port of the Header.astro script): the burger toggles the
  *     menu under 64rem; Escape closes it and returns the focus to the
  *     burger; following a link closes it.
@@ -242,6 +246,8 @@
 
   function init() {
     setupReveal();
+    /* the reveal is running: the inline script of header.php keeps the hidden state */
+    document.documentElement.classList.add('mats-ready');
     setupMenu();
   }
 

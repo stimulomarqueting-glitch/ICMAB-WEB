@@ -116,6 +116,44 @@ function mats_installer_summary_html(): string {
 	);
 }
 
+/** Texts of the "Sobrescribir los textos" confirmation (JS dialog and no-JS box). */
+function mats_installer_overwrite_question(): string {
+	return '¿Seguro que quieres sobrescribir los textos?';
+}
+
+function mats_installer_overwrite_warning(): string {
+	return 'Los textos de las secciones de todas las páginas volverán a ser los de la web original y se perderán los cambios que hayáis hecho en ellas. El equipo, las aplicaciones, las publicaciones, las valoraciones, las noticias, los textos legales y los formularios no se tocan.';
+}
+
+/**
+ * Without JavaScript there is no confirmation dialog: pressing step 3 or
+ * "Hacerlo todo" with "Sobrescribir los textos" ticked comes back here
+ * (?mats_confirm=content|all) and nothing runs until this box is accepted.
+ */
+function mats_installer_confirm_html( string $step ): string {
+	if ( ! mats_installer_step_can_overwrite( $step ) ) {
+		return '';
+	}
+	ob_start();
+	?>
+	<div class="mats-setup__confirm" id="mats-confirm" role="region" aria-labelledby="mats-confirm-title" tabindex="-1">
+		<h2 id="mats-confirm-title" class="mats-setup__confirm-title"><?php echo esc_html( mats_installer_overwrite_question() ); ?></h2>
+		<p><?php echo esc_html( mats_installer_overwrite_warning() ); ?></p>
+		<p><?php echo esc_html( 'all' === $step ? 'Todavía no se ha hecho nada. Si confirmas, se harán los pasos 1 a 4 y se sobrescribirán los textos.' : 'Todavía no se ha hecho nada. Si confirmas, se repetirá el paso 3 y se sobrescribirán los textos.' ); ?></p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="mats-setup__confirm-actions">
+			<input type="hidden" name="action" value="mats_installer_run">
+			<input type="hidden" name="step" value="<?php echo esc_attr( $step ); ?>">
+			<input type="hidden" name="overwrite" value="1">
+			<input type="hidden" name="confirm" value="1">
+			<?php wp_nonce_field( MATS_SETUP_NONCE ); ?>
+			<button type="submit" class="button button-primary"><?php echo esc_html( 'all' === $step ? 'Sí, sobrescribir y hacerlo todo' : 'Sí, sobrescribir los textos' ); ?></button>
+			<a class="button" href="<?php echo esc_url( mats_installer_url() . '#mats-step-content' ); ?>">No, volver sin cambiar nada</a>
+		</form>
+	</div>
+	<?php
+	return (string) ob_get_clean();
+}
+
 /** Card of one step. */
 function mats_installer_step_html( string $key, int $number ): string {
 	$step   = mats_installer_steps()[ $key ];
@@ -162,6 +200,8 @@ function mats_installer_render_page(): void {
 		wp_die( esc_html( 'No tienes permiso para ver esta pantalla.' ) );
 	}
 	$number = 0;
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only chooses which confirmation to show; its form has its own nonce.
+	$confirm = isset( $_GET['mats_confirm'] ) && is_scalar( $_GET['mats_confirm'] ) ? sanitize_key( wp_unslash( $_GET['mats_confirm'] ) ) : '';
 	?>
 	<div class="wrap mats-setup">
 		<h1 class="mats-setup__title">
@@ -169,6 +209,7 @@ function mats_installer_render_page(): void {
 			Puesta en marcha de la web
 		</h1>
 		<p class="mats-setup__lead">Este asistente deja la web de MatSurfer lista en unos minutos: instala los plugins, configura el inglés y el español, crea las páginas con los textos y fotos originales y prepara el formulario de contacto. Puedes repetirlo cuando quieras: nunca duplica páginas ni cambia lo que ya hayáis editado.</p>
+		<?php echo mats_installer_confirm_html( $confirm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside. ?>
 
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="mats-setup__form" id="mats-setup-form">
 			<input type="hidden" name="action" value="mats_installer_run">

@@ -39,36 +39,38 @@ if ( ! $posts ) {
 	return;
 }
 
-/* a section just added (nothing filled in yet) starts with sensible words */
-$fresh = ! mats_has( $kicker ) && ! mats_has( $title ) && ! mats_has( $cta['label'] ?? '' ) && ! mats_has( $cta['page'] ?? '' ) && ! mats_has( $cta['url'] ?? '' );
-if ( $fresh ) {
+/*
+ * Each empty field shows its standard words, in the page language: kicker
+ * "News", title "Latest news", button "All news" to the News page. Filling
+ * one field never removes the others, and the standard words are editable
+ * in place like typed ones (what the editor types replaces them).
+ */
+if ( ! mats_has( $kicker ) ) {
 	$kicker = mats_t( 'news' );
-	$cta    = array(
-		'label' => mats_t( 'all_news' ),
-		'page'  => 'news',
-	);
 }
-$own_kicker = mats_has( mats_get( $attributes, 'kicker' ) );
-$own_title  = mats_has( mats_get( $attributes, 'title' ) );
-$own_cta    = ! $fresh && mats_has( mats_link_label( (array) mats_get( $attributes, 'cta', array() ) ) );
-$cta_label  = mats_link_label( $cta );
-$heading_id = 'lposts-title-' . wp_unique_id();
-if ( '' === trim( $title ) ) {
+if ( ! mats_has( $title ) ) {
 	$title = mats_t( 'latest_news' );
 }
+if ( ! mats_has( $cta['page'] ?? '' ) && ! mats_has( $cta['url'] ?? '' ) ) {
+	$cta['page'] = 'news';
+	$cta['url']  = '';
+}
+if ( ! mats_has( $cta['label'] ?? '' ) ) {
+	$cta['label'] = 'news' === ( $cta['page'] ?? '' ) ? mats_t( 'all_news' ) : mats_t( 'read_more' );
+}
+$cta_label  = mats_link_label( $cta );
+$heading_id = 'lposts-title-' . wp_unique_id();
 ?>
 <section class="sec hairtop lposts" aria-labelledby="<?php echo esc_attr( $heading_id ); ?>">
 	<?php echo mats_preview_note( 'Las noticias se muestran solas, de la más reciente a la más antigua. Para cambiarlas, edita las entradas.', 'edit.php', 'Ir a Entradas' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 	<div class="container">
 		<div class="lposts__head">
 			<div class="reveal">
-				<?php if ( mats_has( $kicker ) ) : ?>
-					<p class="eyebrow"<?php echo $own_kicker ? mats_edit( 'kicker' ) : ''; ?>><?php echo mats_text( $kicker ); ?></p>
-				<?php endif; ?>
-				<h2 class="h2" id="<?php echo esc_attr( $heading_id ); ?>"<?php echo $own_title ? mats_edit( 'title' ) : ''; ?>><?php echo mats_text( $title ); ?></h2>
+				<p class="eyebrow"<?php echo mats_edit( 'kicker' ); ?>><?php echo mats_text( $kicker ); ?></p>
+				<h2 class="h2" id="<?php echo esc_attr( $heading_id ); ?>"<?php echo mats_edit( 'title' ); ?>><?php echo mats_text( $title ); ?></h2>
 			</div>
 			<?php if ( mats_has( $cta_label ) ) : ?>
-				<a class="btn btn--ghost btn--sm lposts__cta reveal" <?php echo mats_link_attrs( $cta ); ?> data-cta-source="latest-news"<?php echo $own_cta ? mats_edit( 'cta.label' ) : ''; ?>><?php echo mats_text( $cta_label ); ?></a>
+				<a class="btn btn--ghost btn--sm lposts__cta reveal" <?php echo mats_link_attrs( $cta ); ?> data-cta-source="latest-news"<?php echo mats_edit( 'cta.label' ); ?>><?php echo mats_text( $cta_label ); ?></a>
 			<?php endif; ?>
 		</div>
 		<div class="lposts__grid lposts__grid--<?php echo (int) $count; ?>">

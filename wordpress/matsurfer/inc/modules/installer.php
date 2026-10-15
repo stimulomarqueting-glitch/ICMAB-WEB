@@ -54,6 +54,10 @@ add_action(
 		if ( 'show' !== $state['notice'] || ! empty( $state['done'] ) ) {
 			return;
 		}
+		/* every step already done (e.g. "Hacerlo todo" finished): the reminder goes away for good */
+		if ( mats_installer_maybe_hide_notice() ) {
+			return;
+		}
 		$hide = wp_nonce_url( add_query_arg( 'action', 'mats_installer_notice', admin_url( 'admin-post.php' ) ), MATS_SETUP_NONCE );
 		?>
 		<div class="notice notice-info mats-setup-notice">
@@ -157,7 +161,7 @@ add_action(
 					'steps'   => mats_installer_auto_steps(),
 					'titles'  => wp_list_pluck( mats_installer_steps(), 'title' ),
 					'text'    => array(
-						'confirm'   => "¿Seguro que quieres sobrescribir los textos?\n\nLos textos de las secciones de todas las páginas volverán a ser los de la web original y se perderán los cambios que hayáis hecho en ellas. El equipo, las aplicaciones, las publicaciones, las valoraciones, las noticias, los textos legales y los formularios no se tocan.",
+						'confirm'   => mats_installer_overwrite_question() . "\n\n" . mats_installer_overwrite_warning(),
 						'working'   => 'Trabajando… no cierres esta pestaña.',
 						'stepStart' => 'Haciendo: %s…',
 						'allDone'   => 'Listo. Revisa el resultado de cada paso y termina con el paso 5 (Revisión final).',
@@ -182,16 +186,35 @@ function mats_installer_request_step(): string {
 	return in_array( $step, $ok, true ) ? $step : '';
 }
 
+/** Is a request flag set to exactly '1'? */
+function mats_installer_request_flag( string $name ): bool {
+	// phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- verified by the callers; compared to a constant.
+	return isset( $_REQUEST[ $name ] ) && is_scalar( $_REQUEST[ $name ] ) && '1' === (string) wp_unslash( $_REQUEST[ $name ] );
+}
+
+/** The "Sobrescribir los textos" box was ticked (confirmed or not). */
+function mats_installer_overwrite_requested(): bool {
+	return mats_installer_request_flag( 'overwrite' );
+}
+
+/**
+ * Options of a request. Overwriting the page texts needs BOTH the ticked
+ * box (overwrite=1) and the confirmation (confirm=1): the JS dialog or the
+ * server-rendered confirmation box when JavaScript is off.
+ */
 function mats_installer_request_opts(): array {
-	// phpcs:disable WordPress.Security.NonceVerification -- verified by the callers before use.
+	// phpcs:ignore WordPress.Security.NonceVerification -- verified by the callers before use.
 	$from = isset( $_REQUEST['from'] ) && is_scalar( $_REQUEST['from'] ) ? sanitize_key( wp_unslash( $_REQUEST['from'] ) ) : '';
-	$opts = array(
-		'overwrite' => isset( $_REQUEST['overwrite'] ) && '1' === (string) wp_unslash( $_REQUEST['overwrite'] ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- compared to a constant.
+	return array(
+		'overwrite' => mats_installer_overwrite_requested() && mats_installer_request_flag( 'confirm' ),
 		'install'   => true,
 		'from'      => in_array( $from, mats_installer_auto_steps(), true ) ? $from : '',
 	);
-	// phpcs:enable
-	return $opts;
+}
+
+/** Does this step overwrite page texts when the box is ticked? */
+function mats_installer_step_can_overwrite( string $step ): bool {
+	return in_array( $step, array( 'content', 'all' ), true );
 }
 
 /** Runs what a request asked for: one step, the SMTP sub-action, or a single step of "all". */
@@ -216,6 +239,11 @@ add_action(
 			wp_safe_redirect( mats_installer_url() );
 			exit;
 		}
+		if ( mats_installer_overwrite_requested() && ! $opts['overwrite'] && mats_installer_step_can_overwrite( $step ) ) {
+			/* no JavaScript, so no dialog: ask on the screen first, nothing runs yet */
+			wp_safe_redirect( mats_installer_url( array( 'mats_confirm' => $step ) ) . '#mats-confirm' );
+			exit;
+		}
 		if ( 'all' === $step ) {
 			$run = mats_installer_run_all( $opts );
 			if ( $run['reload'] && $run['next'] ) {
@@ -227,6 +255,7 @@ add_action(
 							'step'      => 'all',
 							'from'      => $run['next'],
 							'overwrite' => $opts['overwrite'] ? '1' : '0',
+							'confirm'   => $opts['overwrite'] ? '1' : '0',
 							'_wpnonce'  => wp_create_nonce( MATS_SETUP_NONCE ),
 						),
 						admin_url( 'admin-post.php' )
@@ -248,6 +277,7 @@ add_filter(
 	'removable_query_args',
 	static function ( $args ) {
 		$args[] = 'mats_ran';
+		$args[] = 'mats_confirm';
 		return $args;
 	}
 );
@@ -264,7 +294,11 @@ add_action(
 		if ( ! $step || 'all' === $step ) {
 			wp_send_json_error( array( 'message' => 'Paso desconocido.' ), 400 );
 		}
-		$result = mats_installer_dispatch( $step, mats_installer_request_opts() );
+		$opts = mats_installer_request_opts();
+		if ( mats_installer_overwrite_requested() && ! $opts['overwrite'] && mats_installer_step_can_overwrite( $step ) ) {
+			wp_send_json_error( array( 'message' => 'Falta confirmar que quieres sobrescribir los textos. Recarga la página y vuelve a intentarlo.' ), 400 );
+		}
+		$result = mats_installer_dispatch( $step, $opts );
 		$card   = 'smtp' === $step ? 'plugins' : $step;
 		wp_send_json_success(
 			array(
@@ -290,7 +324,8 @@ add_action(
 		}
 		check_ajax_referer( MATS_SETUP_NONCE );
 		mats_installer_prepare();
-		$steps = array();
+		$steps    = array();
+		$all_done = true;
 		foreach ( array_keys( mats_installer_steps() ) as $key ) {
 			$status        = mats_installer_status( $key );
 			$steps[ $key ] = array(
@@ -299,7 +334,12 @@ add_action(
 				'checks' => mats_installer_checks_html( $status ),
 				'button' => 'done' === $status['state'] && 'review' !== $key ? 'Repetir este paso' : mats_installer_steps()[ $key ]['button'],
 			);
+			if ( in_array( $key, mats_installer_auto_steps(), true ) && 'done' !== $status['state'] ) {
+				$all_done = false;
+			}
 		}
+		/* end of "Hacerlo todo" (or of any step) with everything done: no more reminder */
+		mats_installer_maybe_hide_notice( $all_done );
 		wp_send_json_success(
 			array(
 				'steps'   => $steps,

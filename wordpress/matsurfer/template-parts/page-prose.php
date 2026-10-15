@@ -14,7 +14,7 @@ $mats_role   = mats_role_of( get_the_ID() );
 $mats_kicker = in_array( $mats_role, array( 'privacy', 'legal' ), true ) ? (string) mats_setting( 'footer_col3_title' ) : '';
 $mats_kicker = '' !== trim( $mats_kicker ) ? $mats_kicker : 'MatSurfer';
 $mats_lead   = has_excerpt() ? wp_strip_all_tags( get_the_excerpt() ) : '';
-$mats_note   = mats_blog_t( 'updated_on' ) . ' ' . mats_blog_date( get_post(), 'long', 'modified' );
+$mats_note   = mats_t( 'updated_on' ) . ' ' . mats_blog_date( get_post(), 'long', 'modified' );
 
 $mats_content = (string) apply_filters( 'the_content', get_the_content() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals -- core filter
 list( $mats_content, $mats_index ) = mats_blog_heading_index( $mats_content );
@@ -38,9 +38,9 @@ $mats_has_index = count( $mats_index ) >= 3;
 				<?php echo $mats_content; // phpcs:ignore WordPress.Security.EscapeOutput -- the_content output ?>
 			</div>
 			<?php if ( $mats_has_index ) : ?>
-				<nav class="prose-index" aria-label="<?php echo esc_attr( mats_blog_t( 'on_this_page' ) ); ?>">
+				<nav class="prose-index" aria-label="<?php echo esc_attr( mats_t( 'on_this_page' ) ); ?>">
 					<div class="prose-index__inner">
-						<p class="eyebrow"><?php echo esc_html( mats_blog_t( 'on_this_page' ) ); ?></p>
+						<p class="eyebrow"><?php echo esc_html( mats_t( 'on_this_page' ) ); ?></p>
 						<ol class="prose-index__list" role="list">
 							<?php foreach ( $mats_index as $mats_item ) : ?>
 								<li><a href="#<?php echo esc_attr( $mats_item[0] ); ?>"><?php echo esc_html( $mats_item[1] ); ?></a></li>

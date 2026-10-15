@@ -46,6 +46,11 @@ if ( '' !== $form['html'] && function_exists( 'mats_wpforms_enqueue_assets' ) ) 
 	mats_wpforms_enqueue_assets(); // no-op when already enqueued upfront
 }
 
+/* editor notes: only administrators can open WPForms, the Plugins screen and the Dashboard notice */
+$can_admin  = $preview && current_user_can( 'manage_options' );
+$lang_name  = 'es' === $lang ? 'español' : 'inglés';
+$leads_path = $preview && defined( 'MATS_LEADS_PAGE' ) && defined( 'MATS_LEAD_CAP' ) && current_user_can( MATS_LEAD_CAP ) ? 'admin.php?page=' . MATS_LEADS_PAGE : '';
+
 $config = '' !== $form['html'] && function_exists( 'mats_wpforms_client_config' ) ? mats_wpforms_client_config( $lang, (int) $form['form_id'] ) : array();
 $opt    = (string) ( function_exists( 'mats_wpforms_copy' ) ? ( mats_wpforms_copy( $lang )['optionalTag'] ?? '' ) : '' );
 if ( '' === $opt ) {
@@ -105,11 +110,20 @@ if ( '' === $opt ) {
 			<div class="panel lf__card reveal" data-lf-config="<?php echo esc_attr( (string) wp_json_encode( $config ) ); ?>" style="<?php echo esc_attr( '--lf-opt: "' . str_replace( array( '"', '\\' ), '', $opt ) . '"' ); ?>">
 				<?php
 				if ( $preview && $form['form_id'] ) {
-					echo mats_preview_note( // phpcs:ignore WordPress.Security.EscapeOutput
-						sprintf( 'Este es el formulario de WPForms nº %d (%s). Sus campos, el botón, el mensaje de gracias y el email que recibe los contactos se cambian en WPForms.', (int) $form['form_id'], 'es' === $lang ? 'español' : 'inglés' ),
-						'admin.php?page=wpforms-builder&view=fields&form_id=' . (int) $form['form_id'],
-						'Editar el formulario'
-					);
+					if ( $can_admin ) {
+						echo mats_preview_note( // phpcs:ignore WordPress.Security.EscapeOutput
+							sprintf( 'Este es el formulario de WPForms nº %d (%s). Sus campos, el botón, el mensaje de gracias y el email que recibe los contactos se cambian en WPForms.', (int) $form['form_id'], $lang_name ),
+							'admin.php?page=wpforms-builder&view=fields&form_id=' . (int) $form['form_id'],
+							'Editar el formulario'
+						);
+					} else {
+						/* Editors cannot open WPForms: no admin links, just who to ask */
+						echo mats_preview_note( // phpcs:ignore WordPress.Security.EscapeOutput
+							sprintf( 'Este es el formulario de contacto en %s. Sus campos, el botón, el mensaje de gracias y el email que recibe los avisos solo los puede cambiar la persona que administra la web: si hay que cambiar algo, pídeselo. Los mensajes que llegan se guardan en «Contactos».', $lang_name ),
+							$leads_path,
+							$leads_path ? 'Ver los contactos' : ''
+						);
+					}
 				}
 				echo $form['html']; // phpcs:ignore WordPress.Security.EscapeOutput -- WPForms output
 				?>
@@ -118,11 +132,17 @@ if ( '' === $opt ) {
 			<div class="panel lf__card lf__card--missing reveal">
 				<?php
 				if ( $preview ) {
-					$reasons = array(
-						'inactive' => array( 'El plugin WPForms no está instalado o activado, así que los visitantes ven el aviso de abajo con el email de contacto.', 'plugins.php', 'Ir a Plugins' ),
-						'missing'  => array( sprintf( 'Todavía no existe el formulario de contacto en %s. Ve al Escritorio y pulsa «Crear los formularios de contacto». Mientras tanto, los visitantes ven el aviso de abajo.', 'es' === $lang ? 'español' : 'inglés' ), 'index.php', 'Ir al Escritorio' ),
-						'empty'    => array( 'WPForms no ha devuelto el formulario (puede estar vacío o desactivado). Revisa el formulario en WPForms. Mientras tanto, los visitantes ven el aviso de abajo.', 'admin.php?page=wpforms-overview', 'Abrir WPForms' ),
-					);
+					$reasons = $can_admin
+						? array(
+							'inactive' => array( 'El plugin WPForms no está instalado o activado, así que los visitantes ven el aviso de abajo con el email de contacto.', 'plugins.php', 'Ir a Plugins' ),
+							'missing'  => array( sprintf( 'Todavía no existe el formulario de contacto en %s. Ve al Escritorio y pulsa «Crear los formularios de contacto». Mientras tanto, los visitantes ven el aviso de abajo.', $lang_name ), 'index.php', 'Ir al Escritorio' ),
+							'empty'    => array( 'WPForms no ha devuelto el formulario (puede estar vacío o desactivado). Revisa el formulario en WPForms. Mientras tanto, los visitantes ven el aviso de abajo.', 'admin.php?page=wpforms-overview', 'Abrir WPForms' ),
+						)
+						: array(
+							'inactive' => array( 'El formulario de contacto no se puede mostrar porque el plugin WPForms no está activo. Los visitantes ven el aviso de abajo con el email de contacto. Avisa a la persona que administra la web para que lo active.', '', '' ),
+							'missing'  => array( sprintf( 'Todavía no existe el formulario de contacto en %s. Los visitantes ven el aviso de abajo con el email de contacto. Avisa a la persona que administra la web para que cree el formulario.', $lang_name ), '', '' ),
+							'empty'    => array( 'WPForms no ha devuelto el formulario (puede estar vacío o desactivado). Los visitantes ven el aviso de abajo con el email de contacto. Avisa a la persona que administra la web para que lo revise.', '', '' ),
+						);
 					$why     = $reasons[ $form['reason'] ] ?? $reasons['inactive'];
 					echo mats_preview_note( $why[0], $why[1], $why[2] ); // phpcs:ignore WordPress.Security.EscapeOutput
 				}

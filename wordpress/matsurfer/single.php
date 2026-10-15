@@ -2,8 +2,9 @@
 /**
  * News article. Header in the PageHero language (meta row, h1 rising word
  * by word, lead = the excerpt when it was written by hand, featured image
- * on a plate), the block content in a reading column with a share rail,
- * previous / next article and the closing CTA band.
+ * on a plate), the block content in a reading column (its tags below it,
+ * as chips to the tag archive) with a share rail, previous / next article
+ * and the closing CTA band.
  *
  * @package matsurfer
  */
@@ -64,21 +65,36 @@ while ( have_posts() ) :
 
 			<div class="sec hairtop post-body">
 				<div class="container post-body__grid">
-					<div class="mats-prose post-content">
-						<?php the_content(); ?>
+					<div class="post-body__main">
+						<div class="mats-prose post-content">
+							<?php the_content(); ?>
+						</div>
+						<?php
+						$mats_tags = get_the_tags();
+						if ( $mats_tags && ! is_wp_error( $mats_tags ) ) :
+							?>
+							<nav class="post-tags" aria-label="<?php echo esc_attr( mats_t( 'tag' ) ); ?>">
+								<p class="eyebrow post-tags__label"><?php echo esc_html( mats_t( 'tag' ) ); ?></p>
+								<ul class="post-tags__list" role="list">
+									<?php foreach ( $mats_tags as $mats_tag ) : ?>
+										<li><a class="post-tags__chip" href="<?php echo esc_url( get_tag_link( $mats_tag ) ); ?>" rel="tag"><?php echo esc_html( $mats_tag->name ); ?></a></li>
+									<?php endforeach; ?>
+								</ul>
+							</nav>
+						<?php endif; ?>
 					</div>
 					<aside class="post-aside" aria-label="<?php echo esc_attr( mats_t( 'share' ) ); ?>">
 						<div class="post-aside__inner">
 							<p class="eyebrow"><?php echo esc_html( mats_t( 'share' ) ); ?></p>
 							<ul class="post-share" role="list">
 								<li>
-									<a class="post-share__link" href="<?php echo esc_url( 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode( $mats_url ) ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( mats_blog_t( 'share_linkedin' ) ); ?>">
+									<a class="post-share__link" href="<?php echo esc_url( 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode( $mats_url ) ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( mats_t( 'share_linkedin' ) ); ?>">
 										<span class="post-share__icon" aria-hidden="true"><?php echo mats_icon( 'linkedin' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme file ?></span>
 										<span>LinkedIn</span>
 									</a>
 								</li>
 								<li>
-									<a class="post-share__link" href="<?php echo esc_url( 'mailto:?subject=' . rawurlencode( $mats_title ) . '&body=' . rawurlencode( $mats_url ) ); ?>" aria-label="<?php echo esc_attr( mats_blog_t( 'share_email' ) ); ?>">
+									<a class="post-share__link" href="<?php echo esc_url( 'mailto:?subject=' . rawurlencode( $mats_title ) . '&body=' . rawurlencode( $mats_url ) ); ?>" aria-label="<?php echo esc_attr( mats_t( 'share_email' ) ); ?>">
 										<span class="post-share__icon" aria-hidden="true"><?php echo mats_icon( 'mail' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme file ?></span>
 										<span>Email</span>
 									</a>
@@ -96,7 +112,7 @@ while ( have_posts() ) :
 		$mats_next = get_next_post();
 		if ( $mats_prev || $mats_next ) :
 			?>
-			<nav class="sec hairtop post-nav" aria-label="<?php echo esc_attr( mats_blog_t( 'article_nav' ) ); ?>">
+			<nav class="sec hairtop post-nav" aria-label="<?php echo esc_attr( mats_t( 'article_nav' ) ); ?>">
 				<div class="container post-nav__grid">
 					<?php
 					foreach ( array(
@@ -111,9 +127,9 @@ while ( have_posts() ) :
 						<a class="panel post-nav__link post-nav__link--<?php echo esc_attr( $mats_dir ); ?>" href="<?php echo esc_url( get_permalink( $mats_adj ) ); ?>" rel="<?php echo esc_attr( $mats_dir ); ?>">
 							<span class="eyebrow post-nav__label">
 								<?php if ( 'prev' === $mats_dir ) : ?>
-									<span aria-hidden="true">←</span> <?php echo esc_html( mats_blog_t( 'previous_article' ) ); ?>
+									<span aria-hidden="true">←</span> <?php echo esc_html( mats_t( 'previous_article' ) ); ?>
 								<?php else : ?>
-									<?php echo esc_html( mats_blog_t( 'next_article' ) ); ?> <span aria-hidden="true">→</span>
+									<?php echo esc_html( mats_t( 'next_article' ) ); ?> <span aria-hidden="true">→</span>
 								<?php endif; ?>
 							</span>
 							<span class="post-nav__title"><?php echo esc_html( wp_strip_all_tags( get_the_title( $mats_adj ) ) ); ?></span>
@@ -124,7 +140,12 @@ while ( have_posts() ) :
 			</nav>
 		<?php endif; ?>
 
-		<?php echo mats_blog_cta( 'news-article-final' ); // phpcs:ignore WordPress.Security.EscapeOutput -- rendered section ?>
+		<?php
+		/* the closing band, unless the article already contains its own call-to-action section (matsurfer/page-cta) */
+		if ( ! has_block( 'matsurfer/page-cta', $mats_post ) ) {
+			echo mats_blog_cta( 'news-article-final' ); // phpcs:ignore WordPress.Security.EscapeOutput -- rendered section
+		}
+		?>
 	</main>
 	<?php
 endwhile;
