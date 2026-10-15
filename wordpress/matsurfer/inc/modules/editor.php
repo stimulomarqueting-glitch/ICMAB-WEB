@@ -574,10 +574,26 @@ add_action(
 				mats_editor_set_request( 'ids', implode( ',', $keep ), isset( $_GET['ids'] ) ? 'get' : 'post' );
 			}
 		}
+		$left = ! empty( $_REQUEST['post'] ) || ! empty( $_REQUEST['ids'] );
+		$type = isset( $_REQUEST['post_type'] ) && is_scalar( $_REQUEST['post_type'] ) ? sanitize_key( wp_unslash( $_REQUEST['post_type'] ) ) : 'post';
 		// phpcs:enable
-		if ( $skipped ) {
-			add_filter( 'wp_redirect', static fn( $location ) => add_query_arg( 'mats_fixed_skipped', $skipped, $location ) );
+		if ( ! $skipped ) {
+			return;
 		}
+		if ( ! $left ) {
+			/* nothing left to do: back to the list (core would send a request without referer back to itself) */
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'post_type'          => $type,
+						'mats_fixed_skipped' => $skipped,
+					),
+					admin_url( 'edit.php' )
+				)
+			);
+			exit;
+		}
+		add_filter( 'wp_redirect', static fn( $location ) => add_query_arg( 'mats_fixed_skipped', $skipped, $location ) );
 	},
 	1
 );

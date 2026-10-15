@@ -12,13 +12,15 @@
  *     unknown accounts, with and without redirect_to
  *  2. a password reset lifts the login lock at once
  *  3. Atom feed: no <uri> of the user's profile
- *  4. og:locale:alternate only for published translations
+ *  4. og:locale:alternate only for published translations; automatic
+ *     description cut after a multibyte letter stays intact
  *  5. home page: changing Ajustes de la web → «Textos por defecto para
  *     Google» changes its <title> and description
  *  6. editor panel: no «Extracto» hint on landing pages, home page fields
  *     follow the settings, 120–155 counter; REST upload of informe.pl.png
  */
-import { execSync } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
+import { openSync } from 'node:fs';
 import { launch, login as browserLogin, closeWelcome } from './wp-login.mjs';
 
 const BASE = process.env.WP_BASE || 'http://localhost:8916';
@@ -48,10 +50,17 @@ const head = (html) => {
 
 async function restartServer(withStub) {
   if (!withStub) {
-    execSync(`/home/user/wp-serve.sh ${PORT}`);
+    execSync(`/home/user/wp-serve.sh ${PORT}`, { stdio: "ignore" });
     return;
   }
-  execSync(`for pid in $(pgrep -f "localhost:${PORT} /home/user/wpsite-route[r].php"); do kill "$pid" 2>/dev/null; done; sleep 0.3; cd /home/user/wpsite && PHP_CLI_SERVER_WORKERS=4 nohup php -d auto_prepend_file=${QA}/secseo-mailstub.php -S "localhost:${PORT}" /home/user/wpsite-router.php > "/home/user/wpsite-data/server-${PORT}.log" 2>&1 &`, { shell: '/bin/bash' });
+  execSync(`for pid in $(pgrep -f "localhost:${PORT} /home/user/wpsite-route[r].php"); do kill "$pid" 2>/dev/null; done; sleep 0.3`, { shell: '/bin/bash' });
+  const log = openSync(`/home/user/wpsite-data/server-${PORT}.log`, 'a');
+  spawn('php', ['-d', `auto_prepend_file=${QA}/secseo-mailstub.php`, '-S', `localhost:${PORT}`, '/home/user/wpsite-router.php'], {
+    cwd: '/home/user/wpsite',
+    env: { ...process.env, PHP_CLI_SERVER_WORKERS: '4' },
+    detached: true,
+    stdio: ['ignore', log, log],
+  }).unref();
   for (let i = 0; i < 30; i++) {
     await sleep(200);
     try {
@@ -103,7 +112,7 @@ try {
     check(/Acceso bloqueado/.test(locked.err) && /en cuanto la cambies podrás entrar/.test(locked.err), `account locked, message says a new password unlocks ("${locked.err.slice(0, 90)}…")`);
     const { key } = JSON.parse(cli('reset-key'));
     const rp = await get(`/wp-login.php?action=rp&key=${encodeURIComponent(key)}&login=editora`);
-    const cookie = (rp.headers.get('set-cookie') || '').split(';')[0];
+    const cookie = ((rp.headers.getSetCookie ? rp.headers.getSetCookie() : [rp.headers.get('set-cookie') || '']).find((c) => /^wp-resetpass-/.test(c)) || '').split(';')[0];
     check(rp.status === 302 && /wp-resetpass-/.test(cookie), `reset link accepted (${rp.status})`);
     const page = await (await get('/wp-login.php?action=rp', { headers: { Cookie: cookie } })).text();
     const rpKey = (page.match(/name="rp_key" value="([^"]+)"/) || [])[1];
@@ -138,6 +147,13 @@ try {
     check(!only.metas['og:locale:alternate'] && !only.hreflang.includes('es'), `EN article with a draft ES translation: no og:locale:alternate, no hreflang es (${only.metas['og:locale:alternate'] || 'none'} / ${only.hreflang.join(',') || 'none'})`);
     const both = head(await (await get(urls.both)).text());
     check((both.metas['og:locale:alternate'] || []).join() === 'es_ES' && both.hreflang.includes('es'), `EN article with a published ES translation: og:locale:alternate es_ES + hreflang es (${both.metas['og:locale:alternate']} / ${both.hreflang.join(',')})`);
+    const mbHtml = await (await get(urls.multibyte)).text();
+    const mb = head(mbHtml);
+    const desc = (mb.metas.description || [''])[0];
+    const ld = JSON.parse((mbHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [, '{}'])[1]);
+    const posting = (ld['@graph'] || []).find((n) => n['@type'] === 'BlogPosting') || {};
+    check(/PRESENTÓ…$/.test(desc) && (mb.metas['og:description'] || [''])[0] === desc && (mb.metas['twitter:description'] || [''])[0] === desc, `automatic description cut after «Ó» is intact in meta / og / twitter ("…${desc.slice(-24)}")`);
+    check(posting.description === desc && !/\?/.test(posting.description || '?'), 'BlogPosting description intact (no "?")');
   } finally {
     console.log('    ' + cli('drafts-cleanup'));
   }

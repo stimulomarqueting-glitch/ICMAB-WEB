@@ -248,7 +248,7 @@ add_filter(
 /* … and not the "Web" of that user's profile either (Atom <author><uri>:
    empty → WordPress leaves the line out) */
 add_filter(
-	'get_the_author_url',
+	'get_the_author_user_url', // get_the_author_meta( 'url' ) reads the field user_url
 	static function ( $url ) {
 		return is_feed() ? '' : $url;
 	},
@@ -388,7 +388,8 @@ function mats_sec_login_user_id( string $username ): int {
 
 /**
  * Current lock of a login attempt: [ 'until' => unix time (0 = not locked),
- * 'kind' => 'user' (that account from this IP) | 'ip' (this IP) | '' ].
+ * 'kind' => 'user' (that account from this IP) | 'ip' (this IP: a new
+ * password would not help, so it takes precedence) | '' ].
  */
 function mats_sec_login_lock( string $username ): array {
 	$now  = time();
@@ -397,12 +398,11 @@ function mats_sec_login_lock( string $username ): array {
 		'kind'  => '',
 	);
 	foreach ( mats_sec_login_keys( $username ) as $kind => $key ) {
-		$data = get_transient( $key );
-		if ( is_array( $data ) && ! empty( $data['until'] ) && (int) $data['until'] > max( $now, $lock['until'] ) ) {
-			$lock = array(
-				'until' => (int) $data['until'],
-				'kind'  => (string) $kind,
-			);
+		$data  = get_transient( $key );
+		$until = is_array( $data ) ? (int) ( $data['until'] ?? 0 ) : 0;
+		if ( $until > $now ) {
+			$lock['until'] = max( $lock['until'], $until );
+			$lock['kind']  = ( 'ip' === $kind || 'ip' === $lock['kind'] ) ? 'ip' : (string) $kind;
 		}
 	}
 	return $lock;

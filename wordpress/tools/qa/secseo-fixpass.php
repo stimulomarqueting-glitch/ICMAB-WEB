@@ -6,7 +6,9 @@
  * MATS_QA_STEP selects what runs:
  *   unit (default)  trim, social image sizes, home texts, robots.txt,
  *                   upload names, login lock lifted by a new password
- *   drafts-setup    EN article (published) + ES translation (draft) → JSON
+ *   drafts-setup    EN article (published) + ES translation (draft), a
+ *                   published pair, an article whose automatic description
+ *                   is cut after «Ó» → JSON
  *   drafts-cleanup  deletes them
  *   settings-set    seo_title / seo_description of both languages → QA text
  *   settings-reset  puts the saved values back (backup option)
@@ -40,11 +42,16 @@ if ( 'drafts-setup' === $mats_step ) {
 	pll_set_post_language( $mats_en2, 'en' );
 	pll_set_post_language( $mats_es2, 'es' );
 	pll_save_post_translations( array( 'en' => $mats_en2, 'es' => $mats_es2 ) );
-	echo wp_json_encode( array( 'enOnly' => get_permalink( $mats_en ), 'both' => get_permalink( $mats_en2 ), 'ids' => array( $mats_en, $mats_es, $mats_en2, $mats_es2 ) ) ), "\n";
+	/* automatic description cut right after a multibyte letter ("…PRESENTÓ") */
+	$mats_lead = 'Texto de prueba sobre recubrimientos funcionales en el laboratorio, donde EL EQUIPO PRESENTÓ';
+	$mats_lead = str_repeat( 'a', 140 - mb_strlen( $mats_lead ) - 1 ) . ' ' . $mats_lead; // ends at character 140
+	$mats_mb   = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_name' => 'secseo-fixpass-multibyte', 'post_title' => 'SecSEO fixpass: multibyte', 'post_content' => '<!-- wp:paragraph --><p>' . $mats_lead . ' resultadosextraordinarios del método π-π y más texto para alargar.</p><!-- /wp:paragraph -->' ) );
+	pll_set_post_language( $mats_mb, 'es' );
+	echo wp_json_encode( array( 'enOnly' => get_permalink( $mats_en ), 'both' => get_permalink( $mats_en2 ), 'multibyte' => get_permalink( $mats_mb ), 'ids' => array( $mats_en, $mats_es, $mats_en2, $mats_es2, $mats_mb ) ) ), "\n";
 	return;
 }
 if ( 'drafts-cleanup' === $mats_step ) {
-	foreach ( get_posts( array( 'post_type' => 'post', 'post_status' => 'any', 'numberposts' => -1, 'lang' => '', 'fields' => 'ids', 'post_name__in' => array( 'secseo-fixpass-en-only', 'secseo-fixpass-borrador', 'secseo-fixpass-both', 'secseo-fixpass-ambos' ) ) ) as $mats_id ) {
+	foreach ( get_posts( array( 'post_type' => 'post', 'post_status' => 'any', 'numberposts' => -1, 'lang' => '', 'fields' => 'ids', 'post_name__in' => array( 'secseo-fixpass-en-only', 'secseo-fixpass-borrador', 'secseo-fixpass-both', 'secseo-fixpass-ambos', 'secseo-fixpass-multibyte' ) ) ) as $mats_id ) {
 		wp_delete_post( $mats_id, true );
 	}
 	echo "drafts removed\n";

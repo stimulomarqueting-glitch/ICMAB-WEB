@@ -9,9 +9,10 @@ import { launch, login, closeWelcome, BASE } from './wp-login.mjs';
 const OUT = '/tmp/claude-0/-home-user-ICMAB-WEB/ae5d27f5-1af0-537f-966f-1d2257e6cfbd/scratchpad/admin/shots';
 const port = new URL(BASE).port;
 execSync(`MATS_WP_PORT=${port} php /home/user/wpsite-cli.php ${new URL('./admin-unlock.php', import.meta.url).pathname}`, { stdio: 'ignore' });
+const IDS = JSON.parse(execSync(`MATS_WP_PORT=${port} php /home/user/wpsite-cli.php ${new URL('./admin-ids.php', import.meta.url).pathname}`).toString());
 const browser = await launch();
 const page = await login(browser, 'editora', 'editora-local-pass');
-await page.goto(`${BASE}/wp-admin/post.php?post=38&action=edit`);
+await page.goto(`${BASE}/wp-admin/post.php?post=${IDS.product_es}&action=edit`);
 await page.waitForFunction(() => window.wp && wp.data.select('core/editor').getCurrentPostId(), null, { timeout: 60000, polling: 500 });
 await page.waitForTimeout(4000);
 await closeWelcome(page);
@@ -28,18 +29,18 @@ const dirty = await page.evaluate(() => wp.data.select('core/editor').isEditedPo
 await page.click('.editor-post-publish-button, .editor-post-publish-button__button');
 await page.waitForFunction(() => !wp.data.select('core/editor').isSavingPost() && !wp.data.select('core/editor').isEditedPostDirty(), null, { timeout: 30000, polling: 300 });
 await page.screenshot({ path: `${OUT}/editor-inline-saved.png` });
-const saved = await page.evaluate(async () => {
-  const p = await wp.apiFetch({ path: '/wp/v2/pages/38?context=edit' });
+const saved = await page.evaluate(async (id) => {
+  const p = await wp.apiFetch({ path: `/wp/v2/pages/${id}?context=edit` });
   const hero = wp.blocks.parse(p.content.raw).find((b) => b.name === 'matsurfer/page-hero');
   return hero ? hero.attributes.title : null;
-});
+}, IDS.product_es);
 /* restore */
-await page.evaluate(async (orig) => {
-  const p = await wp.apiFetch({ path: '/wp/v2/pages/38?context=edit' });
+await page.evaluate(async ([orig, id]) => {
+  const p = await wp.apiFetch({ path: `/wp/v2/pages/${id}?context=edit` });
   const blocks = wp.blocks.parse(p.content.raw);
   blocks.find((b) => b.name === 'matsurfer/page-hero').attributes.title = orig;
-  await wp.apiFetch({ path: '/wp/v2/pages/38', method: 'POST', data: { content: wp.blocks.serialize(blocks) } });
-}, before);
+  await wp.apiFetch({ path: `/wp/v2/pages/${id}`, method: 'POST', data: { content: wp.blocks.serialize(blocks) } });
+}, [before, IDS.product_es]);
 
 /* new post from the tile, in Spanish */
 await page.goto(`${BASE}/wp-admin/post-new.php?new_lang=es`);

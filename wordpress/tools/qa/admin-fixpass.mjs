@@ -65,6 +65,16 @@ try {
   check(s[R].lang === 'es' && s[R].status === 'draft', 'bulk edit still works for a normal page (language + status changed)');
   cli('admin-langstate.php', `restore ${P},${PES},${R}`);
 
+  /* forged bulk "Move to Trash" of Product alone: a clean redirect with the notice, nothing trashed */
+  await page.goto(`${BASE}/wp-admin/edit.php?post_type=page&lang=all`);
+  const nonce2 = await page.$eval('#posts-filter input[name="_wpnonce"]', (e) => e.value);
+  await page.goto(`${BASE}/wp-admin/edit.php?post_type=page&_wpnonce=${nonce2}&action=trash&action2=-1&post%5B%5D=${P}`);
+  await page.waitForTimeout(500);
+  report.trashUrl = page.url().replace(BASE, '');
+  report.trashNotice = await page.$$eval('.notice-warning p', (els) => els.map((e) => e.textContent.trim()));
+  check(/edit\.php/.test(report.trashUrl) && report.trashNotice.some((t) => /no se cambian en grupo ni se mueven a la papelera/.test(t)), 'editor: bulk trash of a fixed page ends on the Pages list with an explanation');
+  productIntact(state(), 'bulk trash');
+
   /* forged quick edit of Product */
   await page.goto(`${BASE}/wp-admin/edit.php?post_type=page&lang=all`);
   const inlineNonce = await page.$eval('#_inline_edit', (e) => e.value);

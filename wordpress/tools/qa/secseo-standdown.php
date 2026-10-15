@@ -53,4 +53,7 @@ if ( '/research/' === $mats_path ) {
 	$mats_ok( in_array( 'ScholarlyArticle', $mats_types, true ), 'section nodes kept (ScholarlyArticle)' );
 }
 $mats_ok( false !== strpos( $mats_html, 'hreflang="x-default"' ), 'Polylang hreflang + x-default still printed' );
+/* robots.txt: the plugin lists its own sitemap (and usually turns wp-sitemap.xml off) */
+remove_filter( 'robots_txt', array( wp_sitemaps_get_server(), 'add_robots' ), 0 );
+$mats_ok( false === stripos( (string) apply_filters( 'robots_txt', "User-agent: *\nDisallow: /wp-admin/\n", '1' ), 'sitemap:' ), 'robots.txt: no Sitemap line from the theme' );
 echo $mats_fail ? "\nFAILED: $mats_fail\n" : "\nALL STAND-DOWN CHECKS PASSED\n";

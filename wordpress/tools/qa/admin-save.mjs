@@ -14,22 +14,24 @@ import { launch, login, BASE } from './wp-login.mjs';
 
 const port = new URL(BASE).port;
 execSync(`MATS_WP_PORT=${port} php /home/user/wpsite-cli.php ${new URL('./admin-unlock.php', import.meta.url).pathname}`, { stdio: 'ignore' });
+/* ids differ between databases (admin-ids.php) */
+const IDS = JSON.parse(execSync(`MATS_WP_PORT=${port} php /home/user/wpsite-cli.php ${new URL('./admin-ids.php', import.meta.url).pathname}`).toString());
 
 const browser = await launch();
 const page = await login(browser, 'editora', 'editora-local-pass');
-await page.goto(`${BASE}/wp-admin/post.php?post=37&action=edit`);
+await page.goto(`${BASE}/wp-admin/post.php?post=${IDS.product}&action=edit`);
 await page.waitForFunction(() => window.wp && wp.apiFetch && wp.data.select('core/editor').getCurrentPostId(), null, { timeout: 60000, polling: 500 });
 
-const result = await page.evaluate(async () => {
+const result = await page.evaluate(async (IDS) => {
   const out = {};
-  const before = await wp.apiFetch({ path: '/wp/v2/pages/37?context=edit' });
+  const before = await wp.apiFetch({ path: `/wp/v2/pages/${IDS.product}?context=edit` });
   const blocks = wp.blocks.parse(before.content.raw);
   const hero = blocks.find((b) => b.name === 'matsurfer/page-hero');
   const originalTitle = hero.attributes.title;
   hero.attributes.title = 'QA R&D <b>bold</b> a < b "quoted"';
   const content = wp.blocks.serialize(blocks);
   try {
-    const saved = await wp.apiFetch({ path: '/wp/v2/pages/37', method: 'POST', data: { content, slug: 'hacked-slug', status: 'draft', parent: 39, password: 'x' } });
+    const saved = await wp.apiFetch({ path: `/wp/v2/pages/${IDS.product}`, method: 'POST', data: { content, slug: 'hacked-slug', status: 'draft', parent: IDS.team, password: 'x' } });
     out.slug = saved.slug;
     out.status = saved.status;
     out.parent = saved.parent;
@@ -41,19 +43,19 @@ const result = await page.evaluate(async () => {
   }
   /* restore */
   hero.attributes.title = originalTitle;
-  await wp.apiFetch({ path: '/wp/v2/pages/37', method: 'POST', data: { content: wp.blocks.serialize(blocks) } });
+  await wp.apiFetch({ path: `/wp/v2/pages/${IDS.product}`, method: 'POST', data: { content: wp.blocks.serialize(blocks) } });
 
   try {
-    await wp.apiFetch({ path: '/wp/v2/pages/37', method: 'DELETE' });
+    await wp.apiFetch({ path: `/wp/v2/pages/${IDS.product}`, method: 'DELETE' });
     out.delete = 'deleted!';
   } catch (e) {
     out.delete = e.code || e.message;
   }
 
-  const post = await wp.apiFetch({ path: '/wp/v2/posts/53', method: 'POST', data: { content: '<!-- wp:paragraph --><p>Hola <script>alert(1)</script><strong>R&amp;D</strong></p><!-- /wp:paragraph -->' } });
+  const post = await wp.apiFetch({ path: `/wp/v2/posts/${IDS.post}`, method: 'POST', data: { content: '<!-- wp:paragraph --><p>Hola <script>alert(1)</script><strong>R&amp;D</strong></p><!-- /wp:paragraph -->' } });
   out.postContent = post.content.raw;
   return out;
-});
+}, IDS);
 console.log(JSON.stringify(result, null, 2));
 
 const fails = [];

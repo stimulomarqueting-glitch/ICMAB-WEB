@@ -44,7 +44,7 @@ foreach ( array( 'photo.php.jpg', 'shell.phtml', 'x.PHP5', '.htaccess', 'a.svg',
 	$mats_r = mats_sec_upload_prefilter( array( 'name' => $mats_name, 'size' => 100, 'error' => 0 ) );
 	$mats_ok( ! empty( $mats_r['error'] ), "upload refused: $mats_name" );
 }
-foreach ( array( 'product-table.jpg', 'Foto equipo 2026.JPG', 'informe.v2.pdf', 'www.icmab.es.png', 'matsurfer-device.mp4', 'matsurfer-1.0.0.zip' ) as $mats_name ) {
+foreach ( array( 'product-table.jpg', 'Foto equipo 2026.JPG', 'informe.v2.pdf', 'www.icmab.es.png', 'informe.pl.png', 'figura.py.png', 'matsurfer-device.mp4', 'matsurfer-1.0.0.zip' ) as $mats_name ) {
 	$mats_r = mats_sec_upload_prefilter( array( 'name' => $mats_name, 'size' => 100, 'error' => 0 ) );
 	$mats_ok( empty( $mats_r['error'] ), "upload accepted: $mats_name" );
 }
