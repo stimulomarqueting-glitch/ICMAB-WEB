@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/audiences",
+  "title": "Para quién es",
+  "description": "Cuatro tipos de equipo con icono.",
+  "category": "matsurfer",
+  "icon": "groups",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "groups",
+        "type": "repeater",
+        "label": "Tipos de equipo",
+        "itemLabel": "Equipo",
+        "fields": [
+          {
+            "key": "icon",
+            "type": "select",
+            "label": "Icono",
+            "options": [
+              {
+                "value": "surface",
+                "label": "Grupos académicos"
+              },
+              {
+                "value": "lab",
+                "label": "Nuevos en superficies"
+              },
+              {
+                "value": "insitu",
+                "label": "I+D corporativo"
+              },
+              {
+                "value": "modularity",
+                "label": "Socios de equipamiento"
+              }
+            ]
+          },
+          {
+            "key": "title",
+            "type": "text",
+            "label": "Título"
+          },
+          {
+            "key": "text",
+            "type": "textarea",
+            "label": "Texto",
+            "rows": 3
+          }
+        ],
+        "min": 4,
+        "max": 4,
+        "titleField": "title"
+      }
+    ]
+  }
+}

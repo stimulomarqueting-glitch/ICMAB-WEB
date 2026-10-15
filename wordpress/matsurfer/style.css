@@ -1,0 +1,17 @@
+/*
+Theme Name: MatSurfer
+Theme URI: https://matsurfer.icmab.es
+Author: Stimulo
+Author URI: https://stimulo.es
+Description: Tema a medida de MatSurfer (ICMAB-CSIC). Secciones editables con bloques bloqueados, inglés/español con Polylang, formularios con WPForms, equipo, aplicaciones, publicaciones y valoraciones como contenidos propios. Incluye asistente de puesta en marcha (Apariencia → MatSurfer).
+Version: 1.0.0
+Requires at least: 6.6
+Tested up to: 7.1
+Requires PHP: 8.1
+License: Proprietary — built for ICMAB-CSIC
+Text Domain: matsurfer
+*/
+
+/* The real styles live in assets/css (base.css, chrome.css) and in each
+   block's own style.css under blocks/. This file only carries the theme
+   header WordPress reads. */

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/parameters",
+  "title": "Parámetros",
+  "description": "Tarjetas con el símbolo y el nombre de cada parámetro.",
+  "category": "matsurfer",
+  "icon": "performance",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto",
+        "rows": 3
+      },
+      {
+        "key": "items",
+        "type": "repeater",
+        "label": "Parámetros",
+        "itemLabel": "Parámetro",
+        "fields": [
+          {
+            "key": "symbol",
+            "type": "text",
+            "label": "Símbolo"
+          },
+          {
+            "key": "label",
+            "type": "text",
+            "label": "Nombre"
+          }
+        ],
+        "min": 1,
+        "max": 8,
+        "titleField": "label"
+      }
+    ]
+  }
+}

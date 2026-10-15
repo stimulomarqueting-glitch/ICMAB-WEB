@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/section-intro",
+  "title": "Introducción de sección",
+  "description": "Etiqueta, título y texto, sin más elementos.",
+  "category": "matsurfer",
+  "icon": "text",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto",
+        "rows": 4
+      }
+    ]
+  }
+}

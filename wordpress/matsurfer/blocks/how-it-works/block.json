@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/how-it-works",
+  "title": "Cómo funciona",
+  "description": "Vídeo del dispositivo y los pasos del proceso.",
+  "category": "matsurfer",
+  "icon": "controls-play",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "type": "panel",
+        "label": "Vídeo"
+      },
+      {
+        "key": "video",
+        "type": "video",
+        "label": "Vídeo del dispositivo",
+        "help": "Formato MP4. Si no hay vídeo se muestra el aviso de abajo."
+      },
+      {
+        "key": "caption",
+        "type": "text",
+        "label": "Pie del vídeo"
+      },
+      {
+        "key": "playLabel",
+        "type": "text",
+        "label": "Texto del botón de reproducir (accesibilidad)"
+      },
+      {
+        "key": "placeholder",
+        "type": "text",
+        "label": "Aviso cuando no hay vídeo"
+      },
+      {
+        "key": "steps",
+        "type": "repeater",
+        "label": "Pasos",
+        "itemLabel": "Paso",
+        "fields": [
+          {
+            "key": "title",
+            "type": "text",
+            "label": "Título"
+          },
+          {
+            "key": "text",
+            "type": "textarea",
+            "label": "Texto",
+            "rows": 2
+          }
+        ],
+        "min": 1,
+        "max": 6,
+        "titleField": "title"
+      }
+    ]
+  }
+}

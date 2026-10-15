@@ -1,0 +1,93 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/team-journey",
+  "title": "Del laboratorio al banco de trabajo",
+  "description": "Tres tipos de trabajo y cifras clave.",
+  "category": "matsurfer",
+  "icon": "chart-line",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto",
+        "rows": 3
+      },
+      {
+        "key": "steps",
+        "type": "repeater",
+        "label": "Tipos de trabajo",
+        "itemLabel": "Paso",
+        "fields": [
+          {
+            "key": "title",
+            "type": "text",
+            "label": "Título"
+          },
+          {
+            "key": "text",
+            "type": "textarea",
+            "label": "Texto",
+            "rows": 3
+          }
+        ],
+        "min": 3,
+        "max": 3,
+        "titleField": "title"
+      },
+      {
+        "key": "facts",
+        "type": "repeater",
+        "label": "Cifras",
+        "itemLabel": "Cifra",
+        "fields": [
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Cifra"
+          },
+          {
+            "key": "label",
+            "type": "text",
+            "label": "Qué cuenta"
+          }
+        ],
+        "min": 1,
+        "max": 6,
+        "titleField": "label"
+      },
+      {
+        "key": "factsNote",
+        "type": "text",
+        "label": "Nota bajo las cifras"
+      },
+      {
+        "key": "factsLink",
+        "type": "link",
+        "label": "Enlace bajo las cifras"
+      }
+    ]
+  }
+}

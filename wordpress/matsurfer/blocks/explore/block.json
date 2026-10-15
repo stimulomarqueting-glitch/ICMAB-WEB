@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/explore",
+  "title": "Casos de estudio y equipo (accesos)",
+  "description": "Dos tarjetas que llevan a Casos de estudio y a Equipo.",
+  "category": "matsurfer",
+  "icon": "columns",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "researchTitle",
+        "type": "text",
+        "label": "Tarjeta 1 · Título"
+      },
+      {
+        "key": "researchText",
+        "type": "textarea",
+        "label": "Tarjeta 1 · Texto",
+        "rows": 2
+      },
+      {
+        "key": "researchCta",
+        "type": "link",
+        "label": "Tarjeta 1 · Botón"
+      },
+      {
+        "type": "panel",
+        "label": "Tarjeta 2"
+      },
+      {
+        "key": "teamTitle",
+        "type": "text",
+        "label": "Tarjeta 2 · Título"
+      },
+      {
+        "key": "teamText",
+        "type": "textarea",
+        "label": "Tarjeta 2 · Texto",
+        "rows": 2
+      },
+      {
+        "key": "teamCta",
+        "type": "link",
+        "label": "Tarjeta 2 · Botón"
+      }
+    ]
+  }
+}

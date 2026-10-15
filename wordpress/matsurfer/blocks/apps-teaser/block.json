@@ -1,0 +1,75 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/apps-teaser",
+  "title": "Aplicaciones (inicio)",
+  "description": "Isotipo con los cinco campos de aplicación y accesos a cada aplicación.",
+  "category": "matsurfer",
+  "icon": "screenoptions",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto",
+        "rows": 3
+      },
+      {
+        "key": "cta",
+        "type": "link",
+        "label": "Botón"
+      },
+      {
+        "type": "panel",
+        "label": "Isotipo"
+      },
+      {
+        "key": "isotypeLabels",
+        "type": "list",
+        "label": "Etiquetas del isotipo",
+        "itemLabel": "Etiqueta",
+        "min": 5,
+        "max": 5,
+        "help": "Cinco campos, en el orden del dibujo."
+      },
+      {
+        "key": "isotypeCaption",
+        "type": "text",
+        "label": "Pie del isotipo"
+      },
+      {
+        "key": "isotypeAlt",
+        "type": "textarea",
+        "label": "Descripción del dibujo (accesibilidad)",
+        "rows": 2
+      },
+      {
+        "type": "notice",
+        "text": "Los accesos bajo el isotipo salen automáticamente de las aplicaciones publicadas.",
+        "admin": "edit.php?post_type=mats_application",
+        "linkLabel": "Editar aplicaciones"
+      }
+    ]
+  }
+}

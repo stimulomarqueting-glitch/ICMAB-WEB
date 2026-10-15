@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/research-experiences",
+  "title": "Valoraciones de expertos",
+  "description": "Citas de investigadores que han usado el dispositivo.",
+  "category": "matsurfer",
+  "icon": "format-quote",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "type": "notice",
+        "text": "Las valoraciones se añaden y editan en el menú Valoraciones.",
+        "admin": "edit.php?post_type=mats_expert",
+        "linkLabel": "Editar valoraciones"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título de la sección"
+      },
+      {
+        "key": "moreLink",
+        "type": "text",
+        "label": "Texto del enlace «saber más»"
+      }
+    ]
+  }
+}

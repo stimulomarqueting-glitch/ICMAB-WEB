@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/applications-list",
+  "title": "Lista de aplicaciones",
+  "description": "Menú fijo y fichas de cada aplicación.",
+  "category": "matsurfer",
+  "icon": "list-view",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "type": "notice",
+        "text": "Las aplicaciones (títulos, textos y orden) se editan en el menú Aplicaciones.",
+        "admin": "edit.php?post_type=mats_application",
+        "linkLabel": "Editar aplicaciones"
+      },
+      {
+        "key": "labelSection",
+        "type": "text",
+        "label": "Nombre de la sección (accesibilidad)"
+      },
+      {
+        "key": "labelChallenge",
+        "type": "text",
+        "label": "Rótulo · La necesidad"
+      },
+      {
+        "key": "labelUse",
+        "type": "text",
+        "label": "Rótulo · Con MatSurfer"
+      },
+      {
+        "key": "labelBenefit",
+        "type": "text",
+        "label": "Rótulo · Para tu equipo"
+      },
+      {
+        "key": "labelCta",
+        "type": "text",
+        "label": "Texto del botón de cada ficha"
+      }
+    ]
+  }
+}

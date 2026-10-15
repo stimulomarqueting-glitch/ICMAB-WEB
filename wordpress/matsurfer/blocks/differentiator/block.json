@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/differentiator",
+  "title": "Diferencial clave",
+  "description": "Bloque destacado con la distancia fuente–sustrato y sus ventajas.",
+  "category": "matsurfer",
+  "icon": "star-filled",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título destacado"
+      },
+      {
+        "key": "text",
+        "type": "textarea",
+        "label": "Texto destacado",
+        "rows": 3
+      },
+      {
+        "key": "features",
+        "type": "repeater",
+        "label": "Ventajas",
+        "itemLabel": "Ventaja",
+        "fields": [
+          {
+            "key": "title",
+            "type": "text",
+            "label": "Título"
+          },
+          {
+            "key": "text",
+            "type": "textarea",
+            "label": "Texto",
+            "rows": 2
+          }
+        ],
+        "min": 1,
+        "max": 9,
+        "titleField": "title"
+      }
+    ]
+  }
+}

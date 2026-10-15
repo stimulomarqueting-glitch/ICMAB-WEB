@@ -1,0 +1,75 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/team-showcase",
+  "title": "Escaparate del equipo",
+  "description": "Presentación a pantalla completa de cada miembro del equipo.",
+  "category": "matsurfer",
+  "icon": "id-alt",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "type": "notice",
+        "text": "Las personas (foto, cargo, biografía, LinkedIn y orden) se editan en el menú Equipo.",
+        "admin": "edit.php?post_type=mats_team",
+        "linkLabel": "Editar equipo"
+      },
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título de la página (H1)"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto (solo si aún no hay perfiles publicados)",
+        "rows": 3
+      },
+      {
+        "type": "panel",
+        "label": "Rótulos"
+      },
+      {
+        "key": "pickerLabel",
+        "type": "text",
+        "label": "Rótulo del selector de personas (accesibilidad)"
+      },
+      {
+        "key": "showLabel",
+        "type": "text",
+        "label": "Texto «Mostrar» (accesibilidad)"
+      },
+      {
+        "key": "noBio",
+        "type": "text",
+        "label": "Texto cuando falta la biografía"
+      },
+      {
+        "key": "linkedinOf",
+        "type": "text",
+        "label": "«en LinkedIn» (accesibilidad)"
+      },
+      {
+        "key": "websiteOf",
+        "type": "text",
+        "label": "«web» (accesibilidad)"
+      }
+    ]
+  }
+}

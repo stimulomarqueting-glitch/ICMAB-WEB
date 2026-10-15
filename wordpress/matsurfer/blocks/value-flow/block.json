@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/value-flow",
+  "title": "Problema → MatSurfer → Resultado",
+  "description": "Tres pasos en una frase cada uno.",
+  "category": "matsurfer",
+  "icon": "editor-ol",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "label",
+        "type": "text",
+        "label": "Nombre de la sección (solo para lectores de pantalla)"
+      },
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "items",
+        "type": "repeater",
+        "label": "Pasos",
+        "itemLabel": "Paso",
+        "fields": [
+          {
+            "key": "tag",
+            "type": "text",
+            "label": "Etiqueta del paso"
+          },
+          {
+            "key": "text",
+            "type": "textarea",
+            "label": "Frase",
+            "rows": 3
+          }
+        ],
+        "min": 3,
+        "max": 3,
+        "titleField": "tag",
+        "help": "El paso central siempre lleva el isotipo de MatSurfer."
+      }
+    ]
+  }
+}

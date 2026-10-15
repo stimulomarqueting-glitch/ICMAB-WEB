@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/hero-field",
+  "title": "Portada (inicio)",
+  "description": "Cabecera de la página de inicio: foto del producto con el vapor animado dentro del frasco.",
+  "category": "matsurfer",
+  "icon": "cover-image",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "attributes": {
+    "ctaSource": {
+      "type": "string",
+      "default": "hero"
+    }
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "eyebrow",
+        "type": "text",
+        "label": "Línea superior (institución y patente)"
+      },
+      {
+        "key": "headline",
+        "type": "text",
+        "label": "Titular principal"
+      },
+      {
+        "key": "descriptor",
+        "type": "text",
+        "label": "Descriptor bajo el titular"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto de entrada",
+        "rows": 3
+      },
+      {
+        "key": "ctaPrimary",
+        "type": "link",
+        "label": "Botón principal"
+      },
+      {
+        "key": "ctaSecondary",
+        "type": "link",
+        "label": "Botón secundario"
+      },
+      {
+        "type": "panel",
+        "label": "Foto y animación"
+      },
+      {
+        "key": "photo",
+        "type": "image",
+        "label": "Foto del producto",
+        "help": "La animación de vapor está ajustada al frasco de la foto original."
+      },
+      {
+        "key": "vapour",
+        "type": "toggle",
+        "label": "Animación de vapor dentro del frasco",
+        "default": true,
+        "help": "Desactívala si cambias la foto por otra en la que el frasco esté en otro sitio."
+      },
+      {
+        "key": "marquee",
+        "type": "list",
+        "label": "Palabras que desfilan abajo",
+        "itemLabel": "Palabra",
+        "min": 0,
+        "max": 10
+      }
+    ]
+  }
+}

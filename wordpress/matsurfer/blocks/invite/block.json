@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/invite",
+  "title": "Invitación a colaborar",
+  "description": "Recuadro con texto y el email de contacto.",
+  "category": "matsurfer",
+  "icon": "email",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "text",
+        "type": "textarea",
+        "label": "Texto (el email se añade solo al final)",
+        "rows": 2
+      }
+    ]
+  }
+}

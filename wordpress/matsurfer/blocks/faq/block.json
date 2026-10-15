@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/faq",
+  "title": "Preguntas frecuentes",
+  "description": "Preguntas que se despliegan al hacer clic.",
+  "category": "matsurfer",
+  "icon": "editor-help",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "items",
+        "type": "repeater",
+        "label": "Preguntas",
+        "itemLabel": "Pregunta",
+        "fields": [
+          {
+            "key": "q",
+            "type": "text",
+            "label": "Pregunta"
+          },
+          {
+            "key": "a",
+            "type": "textarea",
+            "label": "Respuesta",
+            "rows": 5
+          }
+        ],
+        "min": 1,
+        "max": 20,
+        "titleField": "q"
+      }
+    ]
+  }
+}

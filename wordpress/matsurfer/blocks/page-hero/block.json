@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/page-hero",
+  "title": "Cabecera de página",
+  "description": "Título grande de una página interior, con texto, botón y foto opcionales.",
+  "category": "matsurfer",
+  "icon": "heading",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "attributes": {
+    "ctaSource": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "kickerNote",
+        "type": "text",
+        "label": "Nota a la derecha de la etiqueta",
+        "help": "Opcional."
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título de la página (H1)"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto de entrada",
+        "rows": 3
+      },
+      {
+        "key": "cta",
+        "type": "link",
+        "label": "Botón (opcional)",
+        "help": "Deja el texto vacío para no mostrar botón."
+      },
+      {
+        "key": "photo",
+        "type": "image",
+        "label": "Foto (opcional)"
+      }
+    ]
+  }
+}

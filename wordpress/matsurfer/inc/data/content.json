@@ -1,0 +1,1636 @@
+{
+ "en": {
+  "applications": [
+   {
+    "slug": "organic-electronics",
+    "tag": "molecular layers · OLEDs",
+    "title": "Organic electronics",
+    "shortDescription": "Molecular layers on device-relevant substrates.",
+    "challenge": "Research into OLEDs and other organic electronic systems depends on preparing and comparing many layer variations on relevant substrates.",
+    "use": "MatSurfer prepares and compares molecular layers on device-relevant substrates for research into OLEDs and other organic electronic systems.",
+    "benefit": "Layer variations are compared at reduced scale before committing to larger-scale processes.",
+    "published": true,
+    "order": 1
+   },
+   {
+    "slug": "solar-cells",
+    "tag": "perovskite & organic",
+    "title": "Solar-cell research",
+    "shortDescription": "Material–surface combinations and interface preparation.",
+    "challenge": "Screening candidate materials and interfaces is often limited by material availability and access to deposition equipment.",
+    "use": "MatSurfer lets teams explore material–surface combinations and interface preparation for perovskite and organic solar-cell research.",
+    "benefit": "More candidate conditions explored with small material quantities.",
+    "published": true,
+    "order": 2
+   },
+   {
+    "slug": "sensors",
+    "tag": "receptor materials",
+    "title": "Chemical & biosensors",
+    "shortDescription": "Sensing surfaces functionalized with candidate receptors.",
+    "challenge": "Sensing layers benefit from being prepared directly on the surface that will later be evaluated.",
+    "use": "MatSurfer functionalizes selected sensing surfaces with candidate receptor materials for subsequent evaluation.",
+    "benefit": "The prepared surface moves directly into the evaluation stage of your workflow.",
+    "published": true,
+    "order": 3
+   },
+   {
+    "slug": "coatings",
+    "tag": "functional layers",
+    "title": "Functional coatings",
+    "shortDescription": "Candidate layers on representative substrates.",
+    "challenge": "Coating candidates need early comparison on representative surfaces before any scale-up decision.",
+    "use": "MatSurfer applies candidate functional layers to representative substrates and compares experimental conditions before moving to larger-scale processes.",
+    "benefit": "Experimental conditions are compared early, on the material that matters.",
+    "published": true,
+    "order": 4
+   },
+   {
+    "slug": "spm-sample-preparation",
+    "tag": "scanning probe microscopy",
+    "title": "SPM sample preparation",
+    "shortDescription": "Deposited samples for scanning probe microscopy workflows.",
+    "challenge": "Scanning probe microscopy (SPM) workflows need reproducible, well-defined deposited samples.",
+    "use": "MatSurfer prepares deposited samples for scanning probe microscopy workflows under controlled experimental conditions.",
+    "benefit": "Samples prepared under controlled conditions, ready for the microscopy workflow.",
+    "published": true,
+    "order": 5
+   }
+  ],
+  "applicationsPage": {
+   "meta": {
+    "breadcrumb": "Applications",
+    "title": "Applications — MatSurfer · Confirmed Lines of Application",
+    "description": "Where MatSurfer is used: organic electronics including OLEDs, perovskite and organic solar-cell research, chemical and biosensors, functional coatings and SPM sample preparation."
+   },
+   "hero": {
+    "kicker": "Applications",
+    "kickerNote": "confirmed use cases",
+    "title": "Recognise your use case",
+    "lead": "Five confirmed lines of application — and the exploration of new material–surface combinations running through all of them. Each one links to a conversation."
+   },
+   "labels": {
+    "section": "Use cases",
+    "challenge": "The need",
+    "use": "With MatSurfer",
+    "benefit": "For your team",
+    "cta": "Discuss this application"
+   },
+   "broader": {
+    "kicker": "Beyond surface science",
+    "title": "Not a surface scientist? That is the point",
+    "text": "MatSurfer is designed for researchers and R&D teams working with surfaces or exploring how surface-related processes can contribute to their research — specialised surface-science groups, researchers from adjacent fields, corporate R&D departments and testing laboratories alike."
+   },
+   "finalCta": {
+    "title": "Application not on the list?",
+    "text": "Tell us about the application you would like to explore with MatSurfer.",
+    "button": "Discuss your use case",
+    "href": "/contact?interest=application"
+   }
+  },
+  "contact": {
+   "meta": {
+    "breadcrumb": "Contact",
+    "title": "Contact — MatSurfer · Talk to the Team",
+    "description": "Talk to the MatSurfer team: explore an application, request technical information, discuss a scientific collaboration, join a validation or talk about distribution."
+   },
+   "hero": {
+    "kicker": "Contact",
+    "title": "Talk to the team",
+    "lead": "Tell us about your laboratory, your research needs and how you are considering using MatSurfer. We will review your enquiry and contact you as early-access opportunities become available."
+   },
+   "form": {
+    "fullName": {
+     "label": "Name",
+     "error": "Please enter your name."
+    },
+    "email": {
+     "label": "Work email",
+     "error": "Please enter a valid email address."
+    },
+    "organization": {
+     "label": "Organisation",
+     "error": "Please enter your organisation."
+    },
+    "role": {
+     "label": "Role",
+     "error": "Please enter your role."
+    },
+    "interest": {
+     "label": "I am interested in",
+     "error": "Please select what you are interested in.",
+     "options": [
+      {
+       "value": "product-information",
+       "label": "Product information"
+      },
+      {
+       "value": "research-application",
+       "label": "Research application"
+      },
+      {
+       "value": "scientific-collaboration",
+       "label": "Scientific collaboration"
+      },
+      {
+       "value": "validation",
+       "label": "Validation"
+      },
+      {
+       "value": "distribution",
+       "label": "Distribution"
+      },
+      {
+       "value": "other",
+       "label": "Other"
+      }
+     ]
+    },
+    "areaOfInterest": {
+     "label": "Area of interest",
+     "options": [
+      {
+       "value": "organic-electronics",
+       "label": "Organic electronics, including OLEDs"
+      },
+      {
+       "value": "solar-cells",
+       "label": "Solar cells — perovskite and organic"
+      },
+      {
+       "value": "sensors",
+       "label": "Chemical and biosensors"
+      },
+      {
+       "value": "coatings",
+       "label": "Functional coatings"
+      },
+      {
+       "value": "spm-sample-preparation",
+       "label": "SPM sample preparation"
+      },
+      {
+       "value": "new-combinations",
+       "label": "New material–surface combinations"
+      },
+      {
+       "value": "other",
+       "label": "Other"
+      }
+     ]
+    },
+    "message": {
+     "label": "What would you like to explore with MatSurfer?",
+     "placeholder": "Tell us about your material, substrate, current workflow or research challenge",
+     "error": "Please tell us briefly what you would like to explore."
+    },
+    "consent": {
+     "labelBefore": "I agree to be contacted about MatSurfer and accept the",
+     "privacyLabel": "Privacy Policy",
+     "labelAfter": ".",
+     "error": "Please accept the Privacy Policy to continue."
+    },
+    "optionalTag": "(optional)",
+    "selectPlaceholder": "Select…",
+    "submit": "Send message",
+    "submitting": "Sending…",
+    "successTitle": "Enquiry received",
+    "successText": "Thank you — we have received your enquiry. The MatSurfer team will review the information and contact you as the early-access programme develops.",
+    "errorText": "Something went wrong while sending your message. Please try again, or write to us directly at"
+   },
+   "aside": {
+    "title": "What happens next",
+    "steps": [
+     "We review your research context and intended application.",
+     "We contact you to discuss potential fit and availability.",
+     "Suitable projects may be invited to future pilot or early-access opportunities."
+    ],
+    "directTitle": "Prefer email?",
+    "directText": "You can also write directly to"
+   }
+  },
+  "expertExperiences": [
+   {
+    "id": "technology-assessment",
+    "name": "Dr Diego Gutiérrez Yatacue",
+    "role": "Innovation and Technology Manager",
+    "institution": "ICMAB-CSIC",
+    "field": "Technology assessment",
+    "quote": "The overall experience with MatSurfer has been positive. It serves its purpose as a fast, low-cost screening tool for sublimation experiments in the laboratory, especially in academic environments. It would be very useful for running experiments in parallel on different surfaces or sublimation conditions, to optimise conditions quickly — an advantage over other techniques. I was surprised by how robust it is with respect to temperature. The device has potential for scientific use rather than scale-up.",
+    "date": "2026-09",
+    "published": true
+   },
+   {
+    "id": "mof-cof-films",
+    "field": "MOF & COF thin films",
+    "quote": "MatSurfer proved very versatile for crystallising MOF and COF films. Its adjustable configuration made it possible to set the height at which the films were exposed to the different crystallisation mixtures — in direct contact or further away — with good results in both cases. The device also withstands temperatures of 80–100 °C over several days.",
+    "date": "2026-10",
+    "published": true
+   }
+  ],
+  "home": {
+   "hero": {
+    "eyebrow": "ICMAB-CSIC technology · Patented (EP 4483 979 B1)",
+    "headline": "Direct surface functionalization, made compact",
+    "descriptor": "Compact surface functionalization device · lab-scale R&D",
+    "lead": "Deposit and screen materials directly on final surfaces with a compact device designed for lab-scale experimentation.",
+    "ctaPrimary": "Talk to the team",
+    "ctaSecondary": "Explore the product",
+    "photoAlt": "The MatSurfer glass chamber on a table, next to its documentation and a sample substrate",
+    "field": {
+     "marquee": [
+      "Organic electronics",
+      "Sensors",
+      "Perovskites",
+      "Coatings",
+      "SPM sample preparation",
+      "New material–surface combinations"
+     ]
+    }
+   },
+   "value": {
+    "label": "Value proposition",
+    "kicker": "From problem to result",
+    "items": [
+     {
+      "tag": "The problem",
+      "text": "Early-stage surface experiments can depend on specialised equipment, established workflows and more material than teams have available."
+     },
+     {
+      "tag": "MatSurfer",
+      "text": "A compact glass chamber that deposits material directly onto your final substrate, at reduced scale."
+     },
+     {
+      "tag": "The result",
+      "text": "Material–surface combinations explored in your own laboratory, across the whole team."
+     }
+    ]
+   },
+   "product": {
+    "kicker": "The technology",
+    "title": "Surface functionalization, brought to the bench",
+    "lead": "A controllable source–substrate distance gives researchers direct control over the experimental geometry. MatSurfer uses controlled temperature and pressure conditions to transfer material onto the final substrate in a compact glass chamber.",
+    "cta": "Explore the product",
+    "ctaHref": "/product",
+    "photoAlt": "Close-up of the MatSurfer glass chamber and its machined components"
+   },
+   "benefits": {
+    "kicker": "Benefits",
+    "title": "What your team gets",
+    "outcomes": [
+     {
+      "icon": "material",
+      "title": "Less material per answer",
+      "text": "A few milligrams can be enough — costly or valuable materials stay viable to test."
+     },
+     {
+      "icon": "conditions",
+      "title": "More conditions tested per week",
+      "text": "Fast, straightforward direct depositions shorten research cycles."
+     },
+     {
+      "icon": "group",
+      "title": "Autonomy for the whole group",
+      "text": "A compact workflow the whole research team can use."
+     },
+     {
+      "icon": "defensible",
+      "title": "Defensible results",
+      "text": "The surface you evaluate is the surface you prepared."
+     }
+    ]
+   },
+   "applications": {
+    "kicker": "Applications",
+    "title": "One device, many research objectives",
+    "lead": "Five confirmed lines of application, from organic electronics to SPM sample preparation — with new material–surface combinations running through all of them.",
+    "isotype": {
+     "alt": "The MatSurfer capsule isotype with its five application fields: organic electronics, sensors, perovskites, coatings and SPM",
+     "caption": "One device, different research objectives depending on the field.",
+     "labels": [
+      "Organic electronics",
+      "Sensors",
+      "Perovskites",
+      "Coatings",
+      "SPM"
+     ]
+    },
+    "cta": "Explore applications",
+    "ctaHref": "/applications"
+   },
+   "audiences": {
+    "kicker": "Who it's for",
+    "title": "Built for four kinds of teams",
+    "groups": [
+     {
+      "icon": "surface",
+      "title": "Academic research groups",
+      "text": "Reduced-scale experimentation that complements established workflows."
+     },
+     {
+      "icon": "lab",
+      "title": "Researchers new to surfaces",
+      "text": "An accessible starting point for teams exploring surface-related research."
+     },
+     {
+      "icon": "insitu",
+      "title": "Corporate R&D and testing labs",
+      "text": "Surface preparation and screening with a reduced laboratory footprint."
+     },
+     {
+      "icon": "modularity",
+      "title": "Lab equipment partners",
+      "text": "A differentiated benchtop addition to laboratory equipment portfolios."
+     }
+    ]
+   },
+   "explore": {
+    "researchTitle": "Case studies",
+    "researchText": "The research carried out with the device by the FunNanoSurf group at ICMAB-CSIC.",
+    "researchCta": "Explore the case studies",
+    "researchHref": "/research",
+    "teamTitle": "The team",
+    "teamText": "The people bringing surface research, technology transfer and product development together.",
+    "teamCta": "Meet the team",
+    "teamHref": "/team"
+   },
+   "finalCta": {
+    "title": "Bring surface experiments to your own bench",
+    "text": "Tell us about your research needs and what you would like to explore.",
+    "button": "Talk to the team",
+    "href": "/contact"
+   }
+  },
+  "product": {
+   "meta": {
+    "breadcrumb": "Product",
+    "title": "Product — MatSurfer · Compact Surface Functionalization Device",
+    "description": "What MatSurfer is and how it works: controlled deposition with an adjustable source–substrate distance, transferring materials directly onto final substrates at lab scale."
+   },
+   "hero": {
+    "kicker": "The product",
+    "title": "A compact device for direct surface functionalization",
+    "lead": "MatSurfer deposits and functionalizes materials directly on final substrates, at lab scale — a compact benchtop glass chamber designed for surface-related R&D.",
+    "cta": "Request product information",
+    "ctaHref": "/contact?interest=product",
+    "photoAlt": "The MatSurfer glass chamber on a table, next to its documentation and a sample substrate"
+   },
+   "whatItIs": {
+    "kicker": "What it is",
+    "title": "The technology",
+    "lead": "MatSurfer is a compact device for controlled deposition and functionalization of materials directly on final surfaces. A small amount of source material is transferred across an adjustable source–substrate distance, under controlled temperature and pressure conditions, onto the substrate selected for the experiment — through controlled sublimation or evaporation."
+   },
+   "differentiator": {
+    "kicker": "Key differentiator",
+    "title": "Controllable source–substrate distance",
+    "text": "The distance between the source and the substrate is adjustable, letting researchers tune the experimental geometry directly during preparation — one more parameter under control, on the same bench.",
+    "features": [
+     {
+      "title": "Direct deposition on the final substrate",
+      "text": "The surface system you create is the surface system you measure."
+     },
+     {
+      "title": "Small-scale experimentation",
+      "text": "Reduced-scale work on 1–3 cm² samples with small material quantities."
+     },
+     {
+      "title": "Compact laboratory format",
+      "text": "A compact benchtop device, under 20 cm in size, designed for existing R&D laboratories."
+     },
+     {
+      "title": "Low sample consumption",
+      "text": "A few milligrams can be enough — novel, costly or very valuable materials stay viable to test."
+     },
+     {
+      "title": "Modular configuration",
+      "text": "A modular setup with a straightforward, adaptable workflow."
+     },
+     {
+      "title": "Solvent-free process",
+      "text": "Material reaches the substrate without solvents or intermediate steps."
+     }
+    ]
+   },
+   "howItWorks": {
+    "kicker": "How it works",
+    "title": "From source material to prepared surface",
+    "video": {
+     "caption": "MatSurfer in operation — from source material to prepared surface.",
+     "placeholder": "Device video coming soon",
+     "playLabel": "Play the device video"
+    },
+    "steps": [
+     {
+      "title": "Load the source material",
+      "text": "Place a small amount of material in the source holder."
+     },
+     {
+      "title": "Set the distance and parameters",
+      "text": "Adjust the source–substrate distance first, then set temperature, pressure and time."
+     },
+     {
+      "title": "Deposit directly on the final surface",
+      "text": "The material is transferred directly onto the selected substrate through controlled sublimation or evaporation."
+     },
+     {
+      "title": "Remove the prepared sample",
+      "text": "Take out the deposited sample for subsequent analysis, or prepare the next experimental condition."
+     }
+    ]
+   },
+   "parameters": {
+    "kicker": "Parameters",
+    "title": "Every deposition, defined by measurable values",
+    "lead": "Each experiment is defined by a small set of controlled parameters. Specific ranges depend on the configuration and are shared during the technical conversation.",
+    "items": [
+     {
+      "symbol": "d",
+      "label": "source–substrate distance"
+     },
+     {
+      "symbol": "m",
+      "label": "sample mass"
+     },
+     {
+      "symbol": "P",
+      "label": "pressure"
+     },
+     {
+      "symbol": "T",
+      "label": "temperature"
+     },
+     {
+      "symbol": "t",
+      "label": "time"
+     }
+    ]
+   },
+   "benefits": {
+    "kicker": "Benefits",
+    "title": "What the device changes for your team",
+    "outcomes": [
+     {
+      "icon": "material",
+      "title": "Less material per answer",
+      "text": "Thanks to the reduced size of the technology, a few milligrams can be enough — decisive for novel, costly molecules or very valuable materials, where decisions are taken on milligrams."
+     },
+     {
+      "icon": "conditions",
+      "title": "More conditions tested per week",
+      "text": "Fast and straightforward direct depositions make it easier to explore more experimental conditions in shorter research cycles."
+     },
+     {
+      "icon": "group",
+      "title": "Autonomy for the whole group",
+      "text": "A compact and straightforward workflow makes surface deposition easier to integrate into the laboratory and use across the research team."
+     },
+     {
+      "icon": "defensible",
+      "title": "Defensible results",
+      "text": "Material is deposited directly on the selected substrate, so the surface you evaluate is the surface you prepared."
+     }
+    ]
+   },
+   "faq": {
+    "kicker": "FAQ",
+    "title": "In more detail",
+    "items": [
+     {
+      "q": "How does it work?",
+      "a": "MatSurfer creates controlled conditions for transferring material from a source directly onto a selected substrate. The adjustable source–substrate distance helps researchers define the experimental geometry, while temperature, pressure and time can be adapted to the material and objective. The process produces a prepared surface that can then be removed for analysis or used in the next stage of the research workflow. The surface system you create is the surface system you measure."
+     },
+     {
+      "q": "What can it be used for?",
+      "a": "MatSurfer supports R&D workflows that require controlled deposition or functionalization on selected surfaces. Potential fields include organic electronics, solar-cell research, chemical and biosensors, functional coatings, SPM (scanning probe microscopy) sample preparation and the exploration of new material–surface combinations."
+     },
+     {
+      "q": "Who is it for?",
+      "a": "MatSurfer is designed for researchers and R&D teams working with surfaces or exploring how surface-related processes can contribute to their research. This includes specialised surface-science groups, researchers from adjacent fields, corporate R&D departments, testing laboratories and potential laboratory-equipment partners."
+     },
+     {
+      "q": "What makes it different?",
+      "a": "MatSurfer combines direct work on the final substrate, controllable source–substrate distance and reduced-scale experimentation in a compact format. Its modular configuration and straightforward workflow are designed to make material–surface screening easier to integrate into R&D laboratories."
+     },
+     {
+      "q": "How much material is required?",
+      "a": "A small amount — thanks to the reduced size of the technology, a few milligrams can be enough. That matters for novel, costly molecules or very valuable materials, where decisions are taken on milligrams. Specific amounts depend on the material and the configuration, and are part of the technical conversation."
+     },
+     {
+      "q": "Can it be used in an existing R&D laboratory?",
+      "a": "Yes — it is designed as compact benchtop equipment for existing laboratories, complementing the instruments you already use with a reduced laboratory footprint."
+     },
+     {
+      "q": "How can I discuss a potential application?",
+      "a": "Tell us about the material, substrate or workflow you would like to explore. We review every enquiry and come back to you to discuss the next step — start from the contact page."
+     }
+    ]
+   },
+   "finalCta": {
+    "title": "Discuss your research",
+    "text": "Tell us about the application you would like to explore with MatSurfer.",
+    "button": "Discuss your research",
+    "href": "/contact?interest=product"
+   }
+  },
+  "publications": [
+   {
+    "title": "Curcuminoid-Based Responsive Surfaces for Fluorescent BF3 Detection, a Fast and Reversible Approach",
+    "authors": "R. Gimeno-Muñoz, R. Díaz-Torres, S. Gómez-Coca, O. Roubeau, J. M. Díaz-Cruz, N. Aliaga-Alcalde, A. González-Campo",
+    "journal": "ACS Applied Materials & Interfaces",
+    "year": 2025,
+    "doi": "10.1021/acsami.4c19421",
+    "url": "https://doi.org/10.1021/acsami.4c19421",
+    "published": true
+   },
+   {
+    "title": "Dielectric behavior of curcuminoid polymorphs on different substrates by direct soft vacuum deposition",
+    "authors": "D. Riba-López, R. Zaffino, D. Herrera, R. Matheu, F. Silvestri, J. Ferreira da Silva, E. C. Sañudo, M. Mas-Torrent, E. Barrena, R. Pfattner, E. Ruiz, A. González-Campo, N. Aliaga-Alcalde",
+    "journal": "iScience",
+    "year": 2022,
+    "doi": "10.1016/j.isci.2022.105686",
+    "url": "https://doi.org/10.1016/j.isci.2022.105686",
+    "published": true
+   }
+  ],
+  "researchPage": {
+   "breadcrumb": "Case Studies",
+   "metaTitle": "Case Studies — MatSurfer",
+   "metaDescription": "The research carried out with MatSurfer by the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC.",
+   "kicker": "Case studies",
+   "title": "Built in the lab",
+   "lead": "MatSurfer grows out of the day-to-day research of the Functional Nanomaterials and Surfaces group — FunNanoSurf — at ICMAB-CSIC. This page follows the research carried out with the device and the experiences of the researchers who work with it.",
+   "experiencesTitle": "Expert experiences",
+   "publicationsTitle": "Publications",
+   "moreLink": "More about this experience",
+   "inviteTitle": "Have you worked with the device?",
+   "inviteText": "We would like to feature your experience or your publication here:",
+   "finalCta": {
+    "title": "Explore a collaboration",
+    "text": "Validations, researcher experiences and published work all grow from conversations.",
+    "button": "Explore a collaboration",
+    "href": "/contact?interest=research"
+   }
+  },
+  "site": {
+   "meta": {
+    "title": "MatSurfer — Compact Surface Functionalization Device for Lab-Scale R&D",
+    "description": "MatSurfer is a compact lab-scale device for controlled deposition and functionalization of materials directly on final surfaces. Developed at ICMAB-CSIC for surface-related R&D.",
+    "ogAlt": "MatSurfer — compact device for direct deposition and functionalization on final surfaces"
+   },
+   "header": {
+    "nav": [
+     {
+      "label": "Product",
+      "href": "/product"
+     },
+     {
+      "label": "Applications",
+      "href": "/applications"
+     },
+     {
+      "label": "Case Studies",
+      "href": "/research"
+     },
+     {
+      "label": "Team",
+      "href": "/team"
+     },
+     {
+      "label": "Contact",
+      "href": "/contact"
+     }
+    ],
+    "cta": "Talk to the team",
+    "ctaHref": "/contact",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "language": "Language"
+   },
+   "a11y": {
+    "skipToContent": "Skip to content",
+    "mainNav": "Main",
+    "footerNav": "Footer",
+    "breadcrumbHome": "Home"
+   },
+   "footer": {
+    "description": "Compact surface functionalization device for lab-scale R&D. Developed at ICMAB-CSIC, Barcelona.",
+    "cta": "Talk to the team",
+    "ctaHref": "/contact",
+    "columns": [
+     {
+      "title": "Product",
+      "links": [
+       {
+        "label": "The device",
+        "href": "/product"
+       },
+       {
+        "label": "How it works",
+        "href": "/product#how-it-works"
+       },
+       {
+        "label": "Parameters",
+        "href": "/product#parameters"
+       },
+       {
+        "label": "FAQ",
+        "href": "/product#faq"
+       }
+      ]
+     },
+     {
+      "title": "Explore",
+      "links": [
+       {
+        "label": "Applications",
+        "href": "/applications"
+       },
+       {
+        "label": "Case studies",
+        "href": "/research"
+       },
+       {
+        "label": "Team",
+        "href": "/team"
+       },
+       {
+        "label": "Contact",
+        "href": "/contact"
+       }
+      ]
+     },
+     {
+      "title": "Legal",
+      "links": [
+       {
+        "label": "Privacy Policy",
+        "href": "#"
+       },
+       {
+        "label": "Legal notice",
+        "href": "#"
+       },
+       {
+        "label": "Contact",
+        "href": "mailto:matsurfer@icmab.es"
+       }
+      ]
+     }
+    ],
+    "copyright": "© 2026 MatSurfer · ICMAB-CSIC · Name and brand are provisional.",
+    "bottomMono": "EP 4483 979 B1 · Surfaces for all."
+   }
+  },
+  "teamMembers": [
+   {
+    "name": "Núria Aliaga-Alcalde",
+    "role": "ICREA Professor · Consultant & co-founder",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "PhD in Chemistry, dedicated to bridging the gap between single-molecule-level cutting-edge research and practical applications in technology.",
+    "image": "/img/team/nuria-aliaga-alcalde.jpg",
+    "showcaseImage": "/img/team/showcase/nuria-aliaga-alcalde.webp",
+    "linkedin": "https://www.linkedin.com/in/n%C3%BAria-aliaga-alcalde-97bba517/",
+    "order": 1,
+    "published": true
+   },
+   {
+    "name": "Arántzazu González",
+    "role": "Tenured Scientist · Consultant & co-founder",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "PhD in Chemistry, surface functionalization dreamer, always ready for new material developments and socially conscious.",
+    "image": "/img/team/arantzazu-gonzalez-campo.jpg",
+    "showcaseImage": "/img/team/showcase/arantzazu-gonzalez-campo.webp",
+    "linkedin": "https://www.linkedin.com/in/arantzazu-gonzalez-campo-b500798/",
+    "order": 2,
+    "published": true
+   },
+   {
+    "name": "Daniel Herrera",
+    "role": "Postdoctoral Researcher · CTO",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "Chemist, PhD. Synthesis and catalysis. Organic semiconductors. Expertise in knowledge and technology transfer.",
+    "image": "/img/team/daniel-herrera.jpg",
+    "showcaseImage": "/img/team/showcase/daniel-herrera.webp",
+    "linkedin": "https://www.linkedin.com/in/dherreramiranda",
+    "order": 3,
+    "published": true
+   },
+   {
+    "name": "Coral Herranz Lancho",
+    "role": "Innovation and Research Manager · CEO",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "PhD in Physical Chemistry, passionate about understanding what’s underneath nature. Bridging scientific results and the market creating social value.",
+    "image": "/img/team/coral-herranz-lancho.jpg",
+    "showcaseImage": "/img/team/showcase/coral-herranz-lancho.webp",
+    "linkedin": "https://www.linkedin.com/in/coral-herranz-lancho-phd/",
+    "order": 4,
+    "published": true
+   }
+  ],
+  "teamPage": {
+   "breadcrumb": "Team",
+   "profilesLabel": "Team profiles",
+   "metaTitle": "Team — MatSurfer",
+   "metaDescription": "The team behind MatSurfer: surface research, technology transfer and product development around a technology born at ICMAB-CSIC.",
+   "kicker": "The team",
+   "title": "The team behind MatSurfer",
+   "lead": "MatSurfer brings together surface research, technology transfer and product development around a technology born at ICMAB-CSIC in Barcelona.",
+   "links": {
+    "linkedin": "LinkedIn",
+    "website": "Website",
+    "linkedinOf": "on LinkedIn",
+    "websiteOf": "website"
+   },
+   "showcase": {
+    "pickerLabel": "Team members",
+    "show": "Show",
+    "noBio": "Profile coming soon."
+   },
+   "journey": {
+    "kicker": "From the lab to the bench",
+    "title": "One technology, three kinds of work",
+    "lead": "MatSurfer exists because surface research, technology transfer and product development happen in the same place.",
+    "steps": [
+     {
+      "title": "Research",
+      "text": "The device grows out of the day-to-day work of the FunNanoSurf group at ICMAB-CSIC, where direct surface functionalization is a research tool before it is a product."
+     },
+     {
+      "title": "Protection and validation",
+      "text": "The technology is protected by European and Spanish patents and has been validated externally by research groups and a company, in their own laboratories."
+     },
+     {
+      "title": "Product",
+      "text": "MatSurfer turns that experience into a compact benchtop device for lab-scale R&D, with early-access opportunities opening up."
+     }
+    ],
+    "facts": [
+     {
+      "value": "2",
+      "label": "patents"
+     },
+     {
+      "value": "8",
+      "label": "research groups"
+     },
+     {
+      "value": "1",
+      "label": "company"
+     },
+     {
+      "value": "2",
+      "label": "open-access publications"
+     }
+    ],
+    "factsNote": "External validations and publications as listed on the Case Studies page.",
+    "factsLink": "See the case studies",
+    "factsHref": "/research"
+   },
+   "finalCta": {
+    "title": "Talk to the team",
+    "text": "Scientific, partnership or early-access enquiries all start with a message.",
+    "button": "Talk to the team",
+    "href": "/contact?interest=partnership",
+    "emailLead": "Or write to us directly at"
+   }
+  },
+  "validationItems": [
+   {
+    "title": "IP & Technological Validation",
+    "text": "The technology was developed at The Institute of Materials Science of Barcelona (ICMAB-CSIC) and is protected by the following patents: European Unitary Patent EP4483979B1 and Spanish Patent ES2949292B2. Working prototypes have been externally validated in their operational environments for 8 research groups and 1 company across the following fields: organic electronics, biosensing, new surface materials, and EPR sample preparation. The technology has also been proven in actual operations over time in R&D laboratories of organic electronics and new surface materials. Further external validation in an operational environment and over time in extra fields of application is required and is being developed. Additionally, the technology has been supported by competitive research and technological-transfer programmes: ERC-PoC SmolSUB 101138186, Impulsa-T CSIC, 2025 LLAV 00099 and SUBLIMAT-COMTE.",
+    "published": true
+   }
+  ]
+ },
+ "es": {
+  "applications": [
+   {
+    "slug": "organic-electronics",
+    "tag": "capas moleculares · OLED",
+    "title": "Electrónica orgánica",
+    "shortDescription": "Capas moleculares sobre sustratos relevantes para dispositivos.",
+    "challenge": "La investigación en OLED y otros sistemas de electrónica orgánica depende de preparar y comparar muchas variaciones de capa sobre sustratos relevantes.",
+    "use": "MatSurfer prepara y compara capas moleculares sobre sustratos relevantes para dispositivos, para la investigación en OLED y otros sistemas de electrónica orgánica.",
+    "benefit": "Las variaciones de capa se comparan a escala reducida antes de comprometerse con procesos a mayor escala.",
+    "published": true,
+    "order": 1
+   },
+   {
+    "slug": "solar-cells",
+    "tag": "perovskita y orgánicas",
+    "title": "Investigación en células solares",
+    "shortDescription": "Combinaciones material–superficie y preparación de interfaces.",
+    "challenge": "El cribado de materiales e interfaces candidatos suele estar limitado por la disponibilidad de material y el acceso a equipos de deposición.",
+    "use": "MatSurfer permite a los equipos explorar combinaciones material–superficie y la preparación de interfaces para la investigación en células solares de perovskita y orgánicas.",
+    "benefit": "Más condiciones candidatas exploradas con pequeñas cantidades de material.",
+    "published": true,
+    "order": 2
+   },
+   {
+    "slug": "sensors",
+    "tag": "materiales receptores",
+    "title": "Sensores químicos y biosensores",
+    "shortDescription": "Superficies sensoras funcionalizadas con receptores candidatos.",
+    "challenge": "Las capas sensoras se benefician de prepararse directamente sobre la superficie que se evaluará después.",
+    "use": "MatSurfer funcionaliza superficies sensoras seleccionadas con materiales receptores candidatos para su evaluación posterior.",
+    "benefit": "La superficie preparada pasa directamente a la etapa de evaluación de tu flujo de trabajo.",
+    "published": true,
+    "order": 3
+   },
+   {
+    "slug": "coatings",
+    "tag": "capas funcionales",
+    "title": "Recubrimientos funcionales",
+    "shortDescription": "Capas candidatas sobre sustratos representativos.",
+    "challenge": "Los recubrimientos candidatos necesitan compararse pronto sobre superficies representativas, antes de cualquier decisión de escalado.",
+    "use": "MatSurfer aplica capas funcionales candidatas sobre sustratos representativos y compara condiciones experimentales antes de pasar a procesos a mayor escala.",
+    "benefit": "Las condiciones experimentales se comparan pronto, sobre el material que importa.",
+    "published": true,
+    "order": 4
+   },
+   {
+    "slug": "spm-sample-preparation",
+    "tag": "microscopía de sonda de barrido",
+    "title": "Preparación de muestras para SPM",
+    "shortDescription": "Muestras depositadas para flujos de trabajo de microscopía de sonda de barrido.",
+    "challenge": "Los flujos de trabajo de microscopía de sonda de barrido (SPM) necesitan muestras depositadas reproducibles y bien definidas.",
+    "use": "MatSurfer prepara muestras depositadas para flujos de trabajo de microscopía de sonda de barrido en condiciones experimentales controladas.",
+    "benefit": "Muestras preparadas en condiciones controladas, listas para el flujo de trabajo de microscopía.",
+    "published": true,
+    "order": 5
+   }
+  ],
+  "applicationsPage": {
+   "meta": {
+    "breadcrumb": "Aplicaciones",
+    "title": "Aplicaciones — MatSurfer · Líneas de aplicación confirmadas",
+    "description": "Dónde se utiliza MatSurfer: electrónica orgánica, incluidos los OLED, investigación en células solares de perovskita y orgánicas, sensores químicos y biosensores, recubrimientos funcionales y preparación de muestras para SPM."
+   },
+   "hero": {
+    "kicker": "Aplicaciones",
+    "kickerNote": "casos de uso confirmados",
+    "title": "Reconoce tu caso de uso",
+    "lead": "Cinco líneas de aplicación confirmadas, y la exploración de nuevas combinaciones material–superficie atravesándolas todas. Cada una lleva a una conversación."
+   },
+   "labels": {
+    "section": "Casos de uso",
+    "challenge": "La necesidad",
+    "use": "Con MatSurfer",
+    "benefit": "Para tu equipo",
+    "cta": "Hablar de esta aplicación"
+   },
+   "broader": {
+    "kicker": "Más allá de la ciencia de superficies",
+    "title": "¿No eres especialista en superficies? Esa es la idea",
+    "text": "MatSurfer está diseñado para investigadores y equipos de I+D que trabajan con superficies o que exploran cómo los procesos relacionados con superficies pueden contribuir a su investigación: tanto grupos especializados en ciencia de superficies como investigadores de campos afines, departamentos de I+D corporativos y laboratorios de ensayo."
+   },
+   "finalCta": {
+    "title": "¿Tu aplicación no está en la lista?",
+    "text": "Cuéntanos la aplicación que te gustaría explorar con MatSurfer.",
+    "button": "Hablar de tu caso de uso",
+    "href": "/contact?interest=application"
+   }
+  },
+  "contact": {
+   "meta": {
+    "breadcrumb": "Contacto",
+    "title": "Contacto — MatSurfer · Habla con el equipo",
+    "description": "Habla con el equipo de MatSurfer: explora una aplicación, solicita información técnica, plantea una colaboración científica, participa en una validación o habla de distribución."
+   },
+   "hero": {
+    "kicker": "Contacto",
+    "title": "Habla con el equipo",
+    "lead": "Cuéntanos sobre tu laboratorio, tus necesidades de investigación y cómo te planteas utilizar MatSurfer. Revisaremos tu solicitud y contactaremos contigo a medida que surjan oportunidades de acceso anticipado."
+   },
+   "form": {
+    "fullName": {
+     "label": "Nombre",
+     "error": "Introduce tu nombre."
+    },
+    "email": {
+     "label": "Correo electrónico profesional",
+     "error": "Introduce una dirección de correo válida."
+    },
+    "organization": {
+     "label": "Organización",
+     "error": "Introduce tu organización."
+    },
+    "role": {
+     "label": "Cargo",
+     "error": "Introduce tu cargo."
+    },
+    "interest": {
+     "label": "Me interesa",
+     "error": "Selecciona qué te interesa.",
+     "options": [
+      {
+       "value": "product-information",
+       "label": "Información del producto"
+      },
+      {
+       "value": "research-application",
+       "label": "Aplicación de investigación"
+      },
+      {
+       "value": "scientific-collaboration",
+       "label": "Colaboración científica"
+      },
+      {
+       "value": "validation",
+       "label": "Validación"
+      },
+      {
+       "value": "distribution",
+       "label": "Distribución"
+      },
+      {
+       "value": "other",
+       "label": "Otro"
+      }
+     ]
+    },
+    "areaOfInterest": {
+     "label": "Área de interés",
+     "options": [
+      {
+       "value": "organic-electronics",
+       "label": "Electrónica orgánica, incluidos los OLED"
+      },
+      {
+       "value": "solar-cells",
+       "label": "Células solares: de perovskita y orgánicas"
+      },
+      {
+       "value": "sensors",
+       "label": "Sensores químicos y biosensores"
+      },
+      {
+       "value": "coatings",
+       "label": "Recubrimientos funcionales"
+      },
+      {
+       "value": "spm-sample-preparation",
+       "label": "Preparación de muestras para SPM"
+      },
+      {
+       "value": "new-combinations",
+       "label": "Nuevas combinaciones material–superficie"
+      },
+      {
+       "value": "other",
+       "label": "Otra"
+      }
+     ]
+    },
+    "message": {
+     "label": "¿Qué te gustaría explorar con MatSurfer?",
+     "placeholder": "Cuéntanos tu material, tu sustrato, tu flujo de trabajo actual o tu reto de investigación",
+     "error": "Cuéntanos brevemente qué te gustaría explorar."
+    },
+    "consent": {
+     "labelBefore": "Acepto que se me contacte en relación con MatSurfer y acepto la",
+     "privacyLabel": "Política de privacidad",
+     "labelAfter": ".",
+     "error": "Acepta la Política de privacidad para continuar."
+    },
+    "optionalTag": "(opcional)",
+    "selectPlaceholder": "Selecciona…",
+    "submit": "Enviar mensaje",
+    "submitting": "Enviando…",
+    "successTitle": "Solicitud recibida",
+    "successText": "Gracias: hemos recibido tu solicitud. El equipo de MatSurfer revisará la información y contactará contigo a medida que se desarrolle el programa de acceso anticipado.",
+    "errorText": "Se ha producido un error al enviar tu mensaje. Inténtalo de nuevo o escríbenos directamente a"
+   },
+   "aside": {
+    "title": "Qué ocurre después",
+    "steps": [
+     "Revisamos tu contexto de investigación y la aplicación prevista.",
+     "Contactamos contigo para hablar del posible encaje y de la disponibilidad.",
+     "Los proyectos adecuados podrán ser invitados a futuras oportunidades piloto o de acceso anticipado."
+    ],
+    "directTitle": "¿Prefieres el correo?",
+    "directText": "También puedes escribir directamente a"
+   }
+  },
+  "expertExperiences": [
+   {
+    "id": "technology-assessment",
+    "name": "Dr. Diego Gutiérrez Yatacue",
+    "role": "Innovation and Technology Manager",
+    "institution": "ICMAB-CSIC",
+    "field": "Evaluación tecnológica",
+    "quote": "La experiencia general con MatSurfer ha sido positiva. El equipo cumple adecuadamente su propósito como herramienta de cribado rápido y de bajo coste para experimentos de sublimación en laboratorio, especialmente en entornos académicos. Creo que vendría muy bien a la hora de hacer experimentos en paralelo sobre diferentes superficies o condiciones de sublimación para optimizar condiciones de manera rápida; creo que esto presenta una ventaja en relación con otras técnicas. Me sorprendió la robustez que tiene frente a la temperatura. El equipo tiene potencial para utilidad científica más que de escalado.",
+    "date": "2026-09",
+    "published": true
+   },
+   {
+    "id": "mof-cof-films",
+    "field": "Películas finas de MOF y COF",
+    "quote": "MatSurfer resultó muy versátil para la cristalización de películas de MOF y COF. Gracias a su configuración ajustable fue posible regular la altura a la que las películas quedaban expuestas a las distintas mezclas de cristalización —en contacto directo o a mayor distancia—, con buenos resultados en ambos casos. Además, el dispositivo resiste temperaturas de entre 80 y 100 °C durante varios días.",
+    "date": "2026-10",
+    "published": true
+   }
+  ],
+  "home": {
+   "hero": {
+    "eyebrow": "Tecnología del ICMAB-CSIC · Patentada (EP 4483 979 B1)",
+    "headline": "Funcionalización directa de superficies, en formato compacto",
+    "descriptor": "Dispositivo compacto de funcionalización de superficies · I+D a escala de laboratorio",
+    "lead": "Deposita y criba materiales directamente sobre superficies finales con un dispositivo compacto diseñado para la experimentación a escala de laboratorio.",
+    "ctaPrimary": "Habla con el equipo",
+    "ctaSecondary": "Explora el producto",
+    "photoAlt": "La cámara de vidrio de MatSurfer sobre una mesa, junto a su documentación y un sustrato de muestra",
+    "field": {
+     "marquee": [
+      "Electrónica orgánica",
+      "Sensores",
+      "Perovskitas",
+      "Recubrimientos",
+      "Preparación de muestras para SPM",
+      "Nuevas combinaciones material–superficie"
+     ]
+    }
+   },
+   "value": {
+    "label": "Propuesta de valor",
+    "kicker": "Del problema al resultado",
+    "items": [
+     {
+      "tag": "El problema",
+      "text": "Los primeros experimentos con superficies pueden depender de equipamiento especializado, de flujos de trabajo ya establecidos y de más material del que los equipos tienen disponible."
+     },
+     {
+      "tag": "MatSurfer",
+      "text": "Una cámara de vidrio compacta que deposita el material directamente sobre tu sustrato final, a escala reducida."
+     },
+     {
+      "tag": "El resultado",
+      "text": "Combinaciones material–superficie exploradas en tu propio laboratorio, por todo el equipo."
+     }
+    ]
+   },
+   "product": {
+    "kicker": "La tecnología",
+    "title": "La funcionalización de superficies, en la mesa del laboratorio",
+    "lead": "Una distancia fuente–sustrato controlable da a los investigadores control directo sobre la geometría experimental. MatSurfer utiliza condiciones controladas de temperatura y presión para transferir el material al sustrato final en una cámara de vidrio compacta.",
+    "cta": "Explora el producto",
+    "ctaHref": "/product",
+    "photoAlt": "Detalle de la cámara de vidrio de MatSurfer y de sus componentes mecanizados"
+   },
+   "benefits": {
+    "kicker": "Beneficios",
+    "title": "Lo que gana tu equipo",
+    "outcomes": [
+     {
+      "icon": "material",
+      "title": "Menos material por respuesta",
+      "text": "Unos pocos miligramos pueden ser suficientes: los materiales costosos o valiosos siguen siendo viables para ensayar."
+     },
+     {
+      "icon": "conditions",
+      "title": "Más condiciones ensayadas por semana",
+      "text": "Deposiciones directas, rápidas y sencillas que acortan los ciclos de investigación."
+     },
+     {
+      "icon": "group",
+      "title": "Autonomía para todo el grupo",
+      "text": "Un flujo de trabajo compacto que puede utilizar todo el equipo de investigación."
+     },
+     {
+      "icon": "defensible",
+      "title": "Resultados defendibles",
+      "text": "La superficie que evalúas es la superficie que preparaste."
+     }
+    ]
+   },
+   "applications": {
+    "kicker": "Aplicaciones",
+    "title": "Un dispositivo, muchos objetivos de investigación",
+    "lead": "Cinco líneas de aplicación confirmadas, de la electrónica orgánica a la preparación de muestras para SPM, con nuevas combinaciones material–superficie atravesándolas todas.",
+    "isotype": {
+     "alt": "El isotipo de la cápsula de MatSurfer con sus cinco campos de aplicación: electrónica orgánica, sensores, perovskitas, recubrimientos y SPM",
+     "caption": "Un dispositivo, distintos objetivos de investigación según el campo.",
+     "labels": [
+      "Electrónica orgánica",
+      "Sensores",
+      "Perovskitas",
+      "Recubrimientos",
+      "SPM"
+     ]
+    },
+    "cta": "Explora las aplicaciones",
+    "ctaHref": "/applications"
+   },
+   "audiences": {
+    "kicker": "Para quién es",
+    "title": "Pensado para cuatro tipos de equipo",
+    "groups": [
+     {
+      "icon": "surface",
+      "title": "Grupos de investigación académicos",
+      "text": "Experimentación a escala reducida que complementa los flujos de trabajo establecidos."
+     },
+     {
+      "icon": "lab",
+      "title": "Investigadores que se inician en superficies",
+      "text": "Un punto de partida accesible para equipos que exploran la investigación relacionada con superficies."
+     },
+     {
+      "icon": "insitu",
+      "title": "I+D corporativa y laboratorios de ensayo",
+      "text": "Preparación y cribado de superficies con una huella de laboratorio reducida."
+     },
+     {
+      "icon": "modularity",
+      "title": "Socios de equipamiento de laboratorio",
+      "text": "Una incorporación de sobremesa diferenciada para las carteras de equipamiento de laboratorio."
+     }
+    ]
+   },
+   "explore": {
+    "researchTitle": "Casos de estudio",
+    "researchText": "La investigación realizada con el dispositivo por el grupo FunNanoSurf del ICMAB-CSIC.",
+    "researchCta": "Explora los casos de estudio",
+    "researchHref": "/research",
+    "teamTitle": "El equipo",
+    "teamText": "Las personas que unen investigación en superficies, transferencia de tecnología y desarrollo de producto.",
+    "teamCta": "Conoce al equipo",
+    "teamHref": "/team"
+   },
+   "finalCta": {
+    "title": "Lleva los experimentos con superficies a tu propia mesa de laboratorio",
+    "text": "Cuéntanos tus necesidades de investigación y qué te gustaría explorar.",
+    "button": "Habla con el equipo",
+    "href": "/contact"
+   }
+  },
+  "product": {
+   "meta": {
+    "breadcrumb": "Producto",
+    "title": "Producto — MatSurfer · Dispositivo compacto de funcionalización de superficies",
+    "description": "Qué es MatSurfer y cómo funciona: deposición controlada con una distancia fuente–sustrato ajustable, que transfiere materiales directamente sobre sustratos finales a escala de laboratorio."
+   },
+   "hero": {
+    "kicker": "El producto",
+    "title": "Un dispositivo compacto para la funcionalización directa de superficies",
+    "lead": "MatSurfer deposita y funcionaliza materiales directamente sobre sustratos finales, a escala de laboratorio: una cámara de vidrio compacta, de sobremesa, diseñada para la I+D relacionada con superficies.",
+    "cta": "Solicitar información del producto",
+    "ctaHref": "/contact?interest=product",
+    "photoAlt": "La cámara de vidrio de MatSurfer sobre una mesa, junto a su documentación y un sustrato de muestra"
+   },
+   "whatItIs": {
+    "kicker": "Qué es",
+    "title": "La tecnología",
+    "lead": "MatSurfer es un dispositivo compacto para la deposición controlada y la funcionalización de materiales directamente sobre superficies finales. Una pequeña cantidad de material de partida se transfiere, a través de una distancia fuente–sustrato ajustable y en condiciones controladas de temperatura y presión, al sustrato seleccionado para el experimento, mediante sublimación o evaporación controladas."
+   },
+   "differentiator": {
+    "kicker": "Diferenciador clave",
+    "title": "Distancia fuente–sustrato controlable",
+    "text": "La distancia entre la fuente y el sustrato es ajustable, lo que permite a los investigadores afinar la geometría experimental directamente durante la preparación: un parámetro más bajo control, en la misma mesa de trabajo.",
+    "features": [
+     {
+      "title": "Deposición directa sobre el sustrato final",
+      "text": "El sistema de superficie que creas es el sistema de superficie que mides."
+     },
+     {
+      "title": "Experimentación a pequeña escala",
+      "text": "Trabajo a escala reducida sobre muestras de 1–3 cm² con pequeñas cantidades de material."
+     },
+     {
+      "title": "Formato compacto de laboratorio",
+      "text": "Un dispositivo compacto de sobremesa, de menos de 20 cm, diseñado para los laboratorios de I+D existentes."
+     },
+     {
+      "title": "Bajo consumo de muestra",
+      "text": "Unos pocos miligramos pueden ser suficientes: los materiales novedosos, costosos o muy valiosos siguen siendo viables para ensayar."
+     },
+     {
+      "title": "Configuración modular",
+      "text": "Un montaje modular con un flujo de trabajo sencillo y adaptable."
+     },
+     {
+      "title": "Proceso sin disolventes",
+      "text": "El material llega al sustrato sin disolventes ni pasos intermedios."
+     }
+    ]
+   },
+   "howItWorks": {
+    "kicker": "Cómo funciona",
+    "title": "Del material de partida a la superficie preparada",
+    "video": {
+     "caption": "MatSurfer en funcionamiento: del material de partida a la superficie preparada.",
+     "placeholder": "Vídeo del dispositivo próximamente",
+     "playLabel": "Reproducir el vídeo del dispositivo"
+    },
+    "steps": [
+     {
+      "title": "Carga el material de partida",
+      "text": "Coloca una pequeña cantidad de material en el soporte de la fuente."
+     },
+     {
+      "title": "Ajusta la distancia y los parámetros",
+      "text": "Ajusta primero la distancia fuente–sustrato y, después, la temperatura, la presión y el tiempo."
+     },
+     {
+      "title": "Deposita directamente sobre la superficie final",
+      "text": "El material se transfiere directamente al sustrato seleccionado mediante sublimación o evaporación controladas."
+     },
+     {
+      "title": "Retira la muestra preparada",
+      "text": "Extrae la muestra depositada para su análisis posterior, o prepara la siguiente condición experimental."
+     }
+    ]
+   },
+   "parameters": {
+    "kicker": "Parámetros",
+    "title": "Cada deposición, definida por valores medibles",
+    "lead": "Cada experimento queda definido por un pequeño conjunto de parámetros controlados. Los rangos concretos dependen de la configuración y se comparten durante la conversación técnica.",
+    "items": [
+     {
+      "symbol": "d",
+      "label": "distancia fuente–sustrato"
+     },
+     {
+      "symbol": "m",
+      "label": "masa de muestra"
+     },
+     {
+      "symbol": "P",
+      "label": "presión"
+     },
+     {
+      "symbol": "T",
+      "label": "temperatura"
+     },
+     {
+      "symbol": "t",
+      "label": "tiempo"
+     }
+    ]
+   },
+   "benefits": {
+    "kicker": "Beneficios",
+    "title": "Lo que el dispositivo cambia para tu equipo",
+    "outcomes": [
+     {
+      "icon": "material",
+      "title": "Menos material por respuesta",
+      "text": "Gracias al tamaño reducido de la tecnología, unos pocos miligramos pueden ser suficientes: algo decisivo para moléculas novedosas y costosas o materiales muy valiosos, donde las decisiones se toman con miligramos."
+     },
+     {
+      "icon": "conditions",
+      "title": "Más condiciones ensayadas por semana",
+      "text": "Deposiciones directas, rápidas y sencillas que facilitan explorar más condiciones experimentales en ciclos de investigación más cortos."
+     },
+     {
+      "icon": "group",
+      "title": "Autonomía para todo el grupo",
+      "text": "Un flujo de trabajo compacto y sencillo facilita integrar la deposición sobre superficies en el laboratorio y utilizarla en todo el equipo de investigación."
+     },
+     {
+      "icon": "defensible",
+      "title": "Resultados defendibles",
+      "text": "El material se deposita directamente sobre el sustrato seleccionado, de modo que la superficie que evalúas es la superficie que preparaste."
+     }
+    ]
+   },
+   "faq": {
+    "kicker": "Preguntas frecuentes",
+    "title": "Con más detalle",
+    "items": [
+     {
+      "q": "¿Cómo funciona?",
+      "a": "MatSurfer crea condiciones controladas para transferir material desde una fuente directamente a un sustrato seleccionado. La distancia fuente–sustrato ajustable ayuda a los investigadores a definir la geometría experimental, mientras que la temperatura, la presión y el tiempo pueden adaptarse al material y al objetivo. El proceso produce una superficie preparada que después puede retirarse para su análisis o utilizarse en la siguiente etapa del flujo de trabajo de investigación. El sistema de superficie que creas es el sistema de superficie que mides."
+     },
+     {
+      "q": "¿Para qué puede utilizarse?",
+      "a": "MatSurfer da soporte a flujos de trabajo de I+D que requieren deposición controlada o funcionalización sobre superficies seleccionadas. Entre los campos potenciales están la electrónica orgánica, la investigación en células solares, los sensores químicos y biosensores, los recubrimientos funcionales, la preparación de muestras para SPM (microscopía de sonda de barrido) y la exploración de nuevas combinaciones material–superficie."
+     },
+     {
+      "q": "¿Para quién es?",
+      "a": "MatSurfer está diseñado para investigadores y equipos de I+D que trabajan con superficies o que exploran cómo los procesos relacionados con superficies pueden contribuir a su investigación. Esto incluye grupos especializados en ciencia de superficies, investigadores de campos afines, departamentos de I+D corporativos, laboratorios de ensayo y posibles socios de equipamiento de laboratorio."
+     },
+     {
+      "q": "¿Qué lo hace diferente?",
+      "a": "MatSurfer combina el trabajo directo sobre el sustrato final, una distancia fuente–sustrato controlable y la experimentación a escala reducida en un formato compacto. Su configuración modular y su flujo de trabajo sencillo están pensados para facilitar la integración del cribado material–superficie en los laboratorios de I+D."
+     },
+     {
+      "q": "¿Cuánto material se necesita?",
+      "a": "Una pequeña cantidad: gracias al tamaño reducido de la tecnología, unos pocos miligramos pueden ser suficientes. Esto importa para moléculas novedosas y costosas o materiales muy valiosos, donde las decisiones se toman con miligramos. Las cantidades concretas dependen del material y de la configuración, y forman parte de la conversación técnica."
+     },
+     {
+      "q": "¿Puede utilizarse en un laboratorio de I+D existente?",
+      "a": "Sí: está diseñado como equipamiento compacto de sobremesa para laboratorios existentes, y complementa los instrumentos que ya utilizas con una huella de laboratorio reducida."
+     },
+     {
+      "q": "¿Cómo puedo plantear una posible aplicación?",
+      "a": "Cuéntanos el material, el sustrato o el flujo de trabajo que te gustaría explorar. Revisamos cada solicitud y volvemos a contactar contigo para hablar del siguiente paso: empieza por la página de contacto."
+     }
+    ]
+   },
+   "finalCta": {
+    "title": "Hablemos de tu investigación",
+    "text": "Cuéntanos la aplicación que te gustaría explorar con MatSurfer.",
+    "button": "Hablemos de tu investigación",
+    "href": "/contact?interest=product"
+   }
+  },
+  "publications": [
+   {
+    "title": "Curcuminoid-Based Responsive Surfaces for Fluorescent BF3 Detection, a Fast and Reversible Approach",
+    "authors": "R. Gimeno-Muñoz, R. Díaz-Torres, S. Gómez-Coca, O. Roubeau, J. M. Díaz-Cruz, N. Aliaga-Alcalde, A. González-Campo",
+    "journal": "ACS Applied Materials & Interfaces",
+    "year": 2025,
+    "doi": "10.1021/acsami.4c19421",
+    "url": "https://doi.org/10.1021/acsami.4c19421",
+    "published": true
+   },
+   {
+    "title": "Dielectric behavior of curcuminoid polymorphs on different substrates by direct soft vacuum deposition",
+    "authors": "D. Riba-López, R. Zaffino, D. Herrera, R. Matheu, F. Silvestri, J. Ferreira da Silva, E. C. Sañudo, M. Mas-Torrent, E. Barrena, R. Pfattner, E. Ruiz, A. González-Campo, N. Aliaga-Alcalde",
+    "journal": "iScience",
+    "year": 2022,
+    "doi": "10.1016/j.isci.2022.105686",
+    "url": "https://doi.org/10.1016/j.isci.2022.105686",
+    "published": true
+   }
+  ],
+  "researchPage": {
+   "breadcrumb": "Casos de estudio",
+   "metaTitle": "Casos de estudio — MatSurfer",
+   "metaDescription": "La investigación realizada con MatSurfer por el grupo de Nanomateriales y Superficies Funcionales (FunNanoSurf) del ICMAB-CSIC.",
+   "kicker": "Casos de estudio",
+   "title": "Nacido en el laboratorio",
+   "lead": "MatSurfer nace de la investigación diaria del grupo de Nanomateriales y Superficies Funcionales (FunNanoSurf) del ICMAB-CSIC. Esta página recoge la investigación realizada con el dispositivo y las experiencias de los investigadores que trabajan con él.",
+   "experiencesTitle": "Experiencias de expertos",
+   "publicationsTitle": "Publicaciones",
+   "moreLink": "Más sobre esta experiencia",
+   "inviteTitle": "¿Has trabajado con el dispositivo?",
+   "inviteText": "Nos gustaría recoger aquí tu experiencia o tu publicación:",
+   "finalCta": {
+    "title": "Explora una colaboración",
+    "text": "Las validaciones, las experiencias de los investigadores y los trabajos publicados nacen de conversaciones.",
+    "button": "Explora una colaboración",
+    "href": "/contact?interest=research"
+   }
+  },
+  "site": {
+   "meta": {
+    "title": "MatSurfer — Dispositivo compacto de funcionalización de superficies para I+D a escala de laboratorio",
+    "description": "MatSurfer es un dispositivo compacto, a escala de laboratorio, para la deposición controlada y la funcionalización de materiales directamente sobre superficies finales. Desarrollado en el ICMAB-CSIC para la I+D relacionada con superficies.",
+    "ogAlt": "MatSurfer — dispositivo compacto para la deposición y la funcionalización directas sobre superficies finales"
+   },
+   "header": {
+    "nav": [
+     {
+      "label": "Producto",
+      "href": "/product"
+     },
+     {
+      "label": "Aplicaciones",
+      "href": "/applications"
+     },
+     {
+      "label": "Casos de estudio",
+      "href": "/research"
+     },
+     {
+      "label": "Equipo",
+      "href": "/team"
+     },
+     {
+      "label": "Contacto",
+      "href": "/contact"
+     }
+    ],
+    "cta": "Habla con el equipo",
+    "ctaHref": "/contact",
+    "menuOpen": "Abrir menú",
+    "menuClose": "Cerrar menú",
+    "language": "Idioma"
+   },
+   "a11y": {
+    "skipToContent": "Saltar al contenido",
+    "mainNav": "Principal",
+    "footerNav": "Pie de página",
+    "breadcrumbHome": "Inicio"
+   },
+   "footer": {
+    "description": "Dispositivo compacto de funcionalización de superficies para I+D a escala de laboratorio. Desarrollado en el ICMAB-CSIC, Barcelona.",
+    "cta": "Habla con el equipo",
+    "ctaHref": "/contact",
+    "columns": [
+     {
+      "title": "Producto",
+      "links": [
+       {
+        "label": "El dispositivo",
+        "href": "/product"
+       },
+       {
+        "label": "Cómo funciona",
+        "href": "/product#how-it-works"
+       },
+       {
+        "label": "Parámetros",
+        "href": "/product#parameters"
+       },
+       {
+        "label": "Preguntas frecuentes",
+        "href": "/product#faq"
+       }
+      ]
+     },
+     {
+      "title": "Explora",
+      "links": [
+       {
+        "label": "Aplicaciones",
+        "href": "/applications"
+       },
+       {
+        "label": "Casos de estudio",
+        "href": "/research"
+       },
+       {
+        "label": "Equipo",
+        "href": "/team"
+       },
+       {
+        "label": "Contacto",
+        "href": "/contact"
+       }
+      ]
+     },
+     {
+      "title": "Legal",
+      "links": [
+       {
+        "label": "Política de privacidad",
+        "href": "#"
+       },
+       {
+        "label": "Aviso legal",
+        "href": "#"
+       },
+       {
+        "label": "Contacto",
+        "href": "mailto:matsurfer@icmab.es"
+       }
+      ]
+     }
+    ],
+    "copyright": "© 2026 MatSurfer · ICMAB-CSIC · Nombre y marca provisionales.",
+    "bottomMono": "EP 4483 979 B1 · Superficies para todos."
+   }
+  },
+  "teamMembers": [
+   {
+    "name": "Núria Aliaga-Alcalde",
+    "role": "Profesora ICREA · Consultora y cofundadora",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "Doctora en Química, dedicada a tender puentes entre la investigación puntera a nivel de molécula individual y las aplicaciones prácticas en tecnología.",
+    "image": "/img/team/nuria-aliaga-alcalde.jpg",
+    "showcaseImage": "/img/team/showcase/nuria-aliaga-alcalde.webp",
+    "linkedin": "https://www.linkedin.com/in/n%C3%BAria-aliaga-alcalde-97bba517/",
+    "order": 1,
+    "published": true
+   },
+   {
+    "name": "Arántzazu González",
+    "role": "Científica Titular · Consultora y cofundadora",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "Doctora en Química, soñadora de la funcionalización de superficies, siempre dispuesta a nuevos desarrollos de materiales y con conciencia social.",
+    "image": "/img/team/arantzazu-gonzalez-campo.jpg",
+    "showcaseImage": "/img/team/showcase/arantzazu-gonzalez-campo.webp",
+    "linkedin": "https://www.linkedin.com/in/arantzazu-gonzalez-campo-b500798/",
+    "order": 2,
+    "published": true
+   },
+   {
+    "name": "Daniel Herrera",
+    "role": "Investigador posdoctoral · CTO",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "Químico, doctor. Síntesis y catálisis. Semiconductores orgánicos. Experiencia en transferencia de conocimiento y tecnología.",
+    "image": "/img/team/daniel-herrera.jpg",
+    "showcaseImage": "/img/team/showcase/daniel-herrera.webp",
+    "linkedin": "https://www.linkedin.com/in/dherreramiranda",
+    "order": 3,
+    "published": true
+   },
+   {
+    "name": "Coral Herranz Lancho",
+    "role": "Responsable de Innovación e Investigación · CEO",
+    "affiliation": "ICMAB-CSIC",
+    "bio": "Doctora en Química Física, apasionada por entender lo que hay debajo de la naturaleza. Une los resultados científicos y el mercado creando valor social.",
+    "image": "/img/team/coral-herranz-lancho.jpg",
+    "showcaseImage": "/img/team/showcase/coral-herranz-lancho.webp",
+    "linkedin": "https://www.linkedin.com/in/coral-herranz-lancho-phd/",
+    "order": 4,
+    "published": true
+   }
+  ],
+  "teamPage": {
+   "breadcrumb": "Equipo",
+   "profilesLabel": "Perfiles del equipo",
+   "metaTitle": "Equipo — MatSurfer",
+   "metaDescription": "El equipo detrás de MatSurfer: investigación en superficies, transferencia de tecnología y desarrollo de producto en torno a una tecnología nacida en el ICMAB-CSIC.",
+   "kicker": "El equipo",
+   "title": "El equipo detrás de MatSurfer",
+   "lead": "MatSurfer reúne investigación en superficies, transferencia de tecnología y desarrollo de producto en torno a una tecnología nacida en el ICMAB-CSIC, en Barcelona.",
+   "links": {
+    "linkedin": "LinkedIn",
+    "website": "Sitio web",
+    "linkedinOf": "en LinkedIn",
+    "websiteOf": "sitio web"
+   },
+   "showcase": {
+    "pickerLabel": "Miembros del equipo",
+    "show": "Mostrar a",
+    "noBio": "Perfil disponible próximamente."
+   },
+   "journey": {
+    "kicker": "Del laboratorio a la mesa de trabajo",
+    "title": "Una tecnología, tres tipos de trabajo",
+    "lead": "MatSurfer existe porque la investigación en superficies, la transferencia de tecnología y el desarrollo de producto ocurren en el mismo lugar.",
+    "steps": [
+     {
+      "title": "Investigación",
+      "text": "El dispositivo nace del trabajo diario del grupo FunNanoSurf del ICMAB-CSIC, donde la funcionalización directa de superficies es una herramienta de investigación antes que un producto."
+     },
+     {
+      "title": "Protección y validación",
+      "text": "La tecnología está protegida por una patente europea y otra española, y se ha validado externamente con grupos de investigación y una empresa, en sus propios laboratorios."
+     },
+     {
+      "title": "Producto",
+      "text": "MatSurfer convierte esa experiencia en un dispositivo compacto de sobremesa para I+D a escala de laboratorio, con oportunidades de acceso anticipado que empiezan a abrirse."
+     }
+    ],
+    "facts": [
+     {
+      "value": "2",
+      "label": "patentes"
+     },
+     {
+      "value": "8",
+      "label": "grupos de investigación"
+     },
+     {
+      "value": "1",
+      "label": "empresa"
+     },
+     {
+      "value": "2",
+      "label": "publicaciones en acceso abierto"
+     }
+    ],
+    "factsNote": "Validaciones externas y publicaciones tal como se recogen en la página de Casos de estudio.",
+    "factsLink": "Ver los casos de estudio",
+    "factsHref": "/research"
+   },
+   "finalCta": {
+    "title": "Habla con el equipo",
+    "text": "Las consultas científicas, de colaboración o de acceso anticipado empiezan con un mensaje.",
+    "button": "Habla con el equipo",
+    "href": "/contact?interest=partnership",
+    "emailLead": "O escríbenos directamente a"
+   }
+  },
+  "validationItems": [
+   {
+    "title": "Propiedad intelectual y validación tecnológica",
+    "text": "La tecnología se ha desarrollado en el Instituto de Ciencia de Materiales de Barcelona (ICMAB-CSIC) y está protegida por las siguientes patentes: la patente unitaria europea EP4483979B1 y la patente española ES2949292B2. Se han validado prototipos operativos de forma externa, en su entorno operacional, con 8 grupos de investigación y 1 empresa en los siguientes campos: electrónica orgánica, biosensores, nuevos materiales de superficie y preparación de muestras para EPR. La tecnología también se ha probado en operación real a lo largo del tiempo en laboratorios de I+D de electrónica orgánica y nuevos materiales de superficie. Se requiere, y se está desarrollando, una validación externa adicional en entorno operacional y a lo largo del tiempo en otros campos de aplicación. Además, la tecnología ha contado con el apoyo de programas competitivos de investigación y de transferencia tecnológica: ERC-PoC SmolSUB 101138186, Impulsa-T CSIC, 2025 LLAV 00099 y SUBLIMAT-COMTE.",
+    "published": true
+   }
+  ]
+ },
+ "brand": {
+  "projectName": "MatSurfer",
+  "claim": "Surfaces for all.",
+  "claimEs": "Superficies para todos.",
+  "origin": "Developed at ICMAB-CSIC",
+  "originEs": "Desarrollado en el ICMAB-CSIC",
+  "contactEmail": "matsurfer@icmab.es"
+ },
+ "pendingContent": {
+  "patentFamilyConfirmed": true,
+  "validationIpPublished": true,
+  "teamProfilesPublished": true,
+  "researchContentPublished": true,
+  "legalContentConfirmed": false,
+  "contactEmailConfirmed": false,
+  "productionDomainConfirmed": false
+ },
+ "pendingData": {
+  "patentFamilyCode": "EP 4483 979 B1"
+ },
+ "interestParamMap": {
+  "product": "product-information",
+  "application": "research-application",
+  "research": "scientific-collaboration",
+  "partnership": "scientific-collaboration",
+  "distribution": "distribution",
+  "validation": "validation"
+ }
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/contact",
+  "title": "Contacto con formulario",
+  "description": "Texto de contacto, próximos pasos y el formulario (WPForms).",
+  "category": "matsurfer",
+  "icon": "feedback",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título de la página (H1)"
+      },
+      {
+        "key": "lead",
+        "type": "textarea",
+        "label": "Texto de entrada",
+        "rows": 4
+      },
+      {
+        "type": "panel",
+        "label": "Qué pasa después"
+      },
+      {
+        "key": "asideTitle",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "steps",
+        "type": "list",
+        "label": "Pasos",
+        "itemLabel": "Paso",
+        "min": 1,
+        "max": 5
+      },
+      {
+        "key": "directTitle",
+        "type": "text",
+        "label": "Título del email directo"
+      },
+      {
+        "key": "directText",
+        "type": "text",
+        "label": "Texto antes del email"
+      },
+      {
+        "type": "notice",
+        "text": "Los campos del formulario se editan en WPForms (menú WPForms → Todos los formularios). Los contactos recibidos llegan por email y quedan guardados en «Contactos».",
+        "admin": "admin.php?page=wpforms-overview",
+        "linkLabel": "Abrir WPForms"
+      }
+    ]
+  }
+}

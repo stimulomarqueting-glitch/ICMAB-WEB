@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/research-publications",
+  "title": "Publicaciones",
+  "description": "Lista de artículos científicos.",
+  "category": "matsurfer",
+  "icon": "media-document",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "type": "notice",
+        "text": "Las publicaciones se añaden y editan en el menú Publicaciones.",
+        "admin": "edit.php?post_type=mats_publication",
+        "linkLabel": "Editar publicaciones"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título de la sección"
+      }
+    ]
+  }
+}

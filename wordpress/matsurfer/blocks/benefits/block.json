@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matsurfer/benefits",
+  "title": "Beneficios",
+  "description": "Cuatro beneficios con icono, título y texto.",
+  "category": "matsurfer",
+  "icon": "awards",
+  "textdomain": "matsurfer",
+  "supports": {
+    "html": false,
+    "className": false,
+    "customClassName": false,
+    "reusable": false,
+    "lock": false,
+    "renaming": false
+  },
+  "attributes": {
+    "headingId": {
+      "type": "string",
+      "default": "benefits-title"
+    }
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "matsurfer": {
+    "fields": [
+      {
+        "key": "kicker",
+        "type": "text",
+        "label": "Etiqueta superior"
+      },
+      {
+        "key": "title",
+        "type": "text",
+        "label": "Título"
+      },
+      {
+        "key": "outcomes",
+        "type": "repeater",
+        "label": "Beneficios",
+        "itemLabel": "Beneficio",
+        "fields": [
+          {
+            "key": "icon",
+            "type": "select",
+            "label": "Icono",
+            "options": [
+              {
+                "value": "material",
+                "label": "Material (gota)"
+              },
+              {
+                "value": "conditions",
+                "label": "Condiciones (ciclo)"
+              },
+              {
+                "value": "group",
+                "label": "Grupo (personas)"
+              },
+              {
+                "value": "defensible",
+                "label": "Resultado (diana)"
+              }
+            ]
+          },
+          {
+            "key": "title",
+            "type": "text",
+            "label": "Título del beneficio"
+          },
+          {
+            "key": "text",
+            "type": "textarea",
+            "label": "Texto",
+            "rows": 3
+          }
+        ],
+        "min": 4,
+        "max": 4,
+        "titleField": "title"
+      }
+    ]
+  }
+}
