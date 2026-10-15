@@ -60,6 +60,8 @@ borrar.
    - Instalar y configurar **WP Mail SMTP** con el buzón de Hostinger.
    - Mientras sea staging: Ajustes → Lectura → marcar *Disuadir a los motores
      de búsqueda*. Desmarcarlo al publicar en el dominio final.
+   - En hPanel → Avanzado → Configuración de PHP, desactivar `expose_php`
+     (que el servidor no anuncie la versión de PHP).
    - Crear los usuarios del ICMAB con el rol **Editor** (Usuarios → Añadir
      nuevo). El rol Editor puede hacer todo lo del día a día y no puede tocar
      plugins, tema ni ajustes técnicos.
@@ -93,7 +95,8 @@ borrar.
 Los textos originales viven en `src/content` (web Astro) y se exportan con
 `node wordpress/tools/export-content.mjs`. Una vez instalada la web, los
 textos se editan en WordPress; el asistente solo los vuelve a poner si se
-marca «Sobrescribir los textos con los originales».
+marca «Sobrescribir los textos y las fotos con los originales» (los textos de
+Google se conservan y la versión anterior queda en *Revisiones*).
 
 ## Pendiente del cliente
 

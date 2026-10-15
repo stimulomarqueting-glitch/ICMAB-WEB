@@ -101,14 +101,18 @@ function mats_wpforms_options( string $lang, string $key ): array {
 	return $out;
 }
 
-/** The tracking pseudo-fields of the notification email: key => [ id, label ]. */
-function mats_wpforms_meta_fields(): array {
+/**
+ * The tracking pseudo-fields of the notification email: key => [ id, label ],
+ * labelled in the language of the form (the rest of the email is too).
+ */
+function mats_wpforms_meta_fields( string $lang = 'en' ): array {
+	$es = 'es' === mats_normalize_lang( $lang );
 	return array(
-		'language'    => array( 'id' => 901, 'label' => 'Language' ),
-		'source_page' => array( 'id' => 902, 'label' => 'Source page' ),
-		'cta_source'  => array( 'id' => 903, 'label' => 'CTA' ),
-		'application' => array( 'id' => 904, 'label' => 'Application' ),
-		'utm'         => array( 'id' => 905, 'label' => 'UTM' ),
+		'language'    => array( 'id' => 901, 'label' => $es ? 'Idioma' : 'Language' ),
+		'source_page' => array( 'id' => 902, 'label' => $es ? 'Página de origen' : 'Source page' ),
+		'cta_source'  => array( 'id' => 903, 'label' => $es ? 'Botón de origen' : 'Source button' ),
+		'application' => array( 'id' => 904, 'label' => $es ? 'Aplicación' : 'Application' ),
+		'utm'         => array( 'id' => 905, 'label' => $es ? 'Campaña (UTM)' : 'Campaign (UTM)' ),
 	);
 }
 
@@ -945,7 +949,9 @@ add_action(
 
 /**
  * Tracking data of the submission being processed, sanitized. Usable by
- * other modules from wpforms_process_complete.
+ * other modules from wpforms_process_complete. Language, application and
+ * UTM are display text in the form's language; cta_source is the button's
+ * code (data-cta-source, 'direct' when none).
  *
  * @return array{language:string, source_page:string, cta_source:string, application:string, utm:string}
  */
@@ -994,7 +1000,17 @@ function mats_wpforms_submission_meta( $form_data = array() ): array {
 		}
 	}
 
-	/* UTM: JSON from sessionStorage 'lead:utm' → "source: x · medium: y" */
+	/* UTM: JSON from sessionStorage 'lead:utm' → "source: x · medium: y"
+	   (Spanish form: "fuente: x · medio: y", the names of the Contactos inbox) */
+	$utm_names = 'es' === $lang
+		? array(
+			'source'   => 'fuente',
+			'medium'   => 'medio',
+			'campaign' => 'campaña',
+			'content'  => 'contenido',
+			'term'     => 'término',
+		)
+		: array();
 	$utm      = '';
 	$utm_raw  = isset( $raw['utm'] ) && is_string( $raw['utm'] ) ? $raw['utm'] : '';
 	$utm_data = '' !== $utm_raw ? json_decode( mb_substr( $utm_raw, 0, 2000 ), true ) : null;
@@ -1003,7 +1019,7 @@ function mats_wpforms_submission_meta( $form_data = array() ): array {
 		foreach ( array( 'source', 'medium', 'campaign', 'content', 'term' ) as $key ) {
 			$value = isset( $utm_data[ $key ] ) && is_scalar( $utm_data[ $key ] ) ? mb_substr( sanitize_text_field( (string) $utm_data[ $key ] ), 0, 100 ) : '';
 			if ( '' !== $value ) {
-				$parts[] = $key . ': ' . $value;
+				$parts[] = ( $utm_names[ $key ] ?? $key ) . ': ' . $value;
 			}
 		}
 		$utm = implode( ' · ', $parts );
@@ -1024,11 +1040,21 @@ function mats_wpforms_submission_meta( $form_data = array() ): array {
 	);
 }
 
-/** Pseudo-fields (WPForms field format) carrying the tracking data. */
+/**
+ * Pseudo-fields (WPForms field format) carrying the tracking data, in the
+ * form's language. The button is described in words, with its code in
+ * brackets: "Portada: botón principal [hero]".
+ */
 function mats_wpforms_meta_entries( $form_data ): array {
+	$lang = mats_wpforms_data_lang( $form_data );
 	$meta = mats_wpforms_submission_meta( $form_data );
-	$out  = array();
-	foreach ( mats_wpforms_meta_fields() as $key => $def ) {
+	$cta  = (string) ( $meta['cta_source'] ?? '' );
+	if ( '' !== $cta && function_exists( 'mats_lead_cta_label' ) ) {
+		$label              = (string) mats_lead_cta_label( $cta, 'es' === $lang ? 'es' : 'en' );
+		$meta['cta_source'] = '' !== $label ? $label . ' [' . $cta . ']' : $cta;
+	}
+	$out = array();
+	foreach ( mats_wpforms_meta_fields( $lang ) as $key => $def ) {
 		$out[ $def['id'] ] = array(
 			'name'  => $def['label'],
 			'value' => (string) ( $meta[ $key ] ?? '' ),
@@ -1053,10 +1079,11 @@ function mats_wpforms_meta_entries( $form_data ): array {
 add_filter(
 	'wpforms_process_before_form_data',
 	static function ( $form_data, $entry = array() ) {
-		if ( ! is_array( $form_data ) || '' === mats_wpforms_data_lang( $form_data ) ) {
+		$lang = mats_wpforms_data_lang( $form_data );
+		if ( ! is_array( $form_data ) || '' === $lang ) {
 			return $form_data;
 		}
-		foreach ( mats_wpforms_meta_fields() as $def ) {
+		foreach ( mats_wpforms_meta_fields( $lang ) as $def ) {
 			if ( ! isset( $form_data['fields'][ $def['id'] ] ) ) {
 				$form_data['fields'][ $def['id'] ] = array(
 					'id'         => (string) $def['id'],
@@ -1174,7 +1201,7 @@ add_action(
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display only
 		$done = isset( $_GET['mats_wpforms'] ) ? sanitize_key( wp_unslash( $_GET['mats_wpforms'] ) ) : '';
 		if ( 'created' === $done ) {
-			echo '<div class="notice notice-success is-dismissible"><p><strong>Formularios de contacto listos.</strong> La página Contacto ya muestra el formulario en inglés y en español. Los mensajes llegarán a ' . esc_html( mats_contact_email() ) . '.</p></div>';
+			echo '<div class="notice notice-success is-dismissible"><p><strong>Formularios de contacto listos.</strong> ' . ( mats_page_id( 'contact', 'en' ) ? 'La página Contacto ya muestra el formulario en inglés y en español.' : 'Aparecerán en la página Contacto en cuanto la crees con la puesta en marcha.' ) . ' Los mensajes llegarán a ' . esc_html( mats_contact_email() ) . '.</p></div>';
 		} elseif ( 'error' === $done ) {
 			echo '<div class="notice notice-error"><p><strong>No se han podido crear los formularios de contacto.</strong> Comprueba que WPForms está activo y vuelve a intentarlo. Si sigue fallando, impórtalos a mano en WPForms → Herramientas → Importar (archivos wpforms-en.json y wpforms-es.json de la carpeta del tema, inc/data/).</p></div>';
 		}
@@ -1185,7 +1212,7 @@ add_action(
 		$status = mats_wpforms_status();
 		if ( ! $status['active'] ) {
 			if ( in_array( $id, array( 'dashboard', 'plugins' ), true ) ) {
-				echo '<div class="notice notice-warning"><p><strong>Falta el plugin WPForms.</strong> Sin él, la página Contacto solo muestra el email de contacto. Instálalo y actívalo en <a href="' . esc_url( admin_url( 'plugin-install.php?s=wpforms&tab=search&type=term' ) ) . '">Plugins → Añadir nuevo</a> (busca «WPForms»).</p></div>';
+				echo '<div class="notice notice-warning"><p><strong>Falta el plugin WPForms.</strong> Sin él, la página Contacto solo muestra el email de contacto. Instálalo y actívalo en <a href="' . esc_url( admin_url( 'plugin-install.php?s=wpforms&tab=search&type=term' ) ) . '">Plugins → Añadir nuevo plugin</a> (busca «WPForms»).</p></div>';
 			}
 			return;
 		}

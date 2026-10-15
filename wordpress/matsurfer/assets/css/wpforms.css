@@ -449,12 +449,22 @@
   transform: scale(0.985);
 }
 
-.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:focus-visible {
+/* the states repeat the base rule's :not(:hover):not(:active) selector, so
+   they win over it (same specificity, later in the file) */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:focus-visible,
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:not(:hover):not(:active):focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit[disabled] {
+/* WPForms' own focus frame (its modern styles draw a ring with ::after on
+   :focus): the button shows the site's violet ring instead, as above */
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit::after {
+  content: none;
+}
+
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit[disabled],
+.contact .lf__card .wpforms-container .wpforms-form .wpforms-submit-container button[type='submit'].wpforms-submit:not(:hover):not(:active)[disabled] {
   opacity: 0.6;
   cursor: wait;
 }

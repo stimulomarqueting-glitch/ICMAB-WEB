@@ -18,9 +18,14 @@ function mats_installer_wpforms_howto( array &$result ): void {
 	mats_installer_add(
 		$result,
 		'info',
-		'Primero hay que tener WPForms Lite instalado y activo: pulsa el botón del paso 1. Si no se puede instalar de forma automática, ve a Plugins → Añadir nuevo, busca «WPForms», pulsa «Instalar ahora» y después «Activar». Luego vuelve aquí y pulsa «Crear los formularios». Mientras tanto, la página Contacto muestra el email de contacto en lugar del formulario.',
+		sprintf(
+			'Primero hay que tener WPForms Lite instalado y activo: pulsa el botón del paso 1. Si no se puede instalar de forma automática, ve a %1$s, busca «WPForms», pulsa «%2$s» y después «%3$s». Luego vuelve aquí y pulsa «Crear los formularios». Mientras tanto, la página Contacto muestra el email de contacto en lugar del formulario.',
+			mats_installer_wp_label( 'Plugins → Añadir plugin', 'Plugins → Add Plugin', true ),
+			mats_installer_wp_label( 'Instalar ahora', 'Install Now' ),
+			mats_installer_wp_label( 'Activar', 'Activate' )
+		),
 		admin_url( 'plugin-install.php?tab=search&type=term&s=wpforms' ),
-		'Ir a Plugins → Añadir nuevo'
+		'Buscar el plugin'
 	);
 }
 

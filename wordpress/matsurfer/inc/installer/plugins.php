@@ -86,13 +86,17 @@ function mats_installer_manual_plugin_msg( array &$result, string $key ): void {
 		$result,
 		'info',
 		sprintf(
-			'Cómo instalar %1$s a mano: ve a Plugins → Añadir nuevo, busca «%2$s», pulsa «Instalar ahora» y después «Activar». Luego vuelve a esta pantalla y repite este paso. Si el servidor no tiene acceso a internet, descarga el archivo zip desde wordpress.org/plugins/%3$s en tu ordenador y súbelo en Plugins → Añadir nuevo → Subir plugin.',
+			'Cómo instalar %1$s a mano: ve a %4$s, busca «%2$s», pulsa «%5$s» y después «%6$s». Luego vuelve a esta pantalla y repite este paso. Si el servidor no tiene acceso a internet, descarga el archivo zip desde wordpress.org/plugins/%3$s en tu ordenador y súbelo con el botón «%7$s» de esa misma pantalla.',
 			$spec['name'],
 			'wpforms' === $key ? 'WPForms' : $spec['name'],
-			$spec['slug']
+			$spec['slug'],
+			mats_installer_wp_label( 'Plugins → Añadir plugin', 'Plugins → Add Plugin', true ),
+			mats_installer_wp_label( 'Instalar ahora', 'Install Now' ),
+			mats_installer_wp_label( 'Activar', 'Activate' ),
+			mats_installer_wp_label( 'Subir plugin', 'Upload Plugin' )
 		),
 		admin_url( 'plugin-install.php?tab=search&type=term&s=' . rawurlencode( 'wpforms' === $key ? 'wpforms' : $spec['slug'] ) ),
-		'Ir a Plugins → Añadir nuevo'
+		'Buscar el plugin'
 	);
 }
 
@@ -138,7 +142,7 @@ function mats_installer_install_plugin( array &$result, string $key ): string {
 		return '';
 	}
 	if ( ! wp_is_file_mod_allowed( 'mats_installer_plugins' ) ) {
-		mats_installer_add( $result, 'error', sprintf( 'Esta instalación de WordPress no permite instalar plugins desde el escritorio (está bloqueado en su configuración), así que no se ha podido instalar %s.', $spec['name'] ) );
+		mats_installer_add( $result, 'error', sprintf( 'Esta instalación de WordPress no permite instalar plugins desde el panel (está bloqueado en su configuración), así que no se ha podido instalar %s.', $spec['name'] ) );
 		return '';
 	}
 

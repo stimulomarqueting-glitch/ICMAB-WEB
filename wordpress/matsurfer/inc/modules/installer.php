@@ -9,6 +9,10 @@
  *    otherwise it creates that menu itself)
  *  - reminder notice after the theme is activated, until the setup is
  *    finished or the notice is hidden
+ *  - warning when Polylang stops running after the setup (the Spanish half
+ *    of the site is offline): administrators, editors and the block editor
+ *  - the structural pages store their current version in «Revisiones»
+ *    before any change (pages created by the setup had none)
  *  - handlers: admin-post.php?action=mats_installer_run (no-JS form),
  *    admin-ajax.php?action=mats_installer_step / mats_installer_status (JS),
  *    admin-post.php?action=mats_installer_notice (hide the reminder)
@@ -26,6 +30,9 @@ foreach ( array( 'runner', 'plugins', 'languages', 'content', 'forms', 'review',
 	require_once MATS_DIR . '/inc/installer/' . $mats_installer_part . '.php';
 }
 unset( $mats_installer_part );
+
+/* the structural pages keep their current version in «Revisiones» before they change (see content.php) */
+add_action( 'pre_post_update', 'mats_installer_revision_before_update', 10, 1 );
 
 /* ── theme activation → reminder ─────────────────────────────────────── */
 
@@ -59,17 +66,44 @@ add_action(
 			return;
 		}
 		$hide = wp_nonce_url( add_query_arg( 'action', 'mats_installer_notice', admin_url( 'admin-post.php' ) ), MATS_SETUP_NONCE );
+		$also = mats_installer_notice_also( $screen ? (string) $screen->id : '' );
 		?>
 		<div class="notice notice-info mats-setup-notice">
 			<p><strong>El tema MatSurfer está activado.</strong> Para dejar la web lista (plugins, idiomas, páginas con los textos originales y formulario de contacto) abre la puesta en marcha: son unos clics y se puede repetir sin miedo.</p>
+			<?php if ( $also ) : ?>
+				<p><?php echo esc_html( sprintf( 'La puesta en marcha también %s, así que no hace falta seguir a mano los otros avisos de esta pantalla.', implode( ' y ', $also ) ) ); ?></p>
+			<?php endif; ?>
 			<p>
 				<a class="button button-primary" href="<?php echo esc_url( mats_installer_url() ); ?>">Abrir la puesta en marcha</a>
 				<a class="button-link" href="<?php echo esc_url( $hide ); ?>" style="margin-left:.75em">Ocultar este aviso</a>
 			</p>
 		</div>
 		<?php
-	}
+	},
+	1 // above the other notices it answers (WPForms missing, panel not in Spanish)
 );
+
+/**
+ * Other notices on this screen that tell the administrator to do by hand
+ * what the wizard does on its own: WPForms missing or its forms missing
+ * (inc/modules/wpforms.php) and the panel not in Spanish
+ * (inc/modules/admin.php, dashboard and guide). Returns what the reminder should add
+ * ("instala y activa WPForms"…).
+ */
+function mats_installer_notice_also( string $screen_id ): array {
+	$also  = array();
+	$forms = function_exists( 'mats_wpforms_status' ) ? mats_wpforms_status() : null;
+	if ( $forms && empty( $forms['active'] ) && in_array( $screen_id, array( 'dashboard', 'plugins' ), true ) ) {
+		$also[] = 'instala y activa WPForms';
+	} elseif ( $forms && ! empty( $forms['active'] ) && ! empty( $forms['missing'] ) && in_array( $screen_id, array( 'dashboard', 'edit-page', 'plugins', 'themes' ), true ) ) {
+		$also[] = 'crea los formularios de contacto (después de crear las páginas)';
+	}
+	$es_screens = array( 'dashboard', defined( 'MATS_GUIDE_PAGE' ) ? 'toplevel_page_' . MATS_GUIDE_PAGE : 'dashboard' );
+	if ( in_array( $screen_id, $es_screens, true ) && function_exists( 'mats_admin_spanish_available' ) && ! mats_admin_spanish_available() && ! get_user_meta( get_current_user_id(), 'mats_hide_es_notice', true ) ) {
+		$also[] = 'pone el panel de WordPress en español (si el servidor puede descargar la traducción)';
+	}
+	return $also;
+}
 
 /* after a theme update: sections that were created empty can now be filled */
 add_action(
@@ -92,6 +126,103 @@ add_action(
 			<p><a class="button button-primary" href="<?php echo esc_url( mats_installer_url() . '#mats-step-content' ); ?>">Abrir la puesta en marcha</a></p>
 		</div>
 		<?php
+	}
+);
+
+/* ── Polylang switched off after the setup: the Spanish site is offline ── */
+
+/**
+ * [ url, label ] of the button that brings Polylang back: activates it
+ * when it is installed, otherwise opens the wizard (its step 1 installs it).
+ */
+function mats_installer_polylang_fix_link(): array {
+	$plugin = mats_installer_plugin_state( 'polylang' );
+	if ( 'installed' === $plugin['state'] && $plugin['file'] && current_user_can( 'activate_plugin', $plugin['file'] ) ) {
+		$url = add_query_arg(
+			array(
+				'action' => 'activate',
+				'plugin' => $plugin['file'],
+			),
+			admin_url( 'plugins.php' )
+		);
+		/* raw URL (no &amp;): it is also handed to a block-editor notice in JS */
+		return array( add_query_arg( '_wpnonce', wp_create_nonce( 'activate-plugin_' . $plugin['file'] ), $url ), 'Activar Polylang' );
+	}
+	return array( mats_installer_url() . '#mats-step-plugins', 'Abrir la puesta en marcha' );
+}
+
+/** Short sentence for the people who edit the content (they cannot activate plugins). */
+function mats_installer_spanish_offline_editor_text(): string {
+	return 'La web en español no se ve ahora mismo: el plugin de idiomas (Polylang) está desactivado. Avisa al administrador de la web; en cuanto lo active, todo vuelve a estar como antes (no se ha perdido nada).';
+}
+
+/* every admin screen (the block editor gets its own notice below) */
+add_action(
+	'admin_notices',
+	static function () {
+		if ( ! current_user_can( 'edit_posts' ) || ! mats_installer_spanish_offline() ) {
+			return;
+		}
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen && $screen->is_block_editor() ) {
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$email = (string) get_option( 'admin_email' );
+			echo '<div class="notice notice-warning mats-pll-off-notice"><p><strong>' . esc_html( 'La web en español no se ve ahora mismo.' ) . '</strong> ';
+			echo esc_html( 'El plugin de idiomas (Polylang) está desactivado. Avisa al administrador de la web' );
+			echo $email ? ' (<a href="' . esc_url( 'mailto:' . $email ) . '">' . esc_html( $email ) . '</a>)' : '';
+			echo esc_html( ': en cuanto lo active, todo vuelve a estar como antes; no se ha perdido nada.' ) . '</p></div>';
+			return;
+		}
+		$missing             = 'missing' === mats_installer_plugin_state( 'polylang' )['state'];
+		list( $url, $label ) = mats_installer_polylang_fix_link();
+		?>
+		<div class="notice notice-error mats-pll-off-notice">
+			<p>
+				<strong><?php echo esc_html( $missing ? 'Falta el plugin Polylang: la web en español no se ve.' : 'Polylang está desactivado: la web en español no se ve.' ); ?></strong>
+				Sin él, las páginas en español (las que empiezan por /es/) dan «página no encontrada» o llevan a la versión en inglés, y desaparece el botón EN / ES de la web. No se ha borrado nada: en cuanto Polylang vuelva a estar activo, la web en español vuelve tal como estaba.
+				<?php echo esc_html( $missing ? 'Para recuperarlo, abre la puesta en marcha y pulsa el botón del paso 1 («Plugins necesarios»).' : 'Actívalo con el botón de abajo o en Plugins.' ); ?>
+			</p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $label ); ?></a>
+				<?php if ( ! $missing ) : ?>
+					<a class="button" href="<?php echo esc_url( admin_url( 'plugins.php' ) ); ?>">Ir a Plugins</a>
+				<?php endif; ?>
+			</p>
+		</div>
+		<?php
+	},
+	1
+);
+
+/* the block editor does not show the notices above: same warning inside it */
+add_action(
+	'enqueue_block_editor_assets',
+	static function () {
+		if ( ! current_user_can( 'edit_posts' ) || ! mats_installer_spanish_offline() ) {
+			return;
+		}
+		$admin  = current_user_can( 'manage_options' );
+		$notice = array(
+			'text'   => $admin ? 'Polylang está desactivado: la web en español (/es/) no se ve. No se ha perdido nada: actívalo de nuevo y vuelve tal como estaba.' : mats_installer_spanish_offline_editor_text(),
+			'action' => array(),
+		);
+		if ( $admin ) {
+			list( $url, $label ) = mats_installer_polylang_fix_link();
+			$notice['action']    = array(
+				array(
+					'label' => $label,
+					'url'   => $url,
+				),
+			);
+		}
+		wp_register_script( 'matsurfer-pll-off', false, array( 'wp-data', 'wp-notices', 'wp-dom-ready' ), mats_ver( 'inc/modules/installer.php' ), true );
+		wp_enqueue_script( 'matsurfer-pll-off' );
+		wp_add_inline_script(
+			'matsurfer-pll-off',
+			'(function(wp,n){if(!wp||!wp.data||!wp.domReady){return;}wp.domReady(function(){var s=wp.data.dispatch("core/notices");if(s){s.createWarningNotice(n.text,{id:"mats-pll-off",isDismissible:true,actions:n.action});}});})(window.wp,' . wp_json_encode( $notice ) . ');'
+		);
 	}
 );
 
@@ -192,7 +323,7 @@ function mats_installer_request_flag( string $name ): bool {
 	return isset( $_REQUEST[ $name ] ) && is_scalar( $_REQUEST[ $name ] ) && '1' === (string) wp_unslash( $_REQUEST[ $name ] );
 }
 
-/** The "Sobrescribir los textos" box was ticked (confirmed or not). */
+/** The "Sobrescribir los textos y las fotos" box was ticked (confirmed or not). */
 function mats_installer_overwrite_requested(): bool {
 	return mats_installer_request_flag( 'overwrite' );
 }
@@ -296,7 +427,7 @@ add_action(
 		}
 		$opts = mats_installer_request_opts();
 		if ( mats_installer_overwrite_requested() && ! $opts['overwrite'] && mats_installer_step_can_overwrite( $step ) ) {
-			wp_send_json_error( array( 'message' => 'Falta confirmar que quieres sobrescribir los textos. Recarga la página y vuelve a intentarlo.' ), 400 );
+			wp_send_json_error( array( 'message' => 'Falta confirmar que quieres sobrescribir los textos y las fotos. Recarga la página y vuelve a intentarlo.' ), 400 );
 		}
 		$result = mats_installer_dispatch( $step, $opts );
 		$card   = 'smtp' === $step ? 'plugins' : $step;

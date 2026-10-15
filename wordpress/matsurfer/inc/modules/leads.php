@@ -759,9 +759,13 @@ function mats_lead_choice_label( string $group, string $value ): string {
  * (its data-cta-source; '' when unknown). Covers every source the theme
  * prints: the Astro ones (header, footer, hero*, home-*, <page>-final,
  * applications-<slug>) and the WordPress-only ones (news templates, the
- * "Últimas noticias" section, the 404 page).
+ * "Últimas noticias" section, the 404 page). $lang 'en' gives the English
+ * description (notification email of the English form, inc/modules/wpforms.php).
  */
-function mats_lead_cta_label( string $source ): string {
+function mats_lead_cta_label( string $source, string $lang = 'es' ): string {
+	if ( 'en' === $lang ) {
+		return mats_lead_cta_label_en( $source );
+	}
 	$fixed = array(
 		'direct'             => 'Ninguno: llegó directamente al formulario',
 		'header'             => 'Botón de la cabecera (arriba del todo)',
@@ -810,12 +814,61 @@ function mats_lead_cta_label( string $source ): string {
 	return '';
 }
 
-/** Title (in Spanish) of an application by slug, '' when unknown. */
-function mats_lead_application_title( string $slug ): string {
+/** English version of mats_lead_cta_label() (same sources). */
+function mats_lead_cta_label_en( string $source ): string {
+	$fixed = array(
+		'direct'             => 'None: came straight to the form',
+		'header'             => 'Header button (top of the page)',
+		'footer'             => 'Footer button',
+		'hero'               => 'Home: main button',
+		'hero-product'       => 'Home: button to see the product',
+		'home-product'       => 'Home: product section',
+		'home-applications'  => 'Home: applications section',
+		'home-research'      => 'Home: case studies section',
+		'home-team'          => 'Home: team section',
+		'home-final'         => 'Home: closing call to action',
+		'product-hero'       => 'Product: header button',
+		'product-final'      => 'Product: closing call to action',
+		'applications-final' => 'Applications: closing call to action',
+		'research-final'     => 'Case Studies: closing call to action',
+		'team-final'         => 'Team: closing call to action',
+		'latest-news'        => '“Latest news” section: its button (usually, see all news)',
+		'news-empty'         => 'News: contact button (while there is no news yet)',
+		'news-final'         => 'News: closing call to action (news list or a category)',
+		'news-article-final' => 'News article: closing call to action (end of an article)',
+		'search-final'       => 'Search: closing call to action (results page)',
+		'404-home'           => 'Page not found (404 error): button back to the home page',
+	);
+	if ( isset( $fixed[ $source ] ) ) {
+		return $fixed[ $source ];
+	}
+	if ( str_starts_with( $source, 'applications-' ) ) {
+		$title = mats_lead_application_title( substr( $source, 13 ), 'en' );
+		return $title ? 'Applications: button of “' . $title . '”' : '';
+	}
+	$pages = array(
+		'home'         => 'Home',
+		'product'      => 'Product',
+		'applications' => 'Applications',
+		'research'     => 'Case Studies',
+		'team'         => 'Team',
+		'contact'      => 'Contact',
+		'news'         => 'News',
+		'privacy'      => 'Privacy Policy',
+		'legal'        => 'Legal Notice',
+	);
+	if ( str_ends_with( $source, '-final' ) && isset( $pages[ substr( $source, 0, -6 ) ] ) ) {
+		return $pages[ substr( $source, 0, -6 ) ] . ': closing call to action';
+	}
+	return '';
+}
+
+/** Title (in Spanish, or in $lang) of an application by slug, '' when unknown. */
+function mats_lead_application_title( string $slug, string $lang = 'es' ): string {
 	if ( '' === $slug || ! function_exists( 'mats_get_applications' ) ) {
 		return '';
 	}
-	foreach ( mats_get_applications( 'es' ) as $app ) {
+	foreach ( mats_get_applications( 'en' === $lang ? 'en' : 'es' ) as $app ) {
 		if ( $app['slug'] === $slug ) {
 			return (string) $app['title'];
 		}

@@ -158,6 +158,36 @@ function mats_installer_save_post( array $postarr ) {
 	return $id;
 }
 
+/**
+ * Stores the current version of a page in its «Revisiones» when it is not
+ * there yet. WordPress never saves a revision when a page is CREATED (only
+ * on later saves), so without this the first change somebody saves to a
+ * page made by the setup would be its only version and the original text
+ * could not be brought back. Does nothing when that version is already
+ * stored (or revisions are switched off on the server).
+ */
+function mats_installer_keep_revision( int $id ): void {
+	if ( $id && function_exists( 'wp_save_post_revision' ) ) {
+		wp_save_post_revision( $id );
+	}
+}
+
+/**
+ * 'pre_post_update': just before a structural page changes, its current
+ * version is stored if «Revisiones» does not have it (pages created before
+ * this theme version, or changed without a revision). Normal saves already
+ * have it, so then nothing is added.
+ *
+ * @param int $post_id Post being updated.
+ */
+function mats_installer_revision_before_update( $post_id ): void {
+	$post_id = (int) $post_id;
+	if ( ! $post_id || 'page' !== get_post_type( $post_id ) || '' === (string) get_post_meta( $post_id, '_mats_role', true ) ) {
+		return;
+	}
+	mats_installer_keep_revision( $post_id );
+}
+
 /** Language slug of a post ('' when Polylang is off or it has none). */
 function mats_installer_post_lang( int $id ): string {
 	if ( function_exists( 'pll_get_post_language' ) && mats_installer_pll_ready() ) {
@@ -383,7 +413,12 @@ function mats_installer_page_content( string $role, string $lang, array &$build 
 	return $build['content'];
 }
 
-/** SEO meta: filled when empty, replaced when $overwrite. */
+/**
+ * SEO meta (title + description for Google): filled when empty, replaced
+ * only when $overwrite. The content step never overwrites them: what
+ * somebody wrote in «Google y redes sociales» is not kept in «Revisiones»,
+ * so "Sobrescribir los textos y las fotos" leaves it alone.
+ */
 function mats_installer_set_seo( int $id, string $role, string $lang, bool $overwrite ): void {
 	$seo = mats_installer_seo( $role, $lang );
 	if ( ! $seo ) {
@@ -480,7 +515,9 @@ function mats_installer_ensure_page( string $role, string $lang, bool $overwrite
 	if ( function_exists( 'pll_set_post_language' ) && mats_installer_pll_ready() && mats_installer_post_lang( $id ) !== $lang ) {
 		pll_set_post_language( $id, $lang );
 	}
-	mats_installer_set_seo( $id, $role, $lang, $overwrite || 'created' === $out['action'] );
+	mats_installer_set_seo( $id, $role, $lang, 'created' === $out['action'] );
+	/* the version the setup leaves is the first one in «Revisiones» */
+	mats_installer_keep_revision( $id );
 
 	$out['id']    = $id;
 	$out['build'] = $build;
@@ -557,11 +594,17 @@ function mats_installer_is_default_cat_name( string $name ): bool {
 	return in_array( $name, array( 'uncategorized', 'uncategorised', 'sin categoría', 'sin categoria', 'sin categorizar', mb_strtolower( __( 'Uncategorized' ) ) ), true );
 }
 
-function mats_installer_rename_category( int $term_id, string $name, string $slug ): string {
+/**
+ * Renames a still-default category. Returns missing|same|custom|error|renamed;
+ * $before receives the name it had (for the message: «Uncategorized» on an
+ * English WordPress, «Sin categoría» on one installed in Spanish…).
+ */
+function mats_installer_rename_category( int $term_id, string $name, string $slug, ?string &$before = null ): string {
 	$term = get_term( $term_id, 'category' );
 	if ( ! $term || is_wp_error( $term ) ) {
 		return 'missing';
 	}
+	$before = (string) $term->name;
 	if ( $term->name === $name ) {
 		return 'same';
 	}
@@ -600,9 +643,10 @@ function mats_installer_news_category( array &$result ): void {
 		}
 	}
 	$done   = array();
-	$status = mats_installer_rename_category( $en_id, $names['en'][0], $names['en'][1] );
+	$before = '';
+	$status = mats_installer_rename_category( $en_id, $names['en'][0], $names['en'][1], $before );
 	if ( 'renamed' === $status ) {
-		$done[] = '«News»';
+		$done[] = sprintf( '«News» (antes «%s»)', $before );
 	}
 
 	if ( $pll && mats_installer_pll_language( 'es' ) ) {
@@ -613,7 +657,7 @@ function mats_installer_news_category( array &$result ): void {
 				$es_id = (int) $made->get_error_data();
 			} elseif ( ! is_wp_error( $made ) ) {
 				$es_id  = (int) $made['term_id'];
-				$done[] = '«Noticias»';
+				$done[] = '«Noticias» (nueva, para las noticias en español)';
 			}
 			if ( $es_id ) {
 				pll_set_term_language( $es_id, 'es' );
@@ -624,12 +668,12 @@ function mats_installer_news_category( array &$result ): void {
 					)
 				);
 			}
-		} elseif ( 'renamed' === mats_installer_rename_category( $es_id, $names['es'][0], $names['es'][1] ) ) {
-			$done[] = '«Noticias»';
+		} elseif ( 'renamed' === mats_installer_rename_category( $es_id, $names['es'][0], $names['es'][1], $before ) ) {
+			$done[] = sprintf( '«Noticias» (antes «%s»)', $before );
 		}
 	}
 	if ( $done ) {
-		mats_installer_add( $result, 'ok', 'Categoría de las noticias: ' . implode( ' y ', $done ) . ' (antes «Uncategorized»).' );
+		mats_installer_add( $result, 'ok', 'Categoría de las noticias: ' . implode( ' y ', $done ) . '.' );
 	}
 }
 
@@ -816,7 +860,7 @@ function mats_installer_step_content( array $opts ): array {
 					$by['adopted'][] = $label;
 					break;
 				case 'adopted-kept':
-					mats_installer_add( $result, 'warn', sprintf( 'Ya existía una página «%1$s» con contenido propio: ahora es la página %2$s de la web, pero su contenido no se ha cambiado. Marca «Sobrescribir los textos con los originales» si quieres el diseño original.', get_the_title( $page['id'] ), $label ) );
+					mats_installer_add( $result, 'warn', sprintf( 'Ya existía una página «%1$s» con contenido propio: ahora es la página %2$s de la web, pero su contenido no se ha cambiado. Marca «%3$s» si quieres el diseño original.', get_the_title( $page['id'] ), $label, mats_installer_overwrite_label() ) );
 					break;
 				default:
 					$by['kept'][] = $label;
@@ -882,7 +926,7 @@ function mats_installer_step_content( array $opts ): array {
 		mats_installer_add( $result, 'ok', 'Páginas creadas con los textos originales: ' . $both( $by['created'] ) . '.' );
 	}
 	if ( $by['overwritten'] ) {
-		mats_installer_add( $result, 'ok', 'Textos originales restaurados en: ' . $both( $by['overwritten'] ) . '.' );
+		mats_installer_add( $result, 'ok', 'Textos originales restaurados, con sus fotos, en: ' . $both( $by['overwritten'] ) . '. El título y la descripción para Google que hubierais escrito se mantienen.' );
 	}
 	if ( $by['adopted'] ) {
 		mats_installer_add( $result, 'ok', 'Páginas que ya existían vacías, ahora con los textos originales: ' . $both( $by['adopted'] ) . '.' );

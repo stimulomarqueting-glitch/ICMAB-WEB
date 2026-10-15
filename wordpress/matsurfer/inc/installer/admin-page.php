@@ -116,18 +116,55 @@ function mats_installer_summary_html(): string {
 	);
 }
 
-/** Texts of the "Sobrescribir los textos" confirmation (JS dialog and no-JS box). */
+/*
+ * "Sobrescribir los textos y las fotos": what it changes and what it keeps,
+ * said the same way in the checkbox help, the JS dialog and the no-JS box.
+ * It rebuilds the sections of every structural page (texts, buttons and
+ * photos) from the original copy; the Google title/description somebody
+ * wrote are kept (they are not saved in «Revisiones», so they could not be
+ * brought back).
+ */
+
+/** Label of the checkbox. */
+function mats_installer_overwrite_label(): string {
+	return 'Sobrescribir los textos y las fotos con los originales';
+}
+
+/** Can a page's earlier version be brought back from «Revisiones» on this server? */
+function mats_installer_revisions_on(): bool {
+	return function_exists( 'wp_revisions_enabled' ) && wp_revisions_enabled(
+		new WP_Post(
+			(object) array(
+				'ID'        => 0,
+				'post_type' => 'page',
+			)
+		)
+	);
+}
+
+/** What is replaced (and how to get it back). */
+function mats_installer_overwrite_changes(): string {
+	return 'Los textos y las fotos de las secciones de todas las páginas, en inglés y en español, vuelven a ser los de la web original: se sustituye lo que hayáis cambiado en ellos.'
+		. ( mats_installer_revisions_on() ? ' Si hace falta, la versión anterior de cada página se puede recuperar desde «Revisiones», en la propia página.' : '' );
+}
+
+/** What is never touched. */
+function mats_installer_overwrite_keeps(): string {
+	return 'No se tocan: el título y la descripción para Google que hayáis escrito en cada página, el equipo, las aplicaciones, las publicaciones, las valoraciones, las noticias, los textos legales ni los formularios.';
+}
+
+/** Texts of the confirmation (JS dialog and no-JS box). */
 function mats_installer_overwrite_question(): string {
-	return '¿Seguro que quieres sobrescribir los textos?';
+	return '¿Seguro que quieres sobrescribir los textos y las fotos?';
 }
 
 function mats_installer_overwrite_warning(): string {
-	return 'Los textos de las secciones de todas las páginas volverán a ser los de la web original y se perderán los cambios que hayáis hecho en ellas. El equipo, las aplicaciones, las publicaciones, las valoraciones, las noticias, los textos legales y los formularios no se tocan.';
+	return mats_installer_overwrite_changes() . ' ' . mats_installer_overwrite_keeps();
 }
 
 /**
  * Without JavaScript there is no confirmation dialog: pressing step 3 or
- * "Hacerlo todo" with "Sobrescribir los textos" ticked comes back here
+ * "Hacerlo todo" with "Sobrescribir los textos y las fotos" ticked comes back here
  * (?mats_confirm=content|all) and nothing runs until this box is accepted.
  */
 function mats_installer_confirm_html( string $step ): string {
@@ -139,14 +176,14 @@ function mats_installer_confirm_html( string $step ): string {
 	<div class="mats-setup__confirm" id="mats-confirm" role="region" aria-labelledby="mats-confirm-title" tabindex="-1">
 		<h2 id="mats-confirm-title" class="mats-setup__confirm-title"><?php echo esc_html( mats_installer_overwrite_question() ); ?></h2>
 		<p><?php echo esc_html( mats_installer_overwrite_warning() ); ?></p>
-		<p><?php echo esc_html( 'all' === $step ? 'Todavía no se ha hecho nada. Si confirmas, se harán los pasos 1 a 4 y se sobrescribirán los textos.' : 'Todavía no se ha hecho nada. Si confirmas, se repetirá el paso 3 y se sobrescribirán los textos.' ); ?></p>
+		<p><?php echo esc_html( 'all' === $step ? 'Todavía no se ha hecho nada. Si confirmas, se harán los pasos 1 a 4 y se sobrescribirán los textos y las fotos.' : 'Todavía no se ha hecho nada. Si confirmas, se repetirá el paso 3 y se sobrescribirán los textos y las fotos.' ); ?></p>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="mats-setup__confirm-actions">
 			<input type="hidden" name="action" value="mats_installer_run">
 			<input type="hidden" name="step" value="<?php echo esc_attr( $step ); ?>">
 			<input type="hidden" name="overwrite" value="1">
 			<input type="hidden" name="confirm" value="1">
 			<?php wp_nonce_field( MATS_SETUP_NONCE ); ?>
-			<button type="submit" class="button button-primary"><?php echo esc_html( 'all' === $step ? 'Sí, sobrescribir y hacerlo todo' : 'Sí, sobrescribir los textos' ); ?></button>
+			<button type="submit" class="button button-primary"><?php echo esc_html( 'all' === $step ? 'Sí, sobrescribir y hacerlo todo' : 'Sí, sobrescribir los textos y las fotos' ); ?></button>
 			<a class="button" href="<?php echo esc_url( mats_installer_url() . '#mats-step-content' ); ?>">No, volver sin cambiar nada</a>
 		</form>
 	</div>
@@ -175,9 +212,9 @@ function mats_installer_step_html( string $key, int $number ): string {
 				<p class="mats-step__option">
 					<label>
 						<input type="checkbox" name="overwrite" value="1" class="mats-setup__overwrite">
-						Sobrescribir los textos con los originales
+						<?php echo esc_html( mats_installer_overwrite_label() ); ?>
 					</label>
-					<span class="mats-step__help">Solo si quieres deshacer cambios: sustituye los textos de las secciones de todas las páginas por los de la web original. Lo que hayáis cambiado en las páginas se pierde. El equipo, las aplicaciones, las publicaciones, las valoraciones, las noticias, los textos legales y los formularios no se tocan.</span>
+					<span class="mats-step__help"><?php echo esc_html( 'Solo si quieres deshacer cambios. ' . mats_installer_overwrite_warning() ); ?></span>
 				</p>
 			<?php endif; ?>
 			<button type="submit" name="step" value="<?php echo esc_attr( $key ); ?>" class="button <?php echo 'review' === $key ? 'button-primary' : ''; ?> mats-step__run">

@@ -27,7 +27,7 @@
  *   mats_installer_run_all( $opts )         every step in order (CLI tests:
  *                                            wordpress/tools/qa/installer-run.php)
  *   mats_installer_status( $step )          ✓/✗ state + the checks shown on screen
- * Options: 'overwrite' (bool) replace the page texts with the originals,
+ * Options: 'overwrite' (bool) replace the page texts and photos with the originals,
  *          'install' (bool, default true) allow downloads from wordpress.org,
  *          'smtp' (bool) also install WP Mail SMTP, 'steps' (string[]),
  *          'from' (step key) start there.
@@ -56,7 +56,7 @@ function mats_installer_steps(): array {
 		),
 		'languages' => array(
 			'title'  => 'Idiomas y ajustes básicos',
-			'intro'  => 'Configura el inglés (idioma principal, en la dirección raíz) y el español (en /es/), y deja preparados los ajustes de WordPress: direcciones limpias, zona horaria de Madrid, formato de fecha y comentarios cerrados.',
+			'intro'  => 'Configura el inglés (idioma principal, en la dirección raíz) y el español (en /es/), y deja preparados los ajustes de WordPress: direcciones limpias, zona horaria de Madrid, formato de fecha, comentarios cerrados y el icono de la web.',
 			'run'    => 'mats_installer_step_languages',
 			'status' => 'mats_installer_status_languages',
 			'button' => 'Configurar los idiomas',
@@ -151,6 +151,29 @@ function mats_installer_remember( array $result ): void {
 	mats_installer_save_state( $state );
 }
 
+/* ── WordPress labels in the messages ────────────────────────────────── */
+
+/** Does the current person see the WordPress panel in Spanish? */
+function mats_installer_admin_in_spanish(): bool {
+	$locale = function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+	return str_starts_with( (string) $locale, 'es' );
+}
+
+/**
+ * A label of a WordPress screen (menu path, button, field) as the person
+ * sees it right now: in Spanish when the panel is in Spanish, otherwise in
+ * English (before step 2 the panel is usually still in English). With
+ * $both the Spanish label follows in brackets, so the message still helps
+ * after the panel changes language.
+ *   mats_installer_wp_label( 'Ajustes → Generales', 'Settings → General', true )
+ */
+function mats_installer_wp_label( string $es, string $en, bool $both = false ): string {
+	if ( mats_installer_admin_in_spanish() ) {
+		return $es;
+	}
+	return $both ? $en . ' (' . $es . ')' : $en;
+}
+
 /* ── plugin activation in the current request ────────────────────────── */
 
 /** Called when this request activated a plugin whose code is not loaded yet. */
@@ -165,6 +188,25 @@ function mats_installer_needs_reload(): bool {
 /** Is Polylang loaded and usable in this request? */
 function mats_installer_pll_ready(): bool {
 	return function_exists( 'PLL' ) && PLL() && isset( PLL()->model ) && function_exists( 'pll_set_post_language' );
+}
+
+/**
+ * Polylang is not running (deactivated or deleted) on a site that already
+ * had its two languages: the Spanish half of the site (/es/) is offline.
+ * Nothing is lost (pages, translations and settings stay in the database)
+ * and everything comes back when Polylang is active again.
+ */
+function mats_installer_spanish_offline(): bool {
+	if ( mats_installer_pll_ready() || defined( 'POLYLANG_VERSION' ) ) {
+		return false;
+	}
+	$state = mats_installer_state();
+	if ( ! empty( $state['steps']['languages']['ok'] ) || ! empty( $state['done'] ) ) {
+		return true;
+	}
+	/* set up by hand: Polylang keeps its settings when it is deactivated */
+	$pll = get_option( 'polylang', array() );
+	return is_array( $pll ) && ! empty( $pll['default_lang'] );
 }
 
 /** Polylang language object for a slug, or null. */

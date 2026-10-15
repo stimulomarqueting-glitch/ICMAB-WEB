@@ -9,7 +9,8 @@
  *  - existing content without a language → English
  *  - WordPress: permalinks /%postname%/, Europe/Madrid, "j F Y", Monday
  *    first, comments and pings closed, tagline = brand claim, site title
- *    'MatSurfer' only while it is still a WordPress default
+ *    'MatSurfer' only while it is still a WordPress default, site icon =
+ *    assets/brand/icon-512.png only while the site has none
  *
  * @package matsurfer
  */
@@ -36,6 +37,15 @@ function mats_installer_language_specs(): array {
 			'flag'       => 'es',
 		),
 	);
+}
+
+/** Spanish name of a language inside a Spanish sentence ("el idioma inglés"). */
+function mats_installer_language_label( string $slug ): string {
+	$names = array(
+		'en' => 'inglés',
+		'es' => 'español',
+	);
+	return $names[ $slug ] ?? $slug;
 }
 
 /**
@@ -109,13 +119,13 @@ function mats_installer_setup_pll_languages( array &$result ): bool {
 			}
 			if ( is_wp_error( $added ) || false === $added ) {
 				$ok = false;
-				mats_installer_add( $result, 'error', sprintf( 'No se ha podido añadir el idioma %1$s: %2$s', $spec['name'], is_wp_error( $added ) ? wp_strip_all_tags( $added->get_error_message() ) : 'error desconocido' ), admin_url( 'admin.php?page=mlang' ), 'Abrir Idiomas' );
+				mats_installer_add( $result, 'error', sprintf( 'No se ha podido añadir el idioma %1$s: %2$s', mats_installer_language_label( $slug ), is_wp_error( $added ) ? wp_strip_all_tags( $added->get_error_message() ) : 'error desconocido' ), admin_url( 'admin.php?page=mlang' ), 'Abrir Idiomas' );
 				continue;
 			}
 			if ( method_exists( $model, 'clean_languages_cache' ) ) {
 				$model->clean_languages_cache();
 			}
-			mats_installer_add( $result, 'ok', sprintf( 'Idioma %1$s añadido (%2$s).', $spec['name'], 'en' === $slug ? 'idioma principal, en la dirección raíz de la web' : 'en las direcciones que empiezan por /es/' ) );
+			mats_installer_add( $result, 'ok', sprintf( 'Idioma %1$s añadido (%2$s).', mats_installer_language_label( $slug ), 'en' === $slug ? 'idioma principal, en la dirección raíz de la web' : 'en las direcciones que empiezan por /es/' ) );
 			/* Polylang finishes setting up new languages on the next page load */
 			$result['reload'] = true;
 			mats_installer_flag_activation( 'language:' . $slug );
@@ -133,7 +143,7 @@ function mats_installer_setup_pll_languages( array &$result ): bool {
 			$diff['flag'] = $spec['flag'];
 		}
 		if ( ! $diff ) {
-			mats_installer_add( $result, 'ok', sprintf( 'El idioma %s ya estaba configurado.', $spec['name'] ) );
+			mats_installer_add( $result, 'ok', sprintf( 'El idioma %s ya estaba configurado.', mats_installer_language_label( $slug ) ) );
 			continue;
 		}
 		$args = array_merge( array( 'lang_id' => (int) $lang->term_id ), $diff );
@@ -145,9 +155,9 @@ function mats_installer_setup_pll_languages( array &$result ): bool {
 			$updated = new WP_Error( 'mats_pll_api', 'esta versión de Polylang no permite cambiar idiomas desde el tema' );
 		}
 		if ( is_wp_error( $updated ) || false === $updated ) {
-			mats_installer_add( $result, 'warn', sprintf( 'El idioma %s ya existía pero no se ha podido ajustar (código regional, bandera u orden). Revísalo en Idiomas.', $spec['name'] ), admin_url( 'admin.php?page=mlang' ), 'Abrir Idiomas' );
+			mats_installer_add( $result, 'warn', sprintf( 'El idioma %s ya existía pero no se ha podido ajustar (código regional, bandera u orden). Revísalo en Idiomas.', mats_installer_language_label( $slug ) ), admin_url( 'admin.php?page=mlang' ), 'Abrir Idiomas' );
 		} else {
-			mats_installer_add( $result, 'ok', sprintf( 'El idioma %s ya existía: ajustado a la configuración de la web.', $spec['name'] ) );
+			mats_installer_add( $result, 'ok', sprintf( 'El idioma %s ya existía: ajustado a la configuración de la web.', mats_installer_language_label( $slug ) ) );
 		}
 		if ( method_exists( $model, 'clean_languages_cache' ) ) {
 			$model->clean_languages_cache();
@@ -254,7 +264,7 @@ function mats_installer_translate_tagline( string $en, string $es ): void {
 	$mo->export_to_db( $lang );
 }
 
-/** Permalinks, time zone, formats, comments, title and tagline. */
+/** Permalinks, time zone, formats, comments, title, tagline and site icon. */
 function mats_installer_setup_wp_options( array &$result ): void {
 	global $wp_rewrite;
 
@@ -290,6 +300,108 @@ function mats_installer_setup_wp_options( array &$result ): void {
 	if ( mats_installer_pll_ready() && get_option( 'blogdescription' ) === $claim ) {
 		mats_installer_translate_tagline( $claim, (string) ( $brand['claimEs'] ?? '' ) );
 	}
+	mats_installer_setup_site_icon( $result );
+}
+
+/* ── site icon (browser tab, bookmarks, phone home screen) ────────────── */
+
+/**
+ * Imports a file of the theme's assets/brand/ folder into the Media
+ * Library, once: it is found again by its '_mats_media_source' meta, like
+ * the site photos of mats_import_media() (which only reads assets/media/).
+ * $site_icon also makes the small sizes WordPress uses for a site icon, as
+ * Ajustes → Generales does. Returns the attachment ID, 0 when it failed.
+ */
+function mats_installer_import_brand_file( string $file, string $alt, string $title, bool $site_icon = false ): int {
+	$key      = 'brand/' . $file;
+	$existing = get_posts(
+		array(
+			'post_type'        => 'attachment',
+			'post_status'      => 'inherit',
+			'posts_per_page'   => 1,
+			'fields'           => 'ids',
+			'meta_key'         => '_mats_media_source', // phpcs:ignore WordPress.DB.SlowDBQuery
+			'meta_value'       => $key, // phpcs:ignore WordPress.DB.SlowDBQuery
+			'suppress_filters' => true,
+		)
+	);
+	if ( $existing ) {
+		return (int) $existing[0];
+	}
+	$source = MATS_DIR . '/assets/brand/' . $file;
+	if ( ! is_readable( $source ) ) {
+		return 0;
+	}
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	$tmp = wp_tempnam( $file );
+	if ( ! $tmp || ! copy( $source, $tmp ) ) {
+		return 0;
+	}
+	$sizes = null;
+	if ( $site_icon ) {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-site-icon.php';
+		$sizes = array( new WP_Site_Icon(), 'additional_sizes' );
+		add_filter( 'intermediate_image_sizes_advanced', $sizes );
+	}
+	try {
+		$id = media_handle_sideload(
+			array(
+				'name'     => $file,
+				'tmp_name' => $tmp,
+			),
+			0,
+			$title,
+			$site_icon ? array( 'context' => 'site-icon' ) : array()
+		);
+	} finally {
+		if ( $sizes ) {
+			remove_filter( 'intermediate_image_sizes_advanced', $sizes );
+		}
+	}
+	if ( is_wp_error( $id ) ) {
+		wp_delete_file( $tmp );
+		return 0;
+	}
+	update_post_meta( $id, '_mats_media_source', $key );
+	if ( $alt ) {
+		update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	}
+	return (int) $id;
+}
+
+/** Is the site icon set to an image that still exists? */
+function mats_installer_has_site_icon(): bool {
+	$current = (int) get_option( 'site_icon' );
+	return $current > 0 && wp_attachment_is_image( $current );
+}
+
+/**
+ * The MatSurfer isotype as the site icon, only while the site has none: an
+ * icon somebody chose is never replaced, and once the setup has put it, an
+ * icon removed on purpose does not come back.
+ */
+function mats_installer_setup_site_icon( array &$result ): void {
+	if ( mats_installer_has_site_icon() ) {
+		return;
+	}
+	$state = mats_installer_state();
+	if ( ! empty( $state['site_icon'] ) ) {
+		return;
+	}
+	$where = mats_installer_wp_label( 'Ajustes → Generales → Icono del sitio', 'Settings → General → Site Icon', true );
+	$id    = mats_installer_import_brand_file( 'icon-512.png', 'MatSurfer', 'Icono de MatSurfer', true );
+	if ( ! $id ) {
+		mats_installer_add( $result, 'info', sprintf( 'No se ha podido poner el icono de la web (el que sale en la pestaña del navegador). Se puede elegir a mano en %s.', $where ), admin_url( 'options-general.php' ), 'Abrir los ajustes generales' );
+		return;
+	}
+	update_option( 'site_icon', $id );
+	$state              = mats_installer_state();
+	$state['site_icon'] = $id;
+	mats_installer_save_state( $state );
+	mats_installer_add( $result, 'ok', sprintf( 'Icono de la web (pestaña del navegador, favoritos y pantalla de inicio del móvil): el isotipo de MatSurfer, guardado en Medios. Se puede cambiar en %s.', $where ) );
 }
 
 /** New URLs take effect: rules are rebuilt (and .htaccess updated where it is used). */
@@ -356,7 +468,7 @@ function mats_installer_site_language_is_default(): bool {
 /** Why the Spanish pack could not be downloaded, as a sentence for the message. */
 function mats_installer_langpack_reason( string $why ): string {
 	$reasons = array(
-		'config'  => 'esta instalación de WordPress no permite descargar archivos desde el escritorio (está bloqueado en su configuración)',
+		'config'  => 'esta instalación de WordPress no permite descargar archivos desde el panel (está bloqueado en su configuración)',
 		'folder'  => 'el servidor no deja que WordPress escriba en la carpeta de idiomas (wp-content/languages)',
 		'blocked' => 'este servidor tiene bloqueadas las conexiones con wordpress.org',
 		'network' => 'no se ha podido conectar con wordpress.org (puede ser un corte momentáneo o que el servidor no tenga salida a internet)',
@@ -448,7 +560,18 @@ function mats_installer_install_plugin_translations( array &$result, string $loc
 		mats_installer_add( $result, 'ok', sprintf( '%s ya tenía su traducción al español.', implode( ', ', $already ) ) );
 	}
 	if ( $failed ) {
-		mats_installer_add( $result, 'info', sprintf( 'No se ha podido descargar ahora la traducción al español de %s. No pasa nada: WordPress la ofrecerá en Escritorio → Actualizaciones («Actualizar traducciones»).', implode( ', ', $failed ) ), admin_url( 'update-core.php' ), 'Ir a Actualizaciones' );
+		mats_installer_add(
+			$result,
+			'info',
+			sprintf(
+				'No se ha podido descargar ahora la traducción al español de %1$s. No pasa nada: WordPress la ofrecerá en %2$s («%3$s»).',
+				implode( ', ', $failed ),
+				mats_installer_wp_label( 'Escritorio → Actualizaciones', 'Dashboard → Updates', true ),
+				mats_installer_wp_label( 'Actualizar traducciones', 'Update Translations' )
+			),
+			admin_url( 'update-core.php' ),
+			'Ir a Actualizaciones'
+		);
 	}
 	return $done;
 }
@@ -491,22 +614,35 @@ function mats_installer_setup_admin_language( array &$result ): void {
 			$result,
 			'info',
 			sprintf(
-				'El escritorio de WordPress sigue en inglés: no se ha podido descargar su traducción al español porque %s. No afecta a la web pública, que ya sale en inglés y en español. Para tener los menús en español, ve a Ajustes → Generales, elige «Español» en «Idioma del sitio» y pulsa «Guardar cambios» (WordPress descarga la traducción en ese momento); después repite este paso para traducir también los plugins. Si «Español» no aparece en esa lista, el servidor no puede conectar con wordpress.org: pide a Stimulo que lo revise.',
-				mats_installer_langpack_reason( $why )
+				'El panel de WordPress sigue en inglés: no se ha podido descargar su traducción al español porque %1$s. No afecta a la web pública, que ya sale en inglés y en español. Para tener los menús en español, ve a %2$s, elige «Español» en «%3$s» y pulsa «%4$s» (WordPress descarga la traducción en ese momento); después repite este paso para traducir también los plugins. Si «Español» no aparece en esa lista, el servidor no puede conectar con wordpress.org: pide a Stimulo que lo revise.',
+				mats_installer_langpack_reason( $why ),
+				mats_installer_wp_label( 'Ajustes → Generales', 'Settings → General', true ),
+				mats_installer_wp_label( 'Idioma del sitio', 'Site Language' ),
+				mats_installer_wp_label( 'Guardar cambios', 'Save Changes' )
 			),
 			admin_url( 'options-general.php' ),
-			'Ir a Ajustes → Generales'
+			'Abrir los ajustes generales'
 		);
 		return;
 	}
 
 	if ( (string) get_option( 'WPLANG' ) === $locale ) {
-		mats_installer_add( $result, 'ok', 'El escritorio de WordPress ya estaba en español.' );
+		mats_installer_add( $result, 'ok', 'El panel de WordPress ya estaba en español.' );
 	} elseif ( mats_installer_site_language_is_default() ) {
 		update_option( 'WPLANG', $locale );
-		mats_installer_add( $result, 'ok', 'El escritorio de WordPress queda en español (menús, botones y fechas). La web pública no cambia: sigue en inglés en la raíz y en español en /es/. Cada persona puede elegir otro idioma en su perfil.' );
+		mats_installer_add( $result, 'ok', 'El panel de WordPress queda en español (menús, botones y fechas). La web pública no cambia: sigue en inglés en la raíz y en español en /es/. Cada persona puede elegir otro idioma en su perfil.' );
 	} else {
-		mats_installer_add( $result, 'info', sprintf( 'El idioma del escritorio de WordPress es «%s» porque alguien lo eligió así: no se cambia. Se puede cambiar en Ajustes → Generales → Idioma del sitio, y cada persona puede elegir el suyo en su perfil.', (string) get_option( 'WPLANG' ) ), admin_url( 'options-general.php' ), 'Ir a Ajustes → Generales' );
+		mats_installer_add(
+			$result,
+			'info',
+			sprintf(
+				'El idioma del panel de WordPress es «%1$s» porque alguien lo eligió así: no se cambia. Se puede cambiar en %2$s, y cada persona puede elegir el suyo en su perfil.',
+				(string) get_option( 'WPLANG' ),
+				mats_installer_wp_label( 'Ajustes → Generales → Idioma del sitio', 'Settings → General → Site Language', true )
+			),
+			admin_url( 'options-general.php' ),
+			'Abrir los ajustes generales'
+		);
 	}
 
 	mats_installer_install_plugin_translations( $result, $locale );
@@ -518,13 +654,14 @@ function mats_installer_admin_language_check(): array {
 	$have   = in_array( $locale, get_available_languages(), true );
 	$site   = (string) get_option( 'WPLANG' );
 	if ( $have && $site === $locale ) {
-		return mats_installer_check( true, 'El escritorio de WordPress está en español.' );
+		return mats_installer_check( true, 'El panel de WordPress está en español.' );
 	}
+	$path = mats_installer_wp_label( 'Ajustes → Generales → Idioma del sitio', 'Settings → General → Site Language', true );
 	return mats_installer_check(
 		null,
 		$have
-			? 'El escritorio de WordPress no está en español (opcional): se cambia en Ajustes → Generales → Idioma del sitio.'
-			: 'El escritorio de WordPress está en inglés (opcional): para ponerlo en español, elige «Español» en Ajustes → Generales → Idioma del sitio y repite este paso.',
+			? sprintf( 'El panel de WordPress no está en español (opcional): se cambia en %s.', $path )
+			: sprintf( 'El panel de WordPress está en inglés (opcional): para ponerlo en español, elige «Español» en %s y repite este paso.', $path ),
 		admin_url( 'options-general.php' ),
 		'Ajustes generales'
 	);
@@ -565,7 +702,11 @@ function mats_installer_step_languages( array $opts ): array {
 		mats_installer_add(
 			$result,
 			'warn',
-			'WordPress no ha podido escribir el archivo .htaccess del servidor, así que las direcciones limpias (/product/, /es/producto/) pueden dar «página no encontrada». Abre Ajustes → Enlaces permanentes y pulsa «Guardar cambios»: si sigue sin poder, WordPress te mostrará abajo las líneas que hay que pegar en ese archivo. También puedes pedir al proveedor del hosting que permita a WordPress escribir el archivo .htaccess.',
+			sprintf(
+				'WordPress no ha podido escribir el archivo .htaccess del servidor, así que las direcciones limpias (/product/, /es/producto/) pueden dar «página no encontrada». Abre %1$s y pulsa «%2$s»: si sigue sin poder, WordPress te mostrará abajo las líneas que hay que pegar en ese archivo. También puedes pedir al proveedor del hosting que permita a WordPress escribir el archivo .htaccess.',
+				mats_installer_wp_label( 'Ajustes → Enlaces permanentes', 'Settings → Permalinks', true ),
+				mats_installer_wp_label( 'Guardar cambios', 'Save Changes' )
+			),
 			admin_url( 'options-permalink.php' ),
 			'Abrir Enlaces permanentes'
 		);
@@ -588,7 +729,7 @@ function mats_installer_status_languages(): array {
 		foreach ( mats_installer_language_specs() as $slug => $spec ) {
 			$lang = mats_installer_pll_language( $slug );
 			$ok   = $lang && $lang->locale === $spec['locale'];
-			$checks[] = mats_installer_check( (bool) $ok, $ok ? sprintf( 'Idioma %s configurado.', $spec['name'] ) : sprintf( 'Falta el idioma %s.', $spec['name'] ), admin_url( 'admin.php?page=mlang' ), 'Idiomas' );
+			$checks[] = mats_installer_check( (bool) $ok, $ok ? sprintf( 'Idioma %s configurado.', mats_installer_language_label( $slug ) ) : sprintf( 'Falta el idioma %s.', mats_installer_language_label( $slug ) ), admin_url( 'admin.php?page=mlang' ), 'Idiomas' );
 		}
 		$opts_ok = true;
 		foreach ( mats_installer_polylang_options() as $key => $value ) {
@@ -602,7 +743,7 @@ function mats_installer_status_languages(): array {
 	$permalinks = '/%postname%/' === get_option( 'permalink_structure' );
 	$htaccess   = $permalinks ? mats_installer_htaccess_problem() : '';
 	if ( $htaccess ) {
-		$checks[] = mats_installer_check( false, 'Direcciones limpias elegidas, pero falta escribirlas en el archivo .htaccess del servidor: las páginas pueden dar «página no encontrada». Abre Enlaces permanentes y pulsa «Guardar cambios».', admin_url( 'options-permalink.php' ), 'Enlaces permanentes' );
+		$checks[] = mats_installer_check( false, sprintf( 'Direcciones limpias elegidas, pero falta escribirlas en el archivo .htaccess del servidor: las páginas pueden dar «página no encontrada». Abre %1$s y pulsa «%2$s».', mats_installer_wp_label( 'Ajustes → Enlaces permanentes', 'Settings → Permalinks', true ), mats_installer_wp_label( 'Guardar cambios', 'Save Changes' ) ), admin_url( 'options-permalink.php' ), 'Enlaces permanentes' );
 	} else {
 		$checks[] = mats_installer_check( $permalinks, $permalinks ? 'Direcciones limpias (/product/, /es/producto/).' : 'Las direcciones de las páginas todavía no son las limpias.', admin_url( 'options-permalink.php' ), 'Enlaces permanentes' );
 	}
@@ -613,6 +754,15 @@ function mats_installer_status_languages(): array {
 		}
 	}
 	$checks[] = mats_installer_check( $basics, $basics ? 'Zona horaria de Madrid, formato de fecha y comentarios cerrados.' : 'Faltan ajustes básicos (zona horaria, fecha o comentarios).', admin_url( 'options-general.php' ), 'Ajustes generales' );
+	$icon     = mats_installer_has_site_icon();
+	$checks[] = mats_installer_check(
+		$icon ? true : null,
+		$icon
+			? 'La web tiene icono (pestaña del navegador y móviles).'
+			: sprintf( 'La web no tiene icono (opcional): se elige en %s.', mats_installer_wp_label( 'Ajustes → Generales → Icono del sitio', 'Settings → General → Site Icon', true ) ),
+		$icon ? '' : admin_url( 'options-general.php' ),
+		'Ajustes generales'
+	);
 	$checks[] = mats_installer_admin_language_check();
 	return mats_installer_status_from( $checks );
 }

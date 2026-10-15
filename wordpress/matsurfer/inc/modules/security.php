@@ -15,7 +15,10 @@
  *                   unique to the site and changes with every update, so
  *                   browser caches still refresh); no REST / oEmbed
  *                   discovery links nor shortlink in the head (the REST API
- *                   itself keeps working); no X-Powered-By header.
+ *                   itself keeps working); no X-Powered-By header on any
+ *                   answer WordPress gives (pages, REST API, admin-ajax,
+ *                   wp-cron, feeds…; a PHP file opened directly, outside
+ *                   WordPress, needs expose_php = Off in the PHP settings).
  *  USERS            ?author=N and author archives → home page; REST
  *                   /wp/v2/users and /wp/v2/users/<id> → 401 for visitors
  *                   (logged-in users keep them: the block editor needs
@@ -23,8 +26,10 @@
  *                   users sitemap.
  *  LOGIN            one message for a wrong user or a wrong password; the
  *                   lost-password form never tells whether an account
- *                   exists; 5 failed attempts for one user from one IP (or
- *                   20 from one IP in total) lock the access for 15
+ *                   exists (not even when the site cannot send e-mails:
+ *                   administrators get a notice instead); 5 failed
+ *                   attempts for one user from one IP (or 20 from one IP
+ *                   in total) lock the access for 15
  *                   minutes with a friendly Spanish message; a successful
  *                   login clears the counter and a new password (reset or
  *                   profile) lifts the account lock. No application
@@ -305,7 +310,31 @@ add_filter(
  * used to find out which accounts exist. The redirect is a copy of the one
  * wp-login.php sends for a real account (same relative Location header,
  * same use of redirect_to), so not even the raw HTTP answer differs.
+ * A real account whose e-mail cannot be sent (no mail server, wrong WP Mail
+ * SMTP settings…) gets that same answer too, instead of WordPress' "the
+ * email could not be sent" error; administrators see a notice in the admin.
  */
+
+/** The answer to every lost-password request: wp-login.php's own redirect. */
+function mats_sec_lostpassword_redirect(): void {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- same as wp-login.php; wp_safe_redirect() validates it.
+	$to = ! empty( $_REQUEST['redirect_to'] ) ? wp_unslash( $_REQUEST['redirect_to'] ) : 'wp-login.php?checkemail=confirm';
+	wp_safe_redirect( $to );
+	exit;
+}
+
+/**
+ * ID of the real account of the lost-password request being processed once
+ * it has passed every check (0 = none yet). $user_id sets it.
+ */
+function mats_sec_lostpassword_account( ?int $user_id = null ): int {
+	static $account = 0;
+	if ( null !== $user_id ) {
+		$account = $user_id;
+	}
+	return $account;
+}
+
 add_action(
 	'lostpassword_post',
 	static function ( $errors, $user_data = false ) {
@@ -324,13 +353,91 @@ add_action(
 		if ( $errors instanceof WP_Error && array_diff( $errors->get_error_codes(), array( 'invalid_email', 'invalidcombo' ) ) ) {
 			return; // e.g. the field was empty: WordPress explains it
 		}
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- same as wp-login.php; wp_safe_redirect() validates it.
-		$to = ! empty( $_REQUEST['redirect_to'] ) ? wp_unslash( $_REQUEST['redirect_to'] ) : 'wp-login.php?checkemail=confirm';
-		wp_safe_redirect( $to );
-		exit;
+		mats_sec_lostpassword_redirect();
 	},
 	99,
 	2
+);
+
+/* a real account passed every check (no error from WordPress nor from
+   another plugin, e.g. a captcha): from here on, any error WordPress could
+   show (the e-mail could not be sent, reset not allowed for this user…)
+   would tell that the account exists */
+add_filter(
+	'lostpassword_errors',
+	static function ( $errors, $user_data = false ) {
+		if ( did_action( 'login_init' ) && $user_data instanceof WP_User && $errors instanceof WP_Error && ! $errors->has_errors() ) {
+			mats_sec_lostpassword_account( (int) $user_data->ID );
+		}
+		return $errors;
+	},
+	PHP_INT_MAX,
+	2
+);
+
+/* … so such an error gets the usual answer (wp-login.php fires this right
+   before printing the form with the error) */
+add_action(
+	'lost_password',
+	static function ( $errors = null ) {
+		if ( ! mats_sec_lostpassword_account() || ! $errors instanceof WP_Error || ! $errors->has_errors() ) {
+			return;
+		}
+		if ( in_array( 'retrieve_password_email_failure', $errors->get_error_codes(), true ) ) {
+			update_option( 'mats_sec_mail_failed', time(), false );
+		}
+		mats_sec_lostpassword_redirect();
+	},
+	1
+);
+
+/* the site sent an e-mail again: the notice below is no longer needed */
+add_action(
+	'wp_mail_succeeded',
+	static function () {
+		if ( get_option( 'mats_sec_mail_failed' ) ) {
+			delete_option( 'mats_sec_mail_failed' );
+		}
+	}
+);
+
+/* administrators: the site could not send a password e-mail (shown for a
+   week at most, until an e-mail goes out again or it is hidden) */
+add_action(
+	'admin_notices',
+	static function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$failed = (int) get_option( 'mats_sec_mail_failed', 0 );
+		if ( ! $failed ) {
+			return;
+		}
+		if ( time() - $failed > WEEK_IN_SECONDS ) {
+			delete_option( 'mats_sec_mail_failed' );
+			return;
+		}
+		$hide = wp_nonce_url( admin_url( 'admin-post.php?action=mats_sec_mail_notice' ), 'mats_sec_mail_notice' );
+		printf(
+			'<div class="notice notice-error"><p><strong>La web no consigue enviar correos.</strong> El %1$s alguien pidió una contraseña nueva en «¿Has olvidado la contraseña?» y el correo no se pudo enviar (a quien lo pidió no se le dice, por seguridad). Seguramente tampoco llegan los avisos del formulario de contacto, aunque los mensajes sí se guardan en Contactos. Revisa el envío de correo (plugin WP Mail SMTP: sus ajustes y su correo de prueba). Este aviso desaparece solo en cuanto la web envíe un correo.</p><p><a href="%2$s">Ocultar este aviso</a></p></div>',
+			esc_html( wp_date( 'd/m/Y \a \l\a\s H:i', $failed ) ),
+			esc_url( $hide )
+		);
+	}
+);
+
+add_action(
+	'admin_post_mats_sec_mail_notice',
+	static function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html( 'No tienes permiso para hacer esto.' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'mats_sec_mail_notice' );
+		delete_option( 'mats_sec_mail_failed' );
+		$back = wp_get_referer();
+		wp_safe_redirect( $back ? $back : admin_url( 'index.php' ) );
+		exit;
+	}
 );
 
 /** Lock thresholds: failures per user+IP, failures per IP, lock length (s). */
@@ -618,14 +725,18 @@ add_filter(
 	2
 );
 
-add_action(
-	'send_headers',
-	static function () {
-		if ( ! headers_sent() ) {
-			header_remove( 'X-Powered-By' );
-		}
+/** PHP's X-Powered-By header (it tells the PHP version) goes. */
+function mats_sec_remove_powered_by(): void {
+	if ( ! headers_sent() ) {
+		header_remove( 'X-Powered-By' );
 	}
-);
+}
+/* PHP adds it when the request starts and nothing adds it back, so removing
+   it as soon as the theme is loaded covers every answer WordPress gives
+   after that: pages, feeds, sitemaps, 404s, the REST API, admin-ajax,
+   admin-post, wp-cron, xmlrpc.php, the /wp-admin/ redirect for visitors… */
+add_action( 'after_setup_theme', 'mats_sec_remove_powered_by', 0 );
+add_action( 'send_headers', 'mats_sec_remove_powered_by' );
 
 /** Admin screens, admin-ajax / admin-post and the login screen. */
 function mats_sec_send_headers(): void {
@@ -635,7 +746,7 @@ function mats_sec_send_headers(): void {
 	foreach ( mats_sec_headers() as $name => $value ) {
 		header( $name . ': ' . $value );
 	}
-	header_remove( 'X-Powered-By' );
+	mats_sec_remove_powered_by();
 }
 add_action( 'admin_init', 'mats_sec_send_headers', 1 );
 add_action( 'login_init', 'mats_sec_send_headers', 1 );

@@ -44,11 +44,12 @@ function mats_installer_review_items(): array {
 
 	/* search engines */
 	$public  = '1' === (string) get_option( 'blog_public' );
+	$box     = mats_installer_wp_label( 'Disuadir a los motores de búsqueda de indexar este sitio', 'Discourage search engines from indexing this site' );
 	$items[] = mats_installer_check(
 		null,
 		$public
-			? 'Buscadores: ahora la web es visible para Google. Si todavía es una web de pruebas (staging), marca «Disuadir a los motores de búsqueda de indexar este sitio» en Ajustes → Lectura, y desmárcalo el día que se publique la web definitiva.'
-			: 'Buscadores: está marcado «Disuadir a los motores de búsqueda». Bien mientras sea una web de pruebas; desmárcalo el día que se publique la web definitiva o Google no la mostrará.',
+			? sprintf( 'Buscadores: ahora la web es visible para Google. Si todavía es una web de pruebas (staging), marca «%1$s» en %2$s, y desmárcalo el día que se publique la web definitiva.', $box, mats_installer_wp_label( 'Ajustes → Lectura', 'Settings → Reading', true ) )
+			: sprintf( 'Buscadores: está marcado «%s». Bien mientras sea una web de pruebas; desmárcalo el día que se publique la web definitiva o Google no la mostrará.', $box ),
 		admin_url( 'options-reading.php' ),
 		'Ajustes → Lectura'
 	);
@@ -118,11 +119,25 @@ function mats_installer_step_review( array $opts ): array {
 	return $result;
 }
 
+/**
+ * "Terminada" only while the automatic steps are still in place: when one
+ * of them stops being done later (e.g. Polylang deactivated), the card says
+ * so instead of a ✓ next to a summary of "1 / 4".
+ */
 function mats_installer_status_review(): array {
 	$state = mats_installer_state();
+	$items = mats_installer_review_items();
+	if ( ! $state['done'] ) {
+		return array(
+			'state'  => 'info',
+			'label'  => 'Por revisar',
+			'checks' => $items,
+		);
+	}
+	$all = mats_installer_all_done();
 	return array(
-		'state'  => $state['done'] ? 'done' : 'info',
-		'label'  => $state['done'] ? 'Terminada' : 'Por revisar',
-		'checks' => mats_installer_review_items(),
+		'state'  => $all ? 'done' : 'warn',
+		'label'  => $all ? 'Terminada' : 'Hay pasos pendientes',
+		'checks' => $items,
 	);
 }
