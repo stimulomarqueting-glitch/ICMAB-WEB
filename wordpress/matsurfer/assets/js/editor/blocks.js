@@ -599,7 +599,18 @@
         className: 'mats-preview' + (loading ? ' is-loading' : '') + (isSelected ? ' is-selected' : ''),
         onClickCapture: function (e) {
           var t = e.target;
-          if (t && t.closest && t.closest('a, button, summary') && !t.closest('[contenteditable="true"]')) {
+          if (!t || !t.closest) return;
+          /* editor-only notes link to admin screens: open them in a new tab */
+          var note = t.closest('.mats-note a, .mats-empty a');
+          if (note) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(note.href, '_blank', 'noopener');
+            return;
+          }
+          /* everything else in the preview is a picture of the page: links and
+             buttons must not navigate away from the editor */
+          if (t.closest('a, button, summary') && !t.closest('[contenteditable="true"]')) {
             e.preventDefault();
           }
         },

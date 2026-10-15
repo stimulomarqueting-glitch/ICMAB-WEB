@@ -120,6 +120,11 @@ news exist in the current language.
   database (theme active, Polylang configured, team/apps/publications/experts
   and site photos imported) and serves `http://localhost:<port>`. Use only
   the port you were given. `--reset` starts over.
+* **MySQL check:** ports 8960 and 8961 use a real MariaDB 10.11 database
+  (`wp_mysql_<port>`), like Hostinger. Fresh install there with
+  `MATS_WP_PORT=8960 php wordpress/tools/qa/installer-fresh.php`.
+* **Clone a full site:** `/home/user/wp-clone.sh <from-port> <to-port>` copies
+  a SQLite instance (e.g. a fully installed one) to your port.
 * PHP inside WP: `MATS_WP_PORT=<port> php /home/user/wpsite-cli.php file.php`
   (runs as admin; `mats_import_media( 'product-table.jpg' )` returns the
   attachment ID of a site photo; files live in `assets/media/`).
