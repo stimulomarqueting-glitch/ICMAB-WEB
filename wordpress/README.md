@@ -98,6 +98,32 @@ textos se editan en WordPress; el asistente solo los vuelve a poner si se
 marca «Sobrescribir los textos y las fotos con los originales» (los textos de
 Google se conservan y la versión anterior queda en *Revisiones*).
 
+## Notas de Hostinger (aprendidas en el staging)
+
+Staging actual: https://darkcyan-raccoon-267907.hostingersite.com (dominio
+temporal de Hostinger). La web estática anterior está guardada fuera de la
+web pública en `backup-staging-estatico-2026-10-19/`.
+
+- En los dominios temporales `*.hostingersite.com` no se pueden crear
+  subdominios ni buzones de correo, y la opción «Crear archivo LLMs.txt» de
+  Hostinger Tools está bloqueada (se publica `/llms.txt`; desactivarla al
+  pasar al dominio final).
+- El instalador de WordPress de Hostinger añade por su cuenta plugins y
+  temas. Retirados en el staging: **Hostinger Reach** (cargaba un script de
+  terceros en todas las páginas sin consentimiento), **Hostinger Hub**,
+  «Hostinger AI theme», Twenty Twenty-Four y Twenty Twenty-Three (carpetas en
+  `backups-wp-2026-10-19/`). Se mantienen Hostinger Tools y Twenty
+  Twenty-Five como tema de reserva. Repetirlo en producción.
+- Hostinger guarda páginas en su caché: después de cambiar archivos del tema,
+  vaciarla en hPanel.
+- El límite de subida del navegador puede ser menor que el zip (19 MB): en
+  ese caso subirlo con el Administrador de archivos a
+  `wp-content/themes/` y descomprimirlo allí. Para cambios pequeños basta
+  con sustituir el archivo concreto.
+- Los dominios temporales no tienen buzones: para probar los avisos del
+  formulario, poner temporalmente un email propio en *Ajustes de la web* y
+  configurar WP Mail SMTP con un buzón de Stimulo.
+
 ## Pendiente del cliente
 
 - Confirmar el buzón `matsurfer@icmab.es` (o cambiarlo en *Ajustes de la web*).
