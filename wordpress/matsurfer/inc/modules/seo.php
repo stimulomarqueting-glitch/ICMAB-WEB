@@ -1105,8 +1105,9 @@ function mats_seo_legacy_target(): string {
 		return '';
 	}
 	$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- only compared with fixed patterns.
-	$base = (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH );
-	$base = '' !== $base ? $base : '/';
+	/* the raw option, not home_url(): Polylang rewrites home_url() to the
+	   language home (/es/) inside theme files on Spanish requests */
+	$base = trailingslashit( (string) wp_parse_url( (string) get_option( 'home' ), PHP_URL_PATH ) );
 	if ( 0 !== strpos( $path, $base ) ) {
 		return '';
 	}
@@ -1118,7 +1119,19 @@ function mats_seo_legacy_target(): string {
 	$lang = strtolower( $m[1] );
 	$role = strtolower( $m[2] );
 	/* a real page of that language lives at this address: leave it alone */
-	if ( is_singular() && mats_post_lang( get_queried_object_id() ) === $lang ) {
+	$own = get_posts(
+		array(
+			'post_type'        => 'page',
+			'post_status'      => 'publish',
+			'name'             => $role,
+			'lang'             => $lang,
+			'posts_per_page'   => 1,
+			'fields'           => 'ids',
+			'no_found_rows'    => true,
+			'suppress_filters' => false,
+		)
+	);
+	if ( $own && mats_post_lang( (int) $own[0] ) === $lang ) {
 		return '';
 	}
 	if ( 'home' === $role ) {
@@ -1126,12 +1139,44 @@ function mats_seo_legacy_target(): string {
 	} else {
 		$id     = mats_page_id( $role, $lang );
 		$target = $id ? (string) get_permalink( $id ) : '';
+		/* Polylang's link filters may not be running this early: make sure
+		   the address carries the language folder */
+		if ( $id && '' !== $target && false === strpos( (string) wp_parse_url( $target, PHP_URL_PATH ), '/' . $lang . '/' ) ) {
+			$target = untrailingslashit( (string) get_option( 'home' ) ) . '/' . $lang . '/' . trailingslashit( get_page_uri( $id ) );
+		}
 	}
 	if ( '' === $target || untrailingslashit( (string) wp_parse_url( $target, PHP_URL_PATH ) ) === untrailingslashit( $path ) ) {
 		return '';
 	}
 	return $target;
 }
+
+/*
+ * Old addresses are answered as soon as WordPress starts reading the request
+ * (do_parse_request, before any query or request filter) — before Polylang
+ * (or WordPress' 404 guessing) can send them to the English page of the
+ * same slug. Polylang's canonical redirect runs on
+ * template_redirect and its exact priority has changed between versions, so
+ * waiting for template_redirect is not reliable.
+ */
+add_filter(
+	'do_parse_request',
+	static function ( $parse ) {
+		if ( is_admin() || wp_doing_ajax() ) {
+			return $parse;
+		}
+		$method = strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( ! in_array( $method, array( 'GET', 'HEAD' ), true ) ) {
+			return $parse;
+		}
+		$legacy = mats_seo_legacy_target();
+		if ( '' !== $legacy ) {
+			mats_seo_redirect_keeping_query( $legacy );
+		}
+		return $parse;
+	},
+	0
+);
 
 /* before Polylang's (4) and WordPress' (10) own canonical redirects */
 add_action(
