@@ -107,7 +107,7 @@
 }
 
 .bene--dark .bene__outcome p {
-  font-size: 0.94rem;
+  font-size: 1rem;
   margin-top: 0.5rem;
   max-width: 48ch;
   color: var(--text-on-dark-2);

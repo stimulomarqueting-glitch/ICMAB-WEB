@@ -38,12 +38,12 @@
   --wpforms-button-border-color: var(--coral);
   --wpforms-button-text-color: #ffffff;
   --wpforms-page-break-color: var(--coral);
-  --wpforms-field-size-font-size: 0.94rem;
+  --wpforms-field-size-font-size: 1rem; /* 16px: iPhone does not zoom in on focus */
   --wpforms-field-size-padding-h: 0.9rem;
   --wpforms-field-size-checkbox-size: 1.1rem;
   --wpforms-field-size-sublabel-spacing: 0.45rem;
-  --wpforms-label-size-font-size: 0.81rem;
-  --wpforms-label-size-sublabel-font-size: 0.81rem;
+  --wpforms-label-size-font-size: 0.875rem;
+  --wpforms-label-size-sublabel-font-size: 0.875rem;
   --wpforms-button-size-font-size: 1rem;
   --wpforms-button-size-margin-top: 1.25rem;
   --wpforms-container-shadow-size-box-shadow: none;
@@ -114,7 +114,7 @@
   margin: 0;
   padding: 0;
   font-family: var(--font-body);
-  font-size: 0.81rem;
+  font-size: 0.875rem;
   font-weight: 600;
   font-style: normal;
   line-height: 1.55;
@@ -153,7 +153,7 @@
 .contact .lf__card .wpforms-container .wpforms-form .wpforms-field-description,
 .contact .lf__card .wpforms-container .wpforms-form .wpforms-field-sublabel {
   margin: 0;
-  font-size: 0.81rem;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--text-muted);
 }
@@ -168,7 +168,7 @@
   margin: 0;
   padding: 0.75rem 0.9rem;
   font-family: var(--font-body);
-  font-size: 0.94rem;
+  font-size: 1rem;
   font-weight: 400;
   line-height: normal;
   letter-spacing: normal;

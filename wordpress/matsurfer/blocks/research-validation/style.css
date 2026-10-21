@@ -40,7 +40,7 @@
 }
 
 .validation--dark .research__validation p {
-  font-size: 0.94rem;
+  font-size: 1rem;
   line-height: 1.7;
   max-width: 70ch;
   color: var(--text-on-dark-2);

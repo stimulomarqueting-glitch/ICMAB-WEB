@@ -83,10 +83,12 @@
   transition: grid-template-rows 550ms var(--ease-out), opacity 450ms var(--ease);
 }
 
+/* legibility: 17px / 500 so the line holds up on the plum card too */
 .audiences .aud__more p {
   overflow: hidden;
-  font-size: 0.94rem;
-  line-height: 1.55;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.6;
   color: var(--text-body);
   transition: color 500ms var(--ease);
 }
@@ -127,9 +129,11 @@
   color: #fff;
 }
 
+/* light lavender: ≥ 7:1 on the plum card, also where the spotlight passes
+   behind the text (--text-on-dark-2 dropped to about 4.9:1 there) */
 .audiences .aud__panel[data-active] .aud__more p,
 .audiences .aud__panel:hover .aud__more p {
-  color: var(--text-on-dark-2);
+  color: #E2DAF2;
 }
 
 .audiences .aud__panel[data-active] .aud__layer {
@@ -169,6 +173,14 @@
 
   .audiences .aud__panel[data-active] .aud__title {
     max-width: 24ch;
+  }
+}
+
+/* open grid (below 64rem, every card shows its text): 16px keeps the
+   stacked cards compact */
+@media (max-width: 63.98rem) {
+  .audiences .aud__more p {
+    font-size: 1rem;
   }
 }
 

@@ -108,13 +108,14 @@
   width: 100%;
 }
 
+/* 17px: one step above the 16px feature text, so the title still reads as the title */
 .diff .diff__feature h3 {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.0625rem;
 }
 
 .diff .diff__feature p {
-  font-size: 0.88rem;
+  font-size: 1rem;
   margin-top: 0.4rem;
 }
 

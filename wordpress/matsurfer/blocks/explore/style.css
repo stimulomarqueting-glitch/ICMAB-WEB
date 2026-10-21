@@ -55,13 +55,25 @@
 }
 
 .explore .explore__card p {
-  font-size: 0.88rem;
+  font-size: 1rem;
   margin-top: 0.4rem;
   max-width: 34ch;
+  text-wrap: pretty; /* no lone "CSIC." on the last line */
 }
 
 .explore .explore__card .btn {
   flex: none;
+}
+
+/* legibility: while the two cards share a narrow row (about 900–1150px) the
+   button goes under the text in both, instead of squeezing the 16px text
+   into a thin column next to it (space-between keeps both buttons on the
+   same line at the bottom) */
+@media (min-width: 56.01rem) and (max-width: 72rem) {
+  .explore .explore__card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 56rem) {

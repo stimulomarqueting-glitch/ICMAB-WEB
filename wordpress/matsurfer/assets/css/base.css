@@ -160,6 +160,7 @@
   --coral: #F0532F;                 /* PILLAR · solid material, energy, CTA */
   --coral-warm: #E64E3D;            /* transition · heating                 */
   --coral-dark: #C93E1E;            /* hover / small accessible text        */
+  --coral-deep: #B33719;            /* small coral text on mist / coral-tint bgs (≥ 4.8:1) */
   --magenta: #CE4262;               /* transition · phase change            */
   --violet-mid: #A72F9E;            /* transition · vapour rise             */
   --violet: #6C12F8;                /* PILLAR · vapour, transformation      */
@@ -181,7 +182,7 @@
 
   --text-strong: var(--ink);
   --text-body: #57534A;
-  --text-muted: #8A837D;
+  --text-muted: #69635D;             /* ≥ 4.5:1 on every light section bg (legibility; was #8A837D) */
   --text-on-dark: #FDFBF8;
   --text-on-dark-2: #ABA5B8;
 
@@ -355,7 +356,7 @@ a:hover {
 /* ---- Signature motif: uppercase mono eyebrow ---- */
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.69rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -609,7 +610,7 @@ a:hover {
   /* the institutional line stays legible */
   .field__eyebrow,
   .hero__eyebrow {
-    font-size: 0.69rem;
+    font-size: 0.75rem;
     line-height: 1.6;
   }
 }

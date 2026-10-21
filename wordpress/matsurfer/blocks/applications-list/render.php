@@ -44,6 +44,10 @@ $case_link = array(
 	'hash'  => '#validation',
 );
 $case_on   = mats_page_id( 'research' ) > 0;
+/* editor preview: no href. Its text is edited in place inside the link, and the
+   preview's click guard lets clicks in editable text through, so a live link
+   would take the editor canvas to the Case Studies page. */
+$case_href = mats_is_preview() ? '' : mats_link_attrs( $case_link );
 
 $apps = array_values( mats_get_applications() );
 
@@ -120,7 +124,7 @@ $card_class = 'panel app reveal' . ( mats_is_preview() ? ' is-visible' : '' );
 							<a class="btn btn--ghost btn--sm app__cta" <?php echo mats_link_attrs( $cta ); ?> data-cta-source="<?php echo esc_attr( 'applications-' . $app['slug'] ); ?>" aria-label="<?php echo esc_attr( $label_cta . ' — ' . $app['title'] ); ?>"<?php echo mats_edit( 'labelCta' ); ?>><?php echo mats_text( $label_cta ); ?></a>
 						<?php endif; ?>
 						<?php if ( $has_case ) : ?>
-							<a class="app__case" <?php echo mats_link_attrs( $case_link ); ?> data-case-link="<?php echo esc_attr( $app['slug'] ); ?>"><span class="app__case-icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M10 1.9l2.1 1.5 2.6-.1.8 2.5 2.1 1.5-.8 2.5.8 2.5-2.1 1.5-.8 2.5-2.6-.1L10 18.1l-2.1-1.5-2.6.1-.8-2.5-2.1-1.5.8-2.5-.8-2.5 2.1-1.5.8-2.5 2.6.1L10 1.9Z" /><path d="M6.9 10.2l2.1 2.1 4.1-4.3" /></svg></span><span class="app__case-text"<?php echo $case_edit; // phpcs:ignore WordPress.Security.EscapeOutput -- mats_edit() escapes ?>><?php echo mats_text( $case_text ); ?></span></a>
+							<a class="app__case" <?php echo $case_href; // phpcs:ignore WordPress.Security.EscapeOutput -- mats_link_attrs() escapes ?> data-case-link="<?php echo esc_attr( $app['slug'] ); ?>"><span class="app__case-icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M10 1.9l2.1 1.5 2.6-.1.8 2.5 2.1 1.5-.8 2.5.8 2.5-2.1 1.5-.8 2.5-2.6-.1L10 18.1l-2.1-1.5-2.6.1-.8-2.5-2.1-1.5.8-2.5-.8-2.5 2.1-1.5.8-2.5 2.6.1L10 1.9Z" /><path d="M6.9 10.2l2.1 2.1 4.1-4.3" /></svg></span><span class="app__case-text"<?php echo $case_edit; // phpcs:ignore WordPress.Security.EscapeOutput -- mats_edit() escapes ?>><?php echo mats_text( $case_text ); ?></span></a>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>

@@ -71,6 +71,14 @@
   color: #fff;
 }
 
+/* narrow phones: the longest word («functionalization,») must fit the
+   column, since the animated words cannot break */
+@media (max-width: 26rem) {
+  .field .field__title {
+    font-size: clamp(1.75rem, calc((100vw - 2rem) / 9.4), 2.5rem);
+  }
+}
+
 .field .field__word {
   display: inline-block;
   overflow: hidden;
@@ -254,7 +262,7 @@
   padding: 0;
   list-style: none;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.62);
@@ -318,7 +326,7 @@
   }
 
   .field .field__eyebrow {
-    font-size: 0.69rem;
+    font-size: 0.75rem;
     line-height: 1.6;
   }
 }

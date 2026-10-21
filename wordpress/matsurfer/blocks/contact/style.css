@@ -69,7 +69,7 @@
   position: relative;
   display: block;
   padding: 0.75rem 0;
-  font-size: 0.94rem;
+  font-size: 1rem;
 }
 
 .contact .contact__sn {
@@ -84,7 +84,7 @@
   background: var(--bg-page);
   border: 1px solid var(--border-violet-soft);
   font-family: var(--font-mono);
-  font-size: 0.69rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--violet-dark);
 }
@@ -117,6 +117,11 @@
 .contact .contact__direct-text {
   font-size: 0.94rem;
   margin-top: 0.4rem;
+}
+
+/* the email sits on the coral-tinted aside: the deeper coral keeps 4.5:1 */
+.contact .contact__direct-text a {
+  color: var(--coral-deep);
 }
 
 /* ── the form card (LeadForm .lf__card + the contact page's frame) ── */
