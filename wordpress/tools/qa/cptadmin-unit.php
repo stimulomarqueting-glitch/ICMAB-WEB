@@ -43,6 +43,10 @@ $check( 'image empty', mats_cpta_sanitize( 'image', '0' ), '' );
 $check( 'array rejected', mats_cpta_sanitize( 'text', array( 'x' ) ), null );
 $img = (int) get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'inherit', 'posts_per_page' => 1, 'fields' => 'ids' ) )[0];
 $check( 'image accepts attachment', mats_cpta_sanitize( 'image', (string) $img ), (string) $img );
+$check( 'check ticked', mats_cpta_sanitize( 'check', '1' ), '1' );
+$check( 'check unticked (hidden 0)', mats_cpta_sanitize( 'check', '0' ), '0' );
+$check( 'check other value = no', mats_cpta_sanitize( 'check', 'yes' ), '0' );
+$check( 'check array rejected', mats_cpta_sanitize( 'check', array( '1' ) ), null );
 
 /* ── contract: every field of mats_cpt_fields() has a definition ────── */
 foreach ( mats_cpt_fields() as $type => $fields ) {
@@ -116,6 +120,35 @@ $check( 'valid: bad url keeps old value', get_post_meta( $id, '_mats_website', t
 $notes = get_transient( 'mats_cpta_notes_1' );
 $check( 'valid: notes for bad url + image', is_array( $notes ) && 2 === count( $notes[ $id ] ?? array() ), true );
 delete_transient( 'mats_cpta_notes_1' );
+
+/* application «Enlace a Casos de estudio»: default by identifier until saved */
+$app = wp_insert_post(
+	array(
+		'post_type'   => 'mats_application',
+		'post_title'  => 'Unit Test App',
+		'post_status' => 'draft',
+	)
+);
+update_post_meta( $app, '_mats_slug', 'sensors' );
+$check( 'case study: never saved, sensors → on', mats_application_case_study( $app ), true );
+update_post_meta( $app, '_mats_slug', 'coatings' );
+$check( 'case study: never saved, coatings → off', mats_application_case_study( $app ), false );
+$_POST = array(
+	'mats_cpta_nonce' => wp_create_nonce( 'mats_cpta_save_' . $app ),
+	'mats_cpta'       => array( 'case_study' => '1' ),
+);
+mats_cpta_save( $app, get_post( $app ) );
+$check( 'case study: ticked box saved', get_post_meta( $app, '_mats_case_study', true ), '1' );
+$check( 'case study: saved yes wins over the default', mats_application_case_study( $app ), true );
+update_post_meta( $app, '_mats_slug', 'sensors' );
+$_POST['mats_cpta'] = array( 'case_study' => '0' );
+mats_cpta_save( $app, get_post( $app ) );
+$check( 'case study: unticked box saved', get_post_meta( $app, '_mats_case_study', true ), '0' );
+$check( 'case study: saved no wins over the default', mats_application_case_study( $app ), false );
+$_POST['mats_cpta'] = array( 'tag_en' => 'x' );
+mats_cpta_save( $app, get_post( $app ) );
+$check( 'case study: not in the form → untouched', get_post_meta( $app, '_mats_case_study', true ), '0' );
+wp_delete_post( $app, true );
 
 /* autosave → untouched */
 define( 'DOING_AUTOSAVE', true );

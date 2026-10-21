@@ -11,6 +11,11 @@
  * the menu never sends anyone to the wrong place. "News" appears between
  * Team and Contact only when there are published news in that language.
  *
+ * WordPress only: the brand claim ("Surfaces for all.", Ajustes de la web
+ * → Cabecera → Lema bajo el logotipo) sits under the logo as plain text —
+ * outside the link, not focusable — with the last word emphasised like
+ * the hero claim.
+ *
  * @package matsurfer
  */
 
@@ -44,12 +49,29 @@ foreach ( $mats_nav_roles as $mats_role ) {
 $mats_cta_label = (string) mats_setting( 'header_cta' );
 $mats_cta_url   = mats_page_id( 'contact' ) ? mats_page_url( 'contact' ) : 'mailto:' . mats_contact_email();
 $mats_langs     = mats_language_links();
+
+/* the claim under the logo: the last word is emphasised ("Surfaces for <b>all</b>."), same split as the hero claim;
+   its length (--claim-chars) lets chrome.css fit the letter-spacing to the room left by the menu */
+$mats_claim      = trim( (string) mats_setting( 'header_claim' ) );
+$mats_claim_lead = '';
+$mats_claim_emph = $mats_claim;
+$mats_claim_end  = '';
+if ( preg_match( '/^(.*\s)(\S+?)(\.?)$/us', $mats_claim, $mats_m ) ) {
+	$mats_claim_lead = $mats_m[1];
+	$mats_claim_emph = $mats_m[2];
+	$mats_claim_end  = $mats_m[3];
+}
 ?>
 <header class="header">
 	<div class="container header__inner">
-		<a class="header__logo" href="<?php echo esc_url( mats_home_url() ); ?>" aria-label="<?php echo esc_attr( 'MatSurfer — ' . mats_t( 'home' ) ); ?>">
-			<img class="header__logotype" src="<?php echo esc_url( mats_asset( 'brand/logotipo.svg' ) ); ?>" width="168" height="30" alt="MatSurfer" />
-		</a>
+		<div class="header__brand">
+			<a class="header__logo" href="<?php echo esc_url( mats_home_url() ); ?>" aria-label="<?php echo esc_attr( 'MatSurfer — ' . mats_t( 'home' ) ); ?>">
+				<img class="header__logotype" src="<?php echo esc_url( mats_asset( 'brand/logotipo.svg' ) ); ?>" width="168" height="30" alt="MatSurfer" />
+			</a>
+			<?php if ( '' !== $mats_claim ) : ?>
+				<p class="header__claim" style="--claim-chars: <?php echo (int) max( 1, mb_strlen( $mats_claim ) ); ?>"><?php echo mats_text( $mats_claim_lead ); ?><b><?php echo mats_text( $mats_claim_emph ); ?></b><?php echo mats_text( $mats_claim_end ); ?></p>
+			<?php endif; ?>
+		</div>
 
 		<nav class="header__nav" aria-label="<?php echo esc_attr( mats_t( 'main_nav' ) ); ?>">
 			<ul id="main-menu" class="header__menu">

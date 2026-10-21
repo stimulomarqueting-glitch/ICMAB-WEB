@@ -17,6 +17,7 @@ return array(
 		'form_es' => 0,
 	),
 	'en' => array(
+		'header_claim' => 'Surfaces for all.',
 		'header_cta' => 'Talk to the team',
 		'nav_product' => 'Product',
 		'nav_applications' => 'Applications',
@@ -51,6 +52,7 @@ return array(
 		'blog_cta_button' => 'Talk to the team',
 	),
 	'es' => array(
+		'header_claim' => 'Superficies para todos.',
 		'header_cta' => 'Habla con el equipo',
 		'nav_product' => 'Producto',
 		'nav_applications' => 'Aplicaciones',

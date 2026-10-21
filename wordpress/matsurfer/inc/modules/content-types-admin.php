@@ -18,7 +18,7 @@
  *     each with the right input (long texts with a character guide, web
  *     addresses, year, year-month, photo picker with preview, the
  *     application's link identifier — locked once published unless
- *     "Cambiar" is pressed)
+ *     "Cambiar" is pressed — and its yes/no «Enlace a Casos de estudio»)
  *   - "Orden en la web" box (menu_order) instead of "Atributos"; the
  *     "Publicar" box explains Publicar / Borrador; the featured image box
  *     is "Retrato" / "Figura" / "Foto" with size advice
@@ -67,9 +67,13 @@ function mats_cpta_is_type( $type ): bool {
 
 /**
  * Per-type configuration. Field entries:
- *   kind      text | textarea | url | year | month | doi | slug | image
+ *   kind      text | textarea | url | year | month | doi | slug | image |
+ *             check (a yes/no box, language-neutral, stored '1' / '0')
  *   label     visible label
  *   help      help text under the label
+ *   check     check: text next to the box
+ *   default   check: value shown while the record has none saved yet —
+ *             '1' | '0', or a function( WP_Post ) returning one
  *   max       recommended length (character guide, never enforced)
  *   rows      textarea height
  *   required  true → warn when empty (English for translatable fields)
@@ -146,6 +150,14 @@ function mats_cpta_config( string $type = '' ): array {
 						'max'      => 110,
 						'rows'     => 2,
 						'required' => true,
+					),
+					'case_study' => array(
+						'kind'    => 'check',
+						'label'   => 'Enlace a Casos de estudio',
+						'help'    => 'Márcalo si la página Casos de estudio recoge trabajos, publicaciones o validaciones de esta aplicación. La ficha mostrará un enlace a esa página, junto al botón.',
+						'check'   => 'Mostrar el enlace a Casos de estudio en esta ficha',
+						/* never saved: marked for the fields the page already names */
+						'default' => static fn( WP_Post $post ): string => function_exists( 'mats_application_case_study' ) && mats_application_case_study( $post->ID ) ? '1' : '0',
 					),
 				),
 			),
@@ -375,6 +387,8 @@ function mats_cpta_field_def( string $type, string $field ): array {
 			'required'    => false,
 			'shown'       => true,
 			'placeholder' => '',
+			'check'       => '',
+			'default'     => '',
 		),
 		$def
 	);
@@ -789,8 +803,8 @@ function mats_cpta_render_row( WP_Post $post, string $field, bool $i18n ): void 
 
 	echo '<div class="' . esc_attr( $classes ) . '" data-field="' . esc_attr( $field ) . '">';
 
-	$optional = $def['required'] || 'slug' === $def['kind'] ? '' : ' <span class="mats-cpta-optional">(opcional)</span>';
-	if ( $i18n || 'image' === $def['kind'] ) {
+	$optional = $def['required'] || in_array( $def['kind'], array( 'slug', 'check' ), true ) ? '' : ' <span class="mats-cpta-optional">(opcional)</span>';
+	if ( $i18n || in_array( $def['kind'], array( 'image', 'check' ), true ) ) {
 		echo '<div class="mats-cpta__label" id="' . esc_attr( $base . '-label' ) . '">' . esc_html( $def['label'] ) . $optional . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $optional is fixed markup
 	} else {
 		echo '<label class="mats-cpta__label" id="' . esc_attr( $base . '-label' ) . '" for="' . esc_attr( $base ) . '">' . esc_html( $def['label'] ) . $optional . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $optional is fixed markup
@@ -828,11 +842,36 @@ function mats_cpta_render_row( WP_Post $post, string $field, bool $i18n ): void 
 			case 'image':
 				mats_cpta_render_media( $def, $field, $base, $value, $help );
 				break;
+			case 'check':
+				mats_cpta_render_check( $post, $def, $field, $base, $value, $help );
+				break;
 			default:
 				mats_cpta_render_input( $def, $field, $base, $value, trim( $help . ( $def['max'] ? ' ' . $base . '-count' : '' ) ), '' );
 		}
 	}
 	echo '</div>';
+}
+
+/**
+ * A yes/no box. The hidden '0' before it is what the form sends when the
+ * box is not ticked, so un-ticking is saved too (a ticked box sends '1',
+ * which comes later and wins). Nothing saved yet → the field's default.
+ */
+function mats_cpta_render_check( WP_Post $post, array $def, string $field, string $id, string $value, string $help ): void {
+	if ( '' === $value ) {
+		$default = $def['default'];
+		$value   = (string) ( $default instanceof Closure ? $default( $post ) : $default );
+	}
+	$name = 'mats_cpta[' . $field . ']';
+	echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="0" />';
+	printf(
+		'<label class="mats-cpta__check" for="%1$s"><input type="checkbox" class="mats-cpta__checkbox" id="%1$s" name="%2$s" value="1"%3$s%4$s /> <span>%5$s</span></label>',
+		esc_attr( $id ),
+		esc_attr( $name ),
+		checked( '1', $value, false ),
+		'' !== $help ? ' aria-describedby="' . esc_attr( $help ) . '"' : '',
+		esc_html( '' !== $def['check'] ? $def['check'] : $def['label'] )
+	);
 }
 
 /** A text / textarea / url / year / month / doi input. */
@@ -1065,6 +1104,9 @@ function mats_cpta_sanitize( string $kind, $raw ) {
 
 		case 'slug':
 			return sanitize_title( $raw );
+
+		case 'check':
+			return '1' === trim( $raw ) ? '1' : '0';
 
 		case 'doi':
 			$doi = trim( sanitize_text_field( $raw ) );

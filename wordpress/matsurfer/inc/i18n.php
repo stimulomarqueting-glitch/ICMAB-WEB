@@ -190,6 +190,7 @@ function mats_t( string $key, string $lang = '' ): string {
 		'blog_pagination'  => array( 'en' => 'More news', 'es' => 'Más noticias' ),
 		'article_nav'      => array( 'en' => 'More articles', 'es' => 'Más artículos' ),
 		'play_video'       => array( 'en' => 'Play video', 'es' => 'Reproducir vídeo' ),
+		'case_link'        => array( 'en' => 'Validated in this field · See the case studies', 'es' => 'Validado en este campo · Ver los casos de estudio' ),
 		'form_missing'  => array( 'en' => 'The contact form is being set up. Meanwhile, write to us at', 'es' => 'Estamos configurando el formulario de contacto. Mientras tanto, escríbenos a' ),
 	);
 	$lang = $lang ?: mats_lang();

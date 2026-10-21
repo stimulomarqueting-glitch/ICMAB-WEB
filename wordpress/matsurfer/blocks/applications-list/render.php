@@ -5,7 +5,10 @@
  * aria-current by view.js) and one horizontal block per published
  * application — need → with MatSurfer → benefit — each with its anchor
  * (#<slug>) and a contextual contact CTA
- * (/contact?interest=application&application=<slug>).
+ * (/contact?interest=application&application=<slug>). Cards whose
+ * application has «Enlace a Casos de estudio» ticked also get a text link
+ * to the Case Studies page (#validation) next to that button (theme
+ * addition, not in the Astro page: .app__foot / .app__case).
  *   <nav class="apps-nav" data-apps-nav> + <section class="sec hairtop">
  *
  * The applications come from the Aplicaciones records (mats_get_applications());
@@ -23,6 +26,24 @@ $label_challenge = (string) mats_get( $attributes, 'labelChallenge' );
 $label_use       = (string) mats_get( $attributes, 'labelUse' );
 $label_benefit   = (string) mats_get( $attributes, 'labelBenefit' );
 $label_cta       = (string) mats_get( $attributes, 'labelCta' );
+$label_case      = (string) mats_get( $attributes, 'labelCase' );
+
+/*
+ * Link to the validation band of the Case Studies page, on the cards whose
+ * «Enlace a Casos de estudio» is ticked (caseStudy). Empty text → the
+ * theme's default for the language (then not editable in place: the shown
+ * text is not the attribute). No Case Studies page in this language → no link.
+ */
+$case_text = mats_has( $label_case ) ? $label_case : mats_t( 'case_link' );
+$case_edit = mats_has( $label_case ) ? mats_edit( 'labelCase' ) : '';
+$case_link = array(
+	'label' => $case_text,
+	'page'  => 'research',
+	'url'   => '',
+	'query' => '',
+	'hash'  => '#validation',
+);
+$case_on   = mats_page_id( 'research' ) > 0;
 
 $apps = array_values( mats_get_applications() );
 
@@ -59,7 +80,7 @@ $card_class = 'panel app reveal' . ( mats_is_preview() ? ' is-visible' : '' );
 </nav>
 
 <section class="sec hairtop apps-list"<?php echo mats_has( $label_section ) ? ' aria-label="' . esc_attr( $label_section ) . '"' : ''; ?>>
-	<?php echo mats_preview_note( 'Las fichas salen automáticamente de las aplicaciones publicadas (títulos, textos y orden). Aquí solo se editan los rótulos y el texto del botón.', 'edit.php?post_type=mats_application', 'Editar aplicaciones' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+	<?php echo mats_preview_note( 'Las fichas salen automáticamente de las aplicaciones publicadas (títulos, textos y orden). Aquí solo se editan los rótulos, el texto del botón y el del enlace a Casos de estudio. Qué fichas llevan ese enlace se decide en cada aplicación («Enlace a Casos de estudio»).', 'edit.php?post_type=mats_application', 'Editar aplicaciones' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 	<div class="container apps">
 		<?php foreach ( $apps as $app ) : ?>
 			<?php
@@ -92,8 +113,16 @@ $card_class = 'panel app reveal' . ( mats_is_preview() ? ' is-visible' : '' );
 						<p><?php echo mats_text( $app['benefit'] ); ?></p>
 					</div>
 				</div>
-				<?php if ( mats_has( $label_cta ) ) : ?>
-					<a class="btn btn--ghost btn--sm app__cta" <?php echo mats_link_attrs( $cta ); ?> data-cta-source="<?php echo esc_attr( 'applications-' . $app['slug'] ); ?>" aria-label="<?php echo esc_attr( $label_cta . ' — ' . $app['title'] ); ?>"<?php echo mats_edit( 'labelCta' ); ?>><?php echo mats_text( $label_cta ); ?></a>
+				<?php $has_case = $case_on && ! empty( $app['caseStudy'] ); ?>
+				<?php if ( mats_has( $label_cta ) || $has_case ) : ?>
+					<div class="app__foot">
+						<?php if ( mats_has( $label_cta ) ) : ?>
+							<a class="btn btn--ghost btn--sm app__cta" <?php echo mats_link_attrs( $cta ); ?> data-cta-source="<?php echo esc_attr( 'applications-' . $app['slug'] ); ?>" aria-label="<?php echo esc_attr( $label_cta . ' — ' . $app['title'] ); ?>"<?php echo mats_edit( 'labelCta' ); ?>><?php echo mats_text( $label_cta ); ?></a>
+						<?php endif; ?>
+						<?php if ( $has_case ) : ?>
+							<a class="app__case" <?php echo mats_link_attrs( $case_link ); ?> data-case-link="<?php echo esc_attr( $app['slug'] ); ?>"><span class="app__case-icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M10 1.9l2.1 1.5 2.6-.1.8 2.5 2.1 1.5-.8 2.5.8 2.5-2.1 1.5-.8 2.5-2.6-.1L10 18.1l-2.1-1.5-2.6.1-.8-2.5-2.1-1.5.8-2.5-.8-2.5 2.1-1.5.8-2.5 2.6.1L10 1.9Z" /><path d="M6.9 10.2l2.1 2.1 4.1-4.3" /></svg></span><span class="app__case-text"<?php echo $case_edit; // phpcs:ignore WordPress.Security.EscapeOutput -- mats_edit() escapes ?>><?php echo mats_text( $case_text ); ?></span></a>
+						<?php endif; ?>
+					</div>
 				<?php endif; ?>
 			</article>
 		<?php endforeach; ?>

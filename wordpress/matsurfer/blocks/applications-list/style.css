@@ -157,8 +157,55 @@
   margin-top: 0.5rem;
 }
 
-.apps-list .app__cta {
+/* bottom row: the contact button and, on some cards, the case-study link
+   (wraps under the button when there is no room) */
+.apps-list .app__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.5rem;
   margin-top: 1.5rem;
+}
+
+/* a text link, not a button: no frame or fill; violet-dark (9:1 on white) */
+.apps-list .app__case {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--violet-dark);
+}
+
+.apps-list .app__case:hover,
+.apps-list .app__case:focus-visible {
+  color: var(--violet-dark);
+}
+
+.apps-list .app__case-icon {
+  display: inline-flex;
+  flex: none;
+  margin-top: 0.1rem; /* on the first line when the text wraps */
+}
+
+.apps-list .app__case-icon svg {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.apps-list .app__case-text {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color var(--dur-fast) var(--ease);
+}
+
+.apps-list .app__case:hover .app__case-text,
+.apps-list .app__case:focus-visible .app__case-text {
+  text-decoration-color: currentColor;
 }
 
 @media (max-width: 56rem) {

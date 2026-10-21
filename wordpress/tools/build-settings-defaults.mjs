@@ -1,6 +1,7 @@
 /**
  * Writes wordpress/matsurfer/inc/data/settings-defaults.php (header/footer
- * copy, default SEO texts, closing band of the news pages) from the Astro
+ * copy and the claim under the logo, default SEO texts, closing band of
+ * the news pages) from the Astro
  * content export. These are the values "Ajustes de la web" shows as the
  * originals and goes back to with "Restaurar valores originales".
  *   node wordpress/tools/export-content.mjs && node wordpress/tools/build-settings-defaults.mjs
@@ -23,6 +24,8 @@ const perLang = (lang) => {
   /* the news pages close with the home page's final call to action */
   const finalCta = c[lang].home.finalCta;
   return {
+    /* the brand claim under the logo ("Surfaces for all."), from the brand config */
+    header_claim: lang === 'es' ? c.brand.claimEs : c.brand.claim,
     header_cta: s.header.cta,
     nav_product: nav.product,
     nav_applications: nav.applications,

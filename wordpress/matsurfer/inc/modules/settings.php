@@ -75,12 +75,17 @@ function mats_settings_schema(): array {
 			'title'  => 'Cabecera',
 			'icon'   => 'menu',
 			'scope'  => 'lang',
-			'intro'  => 'La barra de arriba, igual en todas las páginas: el botón de contacto y los nombres del menú.',
+			'intro'  => 'La barra de arriba, igual en todas las páginas: el lema bajo el logotipo, el botón de contacto y los nombres del menú.',
 			'groups' => array(
 				array(
 					'title'  => '',
 					'fields' => array(
-						'header_cta' => array(
+						'header_claim' => array(
+							'label' => 'Lema bajo el logotipo',
+							'help'  => 'Frase corta que aparece debajo del logotipo en todas las páginas. La última palabra se muestra en negrita. Mejor tres o cuatro palabras, para que quepa en una línea junto al menú.',
+							'max'   => 40,
+						),
+						'header_cta'   => array(
 							'label' => 'Botón de contacto',
 							'help'  => 'El botón de color de la derecha. Siempre lleva a la página Contacto.',
 							'max'   => 40,

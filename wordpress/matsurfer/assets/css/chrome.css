@@ -24,17 +24,68 @@
   gap: 1.5rem;
 }
 
+/* WordPress only: logo + brand claim stacked, left-aligned. The group
+   takes the free space the logo's margin-right:auto used to take (same
+   layout) and is a size container, so the claim can fit itself into it:
+   it never pushes the menu, even in Spanish with six menu items. It never
+   gets narrower than the logotype, like the logo link before. */
+.header__brand {
+  flex: 1 1 0%;
+  min-width: 168px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  container-type: inline-size;
+}
+
 .header__logo {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   font-size: 1.1rem;
   color: var(--ink);
-  margin-right: auto;
 }
 
 .header__logo:hover {
   color: var(--ink);
+}
+
+/* the claim: a typographic line, never a control — no box, no hover, no
+   underline; mono caps in ink, the last word in the brand gradient.
+   Letter-spacing 0.2em (in English it then spans the logotype), tightened
+   only when the space is short: every Plex Mono character is 0.6em wide,
+   so with --claim-chars (printed by site-header.php) the line fits
+   exactly; the ellipsis is the last resort for a very long claim. */
+.header__claim {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.2em;
+  letter-spacing: clamp(0em, (100cqi - 2px) / var(--claim-chars, 17) - 0.6em, 0.2em);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  cursor: default;
+}
+
+.header__claim b {
+  font-weight: 600;
+  color: var(--violet-dark);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .header__claim b {
+    /* coral-dark, not coral: keeps the start of the word readable at this size */
+    background-image: linear-gradient(90deg, var(--coral-dark) 0%, var(--violet) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .header__menu {

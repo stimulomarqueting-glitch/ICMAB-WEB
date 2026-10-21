@@ -56,6 +56,12 @@
         "type": "text",
         "label": "Texto del botón de cada ficha",
         "help": "Lleva al formulario de contacto con la aplicación ya elegida."
+      },
+      {
+        "key": "labelCase",
+        "type": "text",
+        "label": "Texto del enlace a Casos de estudio",
+        "help": "Sale junto al botón, solo en las fichas que tienen marcado «Enlace a Casos de estudio» (menú Aplicaciones). Lleva a la parte de validación de la página Casos de estudio. Si lo dejas vacío, se usa un texto ya preparado: «Validated in this field · See the case studies» en inglés y «Validado en este campo · Ver los casos de estudio» en español."
       }
     ]
   }

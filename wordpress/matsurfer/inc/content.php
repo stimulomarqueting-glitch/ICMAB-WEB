@@ -35,8 +35,9 @@ function mats_cpt_fields(): array {
 			'title'     => true,
 			'short'     => true,
 			'challenge' => true,
-			'use'       => true,
-			'benefit'   => true,
+			'use'        => true,
+			'benefit'    => true,
+			'case_study' => false, // '1' | '0'; never saved → mats_application_case_study()
 		),
 		'mats_team'        => array(
 			'role'           => true,
@@ -227,8 +228,33 @@ function mats_attachment_value( int $id, string $alt = '' ): array {
 }
 
 /**
+ * Applications whose field the Case Studies page already covers (its
+ * validation band names organic electronics and biosensing; a publication
+ * covers curcuminoid surfaces for BF3 detection): they link to that page
+ * until someone saves the option «Enlace a Casos de estudio».
+ */
+function mats_case_study_default_slugs(): array {
+	return array( 'organic-electronics', 'sensors' );
+}
+
+/**
+ * Does the application card link to the Case Studies page? Stored '1'/'0'
+ * (language-neutral); a record where it was never saved (installs from
+ * before the option existed) follows mats_case_study_default_slugs().
+ */
+function mats_application_case_study( int $post_id, string $slug = '' ): bool {
+	$value = (string) get_post_meta( $post_id, mats_meta_key( 'case_study' ), true );
+	if ( '' !== $value ) {
+		return '1' === $value;
+	}
+	$slug = '' !== $slug ? $slug : sanitize_title( mats_field( $post_id, 'slug' ) );
+	return '' !== $slug && in_array( $slug, mats_case_study_default_slugs(), true );
+}
+
+/**
  * Applications, ordered. Each: id, slug, tag, title, shortDescription,
- * challenge, use, benefit, order.
+ * challenge, use, benefit, caseStudy (bool: link to the Case Studies
+ * page), order.
  */
 function mats_get_applications( string $lang = '' ): array {
 	$lang = $lang ?: mats_lang();
@@ -244,6 +270,7 @@ function mats_get_applications( string $lang = '' ): array {
 			'challenge'        => mats_field( $p->ID, 'challenge', $lang ),
 			'use'              => mats_field( $p->ID, 'use', $lang ),
 			'benefit'          => mats_field( $p->ID, 'benefit', $lang ),
+			'caseStudy'        => mats_application_case_study( $p->ID, $slug ),
 			'order'            => (int) $p->menu_order,
 		);
 	}
@@ -472,7 +499,10 @@ function mats_seed_cpts( array $content, bool $overwrite = false ): array {
 			$a['title'],
 			(int) $a['order'],
 			! empty( $a['published'] ),
-			array( 'slug' => $a['slug'] ),
+			array(
+				'slug'       => $a['slug'],
+				'case_study' => in_array( $a['slug'], mats_case_study_default_slugs(), true ) ? '1' : '0',
+			),
 			array(
 				'tag'       => array( 'en' => $a['tag'], 'es' => $b['tag'] ?? '' ),
 				'title'     => array( 'en' => $a['title'], 'es' => $b['title'] ?? '' ),
